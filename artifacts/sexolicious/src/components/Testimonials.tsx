@@ -10,7 +10,7 @@ const testimonials = [
     location: "San Francisco"
   },
   {
-    quote: "The interface is beautiful, the properties are genuinely tier-1, and the liquidity is game-changing. I traded a fraction of my Paris apartment for a stake in Tokyo without a single phone call.",
+    quote: "The interface is beautiful, the properties are genuinely tier-1, and the liquidity is game-changing. I traded my Paris equity interest for a stake in Tokyo without a single phone call.",
     name: "Eleanor V.",
     role: "Private Equity",
     location: "London"

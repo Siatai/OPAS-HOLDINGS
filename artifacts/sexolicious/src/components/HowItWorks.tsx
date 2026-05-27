@@ -18,14 +18,14 @@ const steps = [
   {
     number: "03",
     icon: Coins,
-    title: "Acquire Fractions",
-    description: "Purchase smart-contract backed fractional ownership starting at $100. Immutable and verified on-chain.",
+    title: "Acquire Equity Interests",
+    description: "Purchase smart-contract backed co-ownership stakes from $100. Title-deed verified, immutable, and on-chain.",
   },
   {
     number: "04",
     icon: TrendingUp,
     title: "Earn & Trade 24/7",
-    description: "Collect automated yield directly to your wallet, and trade your fractions on our liquid secondary market.",
+    description: "Collect automated rental yield to your wallet and trade your ownership interests on our liquid secondary market.",
   }
 ];
 

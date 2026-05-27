@@ -12,14 +12,54 @@ import tokyoImg from "@/assets/images/tokyo.png";
 import miamiImg from "@/assets/images/miami.png";
 
 const properties = [
-  { id: 1, city: "Dubai", title: "Burj Khalifa Penthouse", image: dubaiImg, price: 150, yield: "8.2%", available: 12, token: "OPA-DXB" },
-  { id: 2, city: "London", title: "Mayfair Townhouse", image: londonImg, price: 200, yield: "6.5%", available: 8, token: "OPA-LDN" },
-  { id: 3, city: "New York", title: "Manhattan Sky-rise", image: newYorkImg, price: 180, yield: "7.1%", available: 24, token: "OPA-NYC" },
-  { id: 4, city: "Hong Kong", title: "Victoria Harbour Suite", image: hongKongImg, price: 160, yield: "6.8%", available: 5, token: "OPA-HKG" },
-  { id: 5, city: "Paris", title: "8th Arr. Balcony", image: parisImg, price: 140, yield: "5.9%", available: 31, token: "OPA-PAR" },
-  { id: 6, city: "Singapore", title: "Marina Bay Condo", image: singaporeImg, price: 170, yield: "7.4%", available: 18, token: "OPA-SGP" },
-  { id: 7, city: "Tokyo", title: "Shibuya Minimalist", image: tokyoImg, price: 130, yield: "6.2%", available: 42, token: "OPA-TKY" },
-  { id: 8, city: "Miami", title: "South Beach Oceanfront", image: miamiImg, price: 120, yield: "9.1%", available: 2, token: "OPA-MIA" },
+  {
+    id: 1, city: "Dubai", country: "UAE", title: "Burj Khalifa Penthouse",
+    image: dubaiImg, price: 150, available: 12, token: "OPA-DXB",
+    rentalYield: "7.4%", capitalGrowth: "+17.2%", totalRoi: "~24.6%",
+    roiNote: "Avg. 2023–24 · Knight Frank / JLL"
+  },
+  {
+    id: 2, city: "London", country: "UK", title: "Mayfair Townhouse",
+    image: londonImg, price: 200, available: 8, token: "OPA-LDN",
+    rentalYield: "3.8%", capitalGrowth: "+4.1%", totalRoi: "~7.9%",
+    roiNote: "Prime Central London · Savills 2024"
+  },
+  {
+    id: 3, city: "New York", country: "USA", title: "Manhattan Sky-rise",
+    image: newYorkImg, price: 180, available: 24, token: "OPA-NYC",
+    rentalYield: "4.2%", capitalGrowth: "+4.8%", totalRoi: "~9.0%",
+    roiNote: "Manhattan avg. · StreetEasy / REBNY 2024"
+  },
+  {
+    id: 4, city: "Hong Kong", country: "HK SAR", title: "Victoria Harbour Suite",
+    image: hongKongImg, price: 160, available: 5, token: "OPA-HKG",
+    rentalYield: "2.8%", capitalGrowth: "+2.1%", totalRoi: "~4.9%",
+    roiNote: "Prime HK · Centaline / JLL 2024"
+  },
+  {
+    id: 5, city: "Paris", country: "France", title: "8th Arrondissement",
+    image: parisImg, price: 140, available: 31, token: "OPA-PAR",
+    rentalYield: "3.6%", capitalGrowth: "+3.2%", totalRoi: "~6.8%",
+    roiNote: "Haussmann belt · BNP Paribas RE 2024"
+  },
+  {
+    id: 6, city: "Singapore", country: "SG", title: "Marina Bay Condo",
+    image: singaporeImg, price: 170, available: 18, token: "OPA-SGP",
+    rentalYield: "4.1%", capitalGrowth: "+7.3%", totalRoi: "~11.4%",
+    roiNote: "Core Central Region · URA / Savills 2024"
+  },
+  {
+    id: 7, city: "Tokyo", country: "Japan", title: "Shibuya Prime",
+    image: tokyoImg, price: 130, available: 42, token: "OPA-TKY",
+    rentalYield: "4.5%", capitalGrowth: "+9.6%", totalRoi: "~14.1%",
+    roiNote: "Inner-city avg. · MLIT / CBRE 2024"
+  },
+  {
+    id: 8, city: "Miami", country: "USA", title: "South Beach Oceanfront",
+    image: miamiImg, price: 120, available: 2, token: "OPA-MIA",
+    rentalYield: "5.8%", capitalGrowth: "+8.4%", totalRoi: "~14.2%",
+    roiNote: "Miami Beach · Miami Realtors / CoreLogic 2024"
+  },
 ];
 
 export default function Properties() {
@@ -114,22 +154,31 @@ export default function Properties() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-auto">
-                  <div className="bg-white/5 p-2 rounded">
-                    <div className="text-white/40 text-[10px] uppercase font-mono tracking-widest mb-1">Est. Annual Yield</div>
-                    <div className="text-white font-mono font-bold">{property.yield}</div>
+                <div className="grid grid-cols-3 gap-2 mt-auto">
+                  <div className="bg-white/5 p-2 rounded text-center">
+                    <div className="text-white/40 text-[9px] uppercase font-mono tracking-widest mb-1">Rental Yield</div>
+                    <div className="text-secondary font-mono font-bold text-sm">{property.rentalYield}</div>
                   </div>
-                  <div className="bg-white/5 p-2 rounded">
-                    <div className="text-white/40 text-[10px] uppercase font-mono tracking-widest mb-1">Min. Investment</div>
-                    <div className="text-primary font-mono font-bold">${property.price}</div>
+                  <div className="bg-white/5 p-2 rounded text-center">
+                    <div className="text-white/40 text-[9px] uppercase font-mono tracking-widest mb-1">Price Growth</div>
+                    <div className="text-green-400 font-mono font-bold text-sm">{property.capitalGrowth}</div>
                   </div>
+                  <div className="bg-primary/10 border border-primary/20 p-2 rounded text-center">
+                    <div className="text-white/40 text-[9px] uppercase font-mono tracking-widest mb-1">Total ROI</div>
+                    <div className="text-primary font-mono font-bold text-sm">{property.totalRoi}</div>
+                  </div>
+                </div>
+
+                <div className="mt-2 mb-3 flex items-center justify-between">
+                  <span className="text-white/25 text-[9px] font-mono italic">{property.roiNote}</span>
+                  <span className="text-primary font-mono font-bold text-xs">from ${property.price}</span>
                 </div>
 
                 <button 
                   onClick={(e) => { e.stopPropagation(); openWallet(); }} 
-                  className="w-full mt-4 py-2 border border-white/10 text-white font-mono text-xs uppercase hover:bg-primary hover:text-black hover:border-primary transition-colors rounded"
+                  className="w-full py-2 border border-white/10 text-white font-mono text-xs uppercase hover:bg-primary hover:text-black hover:border-primary transition-colors rounded"
                 >
-                  Acquire {property.token}
+                  Acquire Equity Interest
                 </button>
               </div>
             </motion.div>

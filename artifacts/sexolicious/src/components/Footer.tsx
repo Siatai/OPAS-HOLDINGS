@@ -63,7 +63,7 @@ export default function Footer() {
             © {new Date().getFullYear()} Opas Properties Ltd. All rights reserved.
           </p>
           <p className="text-white/30 text-[10px] text-center md:text-right max-w-2xl font-mono uppercase tracking-wide">
-            Fractional real estate investments carry risk. Past performance is not indicative of future results. Information provided is for educational purposes and should not be considered financial advice.
+            Co-ownership equity interests in real estate carry risk. ROI figures are indicative estimates based on publicly available market data and do not constitute a guarantee of future returns. Past performance is not indicative of future results. This is not financial advice.
           </p>
         </div>
       </div>

@@ -65,7 +65,7 @@ export default function Hero() {
           transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="text-xl md:text-2xl text-white/70 font-serif italic max-w-3xl mb-12 leading-relaxed"
         >
-          Opas Properties uses AI-driven valuation, blockchain fractional ownership, and real-time market intelligence to give every investor access to the world's finest properties — starting at $100.
+          Opas Properties uses AI-driven valuation, blockchain co-ownership interests, and real-time market intelligence to give every investor an equity stake in the world's finest properties — starting at $100.
         </motion.p>
 
         <motion.div

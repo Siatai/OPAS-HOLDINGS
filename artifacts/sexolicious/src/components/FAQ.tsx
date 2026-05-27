@@ -10,27 +10,27 @@ import {
 const faqs = [
   {
     question: "What exactly am I buying?",
-    answer: "You are purchasing digital tokens representing fractional ownership in a Special Purpose Vehicle (SPV) that legally owns the physical property. These tokens are legally binding and give you direct rights to the property's rental yield and capital appreciation."
+    answer: "You are purchasing digital tokens representing a co-ownership equity interest in a Special Purpose Vehicle (SPV) that legally holds title to the physical property. These tokens are legally binding instruments giving you direct, proportionate rights to rental income and capital appreciation — the same rights a traditional owner holds, scaled to your stake."
   },
   {
-    question: "How do I receive my rental yields?",
-    answer: "Rental yields are calculated monthly after deducting property management and maintenance fees. The net yield is automatically distributed to your connected digital wallet in USDC or your preferred stablecoin."
+    question: "How do I receive my rental income?",
+    answer: "Rental income is calculated monthly after deducting property management and maintenance fees. Your net yield is automatically distributed to your connected digital wallet in USDC or your preferred stablecoin. No bank transfers, no delays."
   },
   {
-    question: "Can I sell my fraction anytime?",
-    answer: "Yes. Unlike traditional real estate which can take months to sell, our secondary marketplace allows you to list and trade your fractions 24/7 with other investors, providing instant liquidity."
+    question: "Can I exit my position anytime?",
+    answer: "Yes. Unlike traditional real estate — which can take months to transact — our secondary marketplace lets you list and transfer your equity interests 24/7 to other investors at market-determined prices, providing institutional-grade liquidity on a retail-accessible platform."
   },
   {
     question: "Who manages the physical properties?",
-    answer: "We partner with elite, tier-1 property management firms in each local market. They handle everything from tenant screening and maintenance to legal compliance and tax reporting. You never have to deal with a broken pipe."
+    answer: "We partner exclusively with tier-1 property management firms in each local market. They handle tenant screening, maintenance, legal compliance, insurance, and tax reporting. As an equity interest holder, you receive returns — never responsibilities."
   },
   {
-    question: "Is there a minimum investment?",
-    answer: "Yes, you can start building your global real estate portfolio with a minimum investment of just $100 per fraction. This democratizes access to properties that typically require millions in capital."
+    question: "What is the minimum investment?",
+    answer: "You can acquire an equity interest in a global prime property from as little as $100 per stake. Properties that traditionally require $1M+ in capital are now accessible to any accredited investor — or aspiring one — worldwide."
   },
   {
     question: "How are the properties selected?",
-    answer: "Our expert acquisitions team analyzes thousands of properties using proprietary algorithms and local market expertise. We only select ultra-premium properties in high-demand global cities with proven track records of appreciation and yield."
+    answer: "Our acquisitions team — backed by proprietary AI valuation models and local market intelligence — screens thousands of assets annually. Only ultra-premium properties in high-conviction global cities with proven rental demand and capital growth trajectories are admitted to the Opas portfolio."
   }
 ];
 

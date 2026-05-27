@@ -16,7 +16,7 @@ const benefits = [
   {
     icon: Zap,
     title: "Real-Time Liquidity",
-    description: "Exit your positions instantly. Trade fractions 24/7 on our matched secondary market with zero lockups."
+    description: "Exit your positions instantly. Trade equity interests 24/7 on our matched secondary market with zero lockup periods."
   },
   {
     icon: Globe,
