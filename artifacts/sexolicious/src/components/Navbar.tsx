@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "wouter";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
-import { Hexagon, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useWallet } from "./WalletContext";
 
 export default function Navbar() {
@@ -16,8 +16,9 @@ export default function Navbar() {
 
   const navLinks = [
     { label: "Properties", href: "#properties" },
+    { label: "Technology", href: "#technology" },
     { label: "How it Works", href: "#how-it-works" },
-    { label: "Benefits", href: "#benefits" },
+    { label: "Markets", href: "#markets" },
     { label: "FAQ", href: "#faq" },
   ];
 
@@ -31,9 +32,12 @@ export default function Navbar() {
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2 group">
-          <Hexagon className="w-8 h-8 text-primary group-hover:text-white transition-colors duration-300" />
-          <span className="text-2xl font-serif font-semibold tracking-wide text-white">OPAS PROPERTIES</span>
+        <Link href="/" className="flex items-center space-x-3 group">
+          <img src="/opas-logo.png" alt="Opas Logo" className="w-10 h-10 object-contain drop-shadow-[0_0_15px_rgba(232,137,12,0.5)]" />
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-sans font-bold tracking-wide text-white">OPAS PROPERTIES</span>
+            <span className="px-2 py-0.5 text-[10px] font-bold bg-secondary/20 text-secondary border border-secondary/40 rounded-full tracking-widest uppercase">BETA</span>
+          </div>
         </Link>
 
         {/* Desktop Nav */}
@@ -48,11 +52,17 @@ export default function Navbar() {
             </a>
           ))}
           <div className="w-px h-6 bg-white/10" />
+          
           <button
             onClick={openWallet}
-            className="px-6 py-2.5 text-sm font-semibold tracking-wider text-background bg-primary hover:bg-primary/90 rounded-none transition-all duration-300 shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] uppercase"
+            className="relative group px-6 py-2.5 text-sm font-bold tracking-wider text-background bg-primary rounded hover:bg-primary/90 transition-all duration-300 uppercase overflow-hidden"
           >
-            Connect Wallet
+            <motion.div 
+              className="absolute inset-0 rounded border border-primary/50"
+              animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0, 0.5] }}
+              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+            />
+            <span className="relative z-10">Connect Wallet</span>
           </button>
         </nav>
 
@@ -72,7 +82,7 @@ export default function Navbar() {
             <a
               key={link.label}
               href={link.href}
-              className="text-lg font-serif text-white hover:text-primary transition-colors"
+              className="text-lg font-sans font-medium text-white hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               {link.label}
@@ -83,9 +93,9 @@ export default function Navbar() {
               setMobileMenuOpen(false);
               openWallet();
             }}
-            className="w-full py-4 text-sm font-semibold tracking-wider text-background bg-primary rounded-none uppercase mt-4"
+            className="relative w-full py-4 text-sm font-bold tracking-wider text-background bg-primary rounded uppercase mt-4 overflow-hidden"
           >
-            Connect Wallet
+            <span className="relative z-10">Connect Wallet</span>
           </button>
         </div>
       )}

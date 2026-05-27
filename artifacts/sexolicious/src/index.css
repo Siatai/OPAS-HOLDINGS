@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -52,90 +52,90 @@
 
 :root {
   /* Force dark mode colors universally for this luxury app */
-  --app-font-sans: 'Inter', sans-serif;
-  --app-font-serif: 'Playfair Display', serif;
-  --app-font-mono: Menlo, monospace;
+  --app-font-sans: 'Space Grotesk', sans-serif;
+  --app-font-serif: 'Cormorant Garamond', serif;
+  --app-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --radius: 0.5rem;
 
-  --background: 0 0% 4%; /* Deep obsidian #0a0a0a */
+  --background: 220 60% 4%; /* Deep navy-black #05080f */
   --foreground: 40 33% 97%; /* Cream #faf9f6 */
   
-  --border: 0 0% 15%;
-  --input: 0 0% 15%;
-  --ring: 46 65% 52%; /* Gold */
+  --border: 220 20% 15%;
+  --input: 220 20% 15%;
+  --ring: 35 90% 48%; /* Amber */
 
-  --card: 0 0% 6%;
+  --card: 224 42% 9%; /* Deep navy #0d1220 */
   --card-foreground: 40 33% 97%;
-  --card-border: 0 0% 12%;
+  --card-border: 220 20% 15%;
 
-  --popover: 0 0% 6%;
+  --popover: 224 42% 9%;
   --popover-foreground: 40 33% 97%;
-  --popover-border: 0 0% 12%;
+  --popover-border: 220 20% 15%;
 
-  --primary: 46 65% 52%; /* Gold #d4af37 */
+  --primary: 35 90% 48%; /* Amber #E8890C */
   --primary-foreground: 0 0% 4%; /* Black */
   
-  --secondary: 0 0% 12%;
-  --secondary-foreground: 40 33% 97%;
+  --secondary: 185 90% 38%; /* Electric teal-blue #0AAFB8 */
+  --secondary-foreground: 0 0% 4%;
   
-  --muted: 0 0% 12%;
-  --muted-foreground: 0 0% 60%;
+  --muted: 220 20% 15%;
+  --muted-foreground: 220 10% 60%;
   
-  --accent: 46 65% 20%; /* Dark Gold */
-  --accent-foreground: 46 65% 80%;
+  --accent: 35 90% 20%; /* Dark Amber */
+  --accent-foreground: 35 90% 80%;
   
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  --sidebar: 0 0% 6%;
+  --sidebar: 224 42% 9%;
   --sidebar-foreground: 40 33% 97%;
-  --sidebar-border: 0 0% 12%;
-  --sidebar-primary: 46 65% 52%;
+  --sidebar-border: 220 20% 15%;
+  --sidebar-primary: 35 90% 48%;
   --sidebar-primary-foreground: 0 0% 4%;
-  --sidebar-accent: 0 0% 12%;
+  --sidebar-accent: 220 20% 15%;
   --sidebar-accent-foreground: 40 33% 97%;
-  --sidebar-ring: 46 65% 52%;
+  --sidebar-ring: 35 90% 48%;
 }
 
 .dark {
-  --background: 0 0% 4%; /* Deep obsidian #0a0a0a */
-  --foreground: 40 33% 97%; /* Cream #faf9f6 */
+  --background: 220 60% 4%;
+  --foreground: 40 33% 97%;
   
-  --border: 0 0% 15%;
-  --input: 0 0% 15%;
-  --ring: 46 65% 52%; /* Gold */
+  --border: 220 20% 15%;
+  --input: 220 20% 15%;
+  --ring: 35 90% 48%;
 
-  --card: 0 0% 6%;
+  --card: 224 42% 9%;
   --card-foreground: 40 33% 97%;
-  --card-border: 0 0% 12%;
+  --card-border: 220 20% 15%;
 
-  --popover: 0 0% 6%;
+  --popover: 224 42% 9%;
   --popover-foreground: 40 33% 97%;
-  --popover-border: 0 0% 12%;
+  --popover-border: 220 20% 15%;
 
-  --primary: 46 65% 52%; /* Gold #d4af37 */
-  --primary-foreground: 0 0% 4%; /* Black */
+  --primary: 35 90% 48%;
+  --primary-foreground: 0 0% 4%;
   
-  --secondary: 0 0% 12%;
-  --secondary-foreground: 40 33% 97%;
+  --secondary: 185 90% 38%;
+  --secondary-foreground: 0 0% 4%;
   
-  --muted: 0 0% 12%;
-  --muted-foreground: 0 0% 60%;
+  --muted: 220 20% 15%;
+  --muted-foreground: 220 10% 60%;
   
-  --accent: 46 65% 20%; /* Dark Gold */
-  --accent-foreground: 46 65% 80%;
+  --accent: 35 90% 20%;
+  --accent-foreground: 35 90% 80%;
   
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  --sidebar: 0 0% 6%;
+  --sidebar: 224 42% 9%;
   --sidebar-foreground: 40 33% 97%;
-  --sidebar-border: 0 0% 12%;
-  --sidebar-primary: 46 65% 52%;
+  --sidebar-border: 220 20% 15%;
+  --sidebar-primary: 35 90% 48%;
   --sidebar-primary-foreground: 0 0% 4%;
-  --sidebar-accent: 0 0% 12%;
+  --sidebar-accent: 220 20% 15%;
   --sidebar-accent-foreground: 40 33% 97%;
-  --sidebar-ring: 46 65% 52%;
+  --sidebar-ring: 35 90% 48%;
 }
 
 @layer base {

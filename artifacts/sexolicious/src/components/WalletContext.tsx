@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Hexagon, Loader2 } from "lucide-react";
+import { X, Cpu, Loader2 } from "lucide-react";
 
 interface WalletContextType {
   isOpen: boolean;
@@ -31,43 +31,49 @@ export function WalletProvider({ children }: { children: ReactNode }) {
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              transition={{ delay: 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-full max-w-lg p-8 mx-4 border glass-panel border-primary/20 rounded-2xl gold-glow"
+              transition={{ delay: 0.1, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-md p-8 mx-4 bg-card border border-white/10 rounded-lg shadow-[0_0_50px_rgba(232,137,12,0.15)]"
             >
               <button
                 onClick={closeWallet}
-                className="absolute top-6 right-6 text-muted-foreground hover:text-primary transition-colors"
+                className="absolute top-4 right-4 text-white/50 hover:text-primary transition-colors"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
 
               <div className="flex flex-col items-center text-center space-y-6">
                 <div className="relative flex items-center justify-center w-20 h-20">
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                     className="absolute inset-0 border-t-2 border-r-2 border-primary rounded-full opacity-50"
                   />
                   <motion.div
                     animate={{ rotate: -360 }}
-                    transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-2 border-b-2 border-l-2 border-primary/50 rounded-full"
+                    transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-2 border-b-2 border-l-2 border-secondary rounded-full"
                   />
-                  <Hexagon className="w-8 h-8 text-primary" />
+                  <Cpu className="w-8 h-8 text-primary" />
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-3xl font-serif luxury-gradient-text">Extraordinary Awaits</h3>
-                  <p className="text-muted-foreground text-lg leading-relaxed">
-                    We are building something extraordinary for you. Our secure wallet integration is currently under construction.
+                  <h3 className="text-2xl font-sans font-bold text-white">System Integration</h3>
+                  <p className="text-white/50 text-sm leading-relaxed font-mono">
+                    Establishing secure connection to decentralized wallet protocols. Standby.
                   </p>
                 </div>
                 
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent my-4" />
+                <div className="w-full h-px bg-white/5 my-4 relative overflow-hidden">
+                   <motion.div 
+                     className="absolute inset-y-0 left-0 w-1/3 bg-primary"
+                     animate={{ x: ["-100%", "300%"] }}
+                     transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                   />
+                </div>
 
-                <div className="flex items-center space-x-3 text-sm text-primary/80 uppercase tracking-widest">
+                <div className="flex items-center space-x-3 text-xs text-primary font-mono uppercase tracking-widest">
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Preparing Vault</span>
+                  <span>Awaiting Web3 Provider...</span>
                 </div>
               </div>
             </motion.div>
