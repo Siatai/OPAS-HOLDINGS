@@ -161,7 +161,7 @@ export default function CityPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-7">
             {city.properties.map((p, i) => (
-              <PropertyCard key={p.id} property={p} cityImage={city.image} cityName={city.name} index={i} onAcquire={openWallet} />
+              <PropertyCard key={p.id} property={p} propImage={p.image} cityName={city.name} index={i} onAcquire={openWallet} />
             ))}
           </div>
 
@@ -188,13 +188,13 @@ export default function CityPage() {
 
 function PropertyCard({
   property: p,
-  cityImage,
+  propImage,
   cityName,
   index,
   onAcquire,
 }: {
   property: Property;
-  cityImage: string;
+  propImage: string;
   cityName: string;
   index: number;
   onAcquire: () => void;
@@ -216,7 +216,7 @@ function PropertyCard({
       {/* Image area */}
       <div className="relative aspect-[16/10] overflow-hidden">
         <img
-          src={cityImage}
+          src={propImage}
           alt={p.title}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-110"
           style={{ filter: "saturate(1) brightness(0.85)" }}
