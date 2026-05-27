@@ -174,9 +174,10 @@ export default function Properties() {
                   <span className="text-primary font-mono font-bold text-xs">from ${property.price}</span>
                 </div>
 
-                <button 
-                  onClick={(e) => { e.stopPropagation(); openWallet(); }} 
-                  className="w-full py-2 border border-white/10 text-white font-mono text-xs uppercase hover:bg-primary hover:text-black hover:border-primary transition-colors rounded"
+                <button
+                  onClick={(e) => { e.stopPropagation(); openWallet(); }}
+                  className="w-full py-2.5 border border-white/10 text-white/70 text-[10px] uppercase tracking-[0.22em] hover:bg-primary hover:text-[#050810] hover:border-primary transition-all duration-300 rounded-sm"
+                  style={{ fontFamily: "BankGothic, sans-serif" }}
                 >
                   Acquire Equity Interest
                 </button>

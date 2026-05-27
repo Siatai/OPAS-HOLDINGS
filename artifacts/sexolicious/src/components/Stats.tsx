@@ -67,10 +67,16 @@ export default function Stats() {
                 <div className="mb-4 p-3 rounded-full bg-white/5 border border-white/10">
                   <Icon className="w-5 h-5 text-secondary" />
                 </div>
-                <div className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 tracking-tighter">
+                <div
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight"
+                  style={{ fontFamily: "Rostex, BankGothic, sans-serif" }}
+                >
                   <Counter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} decimal={stat.decimal} />
                 </div>
-                <div className="text-white/50 text-xs font-mono uppercase tracking-widest">
+                <div
+                  className="text-white/45 text-[10px] uppercase tracking-[0.25em]"
+                  style={{ fontFamily: "Xirod, monospace" }}
+                >
                   {stat.label}
                 </div>
               </motion.div>

@@ -89,7 +89,12 @@ export default function HowItWorks() {
                 <div className="w-24 h-24 rounded-full bg-card border border-white/10 flex items-center justify-center mb-8 relative group hover:border-primary/50 transition-colors">
                   <div className="absolute inset-0 rounded-full bg-primary/5 scale-[1.15] opacity-0 group-hover:opacity-100 transition-all duration-500" />
                   <Icon className="w-8 h-8 text-primary relative z-10" />
-                  <div className="absolute -bottom-4 bg-background px-2 text-xs font-mono text-white/30">{step.number}</div>
+                  <div
+                  className="absolute -bottom-4 bg-background px-2 text-[11px] text-white/35 tracking-widest"
+                  style={{ fontFamily: "Xirod, monospace" }}
+                >
+                  {step.number}
+                </div>
                 </div>
                 
                 <h3 className="text-xl font-sans font-bold text-white mb-4 mt-2">{step.title}</h3>

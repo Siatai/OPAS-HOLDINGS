@@ -11,94 +11,117 @@ export default function Navbar() {
   const { openWallet } = useWallet();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setIsScrolled(latest > 50);
+    setIsScrolled(latest > 60);
   });
 
   const navLinks = [
     { label: "Properties", href: "#properties" },
-    { label: "Technology", href: "#technology" },
-    { label: "How it Works", href: "#how-it-works" },
-    { label: "Markets", href: "#markets" },
+    { label: "Protocol", href: "#how-it-works" },
+    { label: "Advantage", href: "#benefits" },
     { label: "FAQ", href: "#faq" },
   ];
 
   return (
     <motion.header
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
-        isScrolled ? "bg-background/80 backdrop-blur-lg border-b border-white/5 py-4" : "bg-transparent py-6"
+        isScrolled
+          ? "bg-[#050810]/90 backdrop-blur-xl border-b border-white/5 py-3"
+          : "bg-transparent py-5"
       }`}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
-        <Link href="/" className="flex items-center space-x-3 group">
-          <img src="/opas-logo.png" alt="Opas Logo" className="w-10 h-10 object-contain drop-shadow-[0_0_15px_rgba(232,137,12,0.5)]" />
-          <div className="flex items-center gap-1">
-            <span className="text-2xl font-display font-bold tracking-widest text-white">OPAS</span>
-            <span className="text-xl font-display text-primary/80 font-normal tracking-[0.3em]">PROPERTIES</span>
-            <span className="ml-2 px-2 py-0.5 text-[10px] font-bold bg-secondary/20 text-secondary border border-secondary/40 rounded-full tracking-widest uppercase">BETA</span>
+      <div className="container mx-auto px-6 lg:px-12 flex items-center justify-between gap-4">
+
+        {/* ── Logo ── */}
+        <Link href="/" className="flex items-center gap-3 shrink-0 group">
+          <img
+            src="/opas-logo.png"
+            alt="Opas"
+            className="w-9 h-9 object-contain drop-shadow-[0_0_12px_rgba(234,141,14,0.6)] group-hover:drop-shadow-[0_0_20px_rgba(234,141,14,0.9)] transition-all duration-300"
+          />
+          <div className="flex flex-col leading-none">
+            <span
+              className="text-[17px] tracking-[0.22em] text-white font-bold uppercase"
+              style={{ fontFamily: "BankGothic, sans-serif" }}
+            >
+              OPAS
+            </span>
+            <span
+              className="text-[10px] tracking-[0.35em] text-primary/80 uppercase"
+              style={{ fontFamily: "BankGothic, sans-serif", fontWeight: 300 }}
+            >
+              PROPERTIES
+            </span>
           </div>
+          <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[9px] font-mono font-bold bg-secondary/15 text-secondary border border-secondary/30 rounded-full tracking-widest uppercase">
+            BETA
+          </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center space-x-8">
+        {/* ── Desktop nav ── */}
+        <nav className="hidden md:flex items-center gap-7">
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="text-sm font-medium text-white/70 hover:text-primary transition-colors tracking-wide"
+              className="text-xs text-white/55 hover:text-primary transition-colors duration-200 tracking-[0.15em] uppercase"
+              style={{ fontFamily: "Neuropol, sans-serif" }}
             >
               {link.label}
             </a>
           ))}
-          <div className="w-px h-6 bg-white/10" />
-          
+          <div className="w-px h-5 bg-white/10" />
           <button
             onClick={openWallet}
-            className="relative group px-6 py-2.5 text-sm font-bold tracking-wider text-background bg-primary rounded hover:bg-primary/90 transition-all duration-300 uppercase overflow-hidden"
+            className="relative group overflow-hidden px-5 py-2.5 text-[11px] font-bold tracking-[0.2em] text-[#050810] bg-primary uppercase rounded-sm transition-all duration-300 hover:bg-primary/90 amber-glow"
+            style={{ fontFamily: "BankGothic, sans-serif" }}
           >
-            <motion.div 
-              className="absolute inset-0 rounded border border-primary/50"
-              animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0, 0.5] }}
-              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+            <motion.span
+              className="absolute inset-0 border border-primary/60 rounded-sm"
+              animate={{ scale: [1, 1.12, 1], opacity: [0.6, 0, 0.6] }}
+              transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut" }}
             />
             <span className="relative z-10">Connect Wallet</span>
           </button>
         </nav>
 
-        {/* Mobile Toggle */}
+        {/* ── Mobile toggle ── */}
         <button
-          className="md:hidden text-white p-2"
+          className="md:hidden text-white/70 hover:text-white p-2 transition-colors"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-          {mobileMenuOpen ? <X /> : <Menu />}
+          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
-      {/* Mobile Nav */}
+      {/* ── Mobile drawer ── */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-white/5 p-6 flex flex-col space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="md:hidden absolute top-full left-0 right-0 bg-[#050810]/98 backdrop-blur-2xl border-b border-white/5 px-6 py-8 flex flex-col gap-6"
+        >
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="text-lg font-sans font-medium text-white hover:text-primary transition-colors"
+              className="text-sm tracking-[0.25em] text-white/60 hover:text-primary transition-colors uppercase"
+              style={{ fontFamily: "Neuropol, sans-serif" }}
               onClick={() => setMobileMenuOpen(false)}
             >
               {link.label}
             </a>
           ))}
           <button
-            onClick={() => {
-              setMobileMenuOpen(false);
-              openWallet();
-            }}
-            className="relative w-full py-4 text-sm font-bold tracking-wider text-background bg-primary rounded uppercase mt-4 overflow-hidden"
+            onClick={() => { setMobileMenuOpen(false); openWallet(); }}
+            className="w-full py-3.5 text-xs font-bold tracking-[0.2em] text-[#050810] bg-primary uppercase rounded-sm mt-2"
+            style={{ fontFamily: "BankGothic, sans-serif" }}
           >
-            <span className="relative z-10">Connect Wallet</span>
+            Connect Wallet
           </button>
-        </div>
+        </motion.div>
       )}
     </motion.header>
   );
