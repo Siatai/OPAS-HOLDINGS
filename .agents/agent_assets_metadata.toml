@@ -1,0 +1,50 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "tpE9npCUaIE_NPEH0dOzc"
+uri = "file://artifacts/sexolicious/src/assets/images/dubai.png"
+type = "image"
+title = "Dubai luxury penthouse"
+
+[[generated]]
+id = "JudEQQp77JuQZzurWuJHv"
+uri = "file://artifacts/sexolicious/src/assets/images/london.png"
+type = "image"
+title = "London Mayfair townhouse"
+
+[[generated]]
+id = "ozeySLjP63xQtHioLvyH-"
+uri = "file://artifacts/sexolicious/src/assets/images/new-york.png"
+type = "image"
+title = "New York penthouse"
+
+[[generated]]
+id = "6D7RYnFF_XiccJ_cJmNfB"
+uri = "file://artifacts/sexolicious/src/assets/images/hong-kong.png"
+type = "image"
+title = "Hong Kong apartment"
+
+[[generated]]
+id = "UcEEqtf1pTLa1LhKvtzWO"
+uri = "file://artifacts/sexolicious/src/assets/images/paris.png"
+type = "image"
+title = "Paris luxury balcony"
+
+[[generated]]
+id = "BVjP9KF9n8vR8I_5orR1Z"
+uri = "file://artifacts/sexolicious/src/assets/images/singapore.png"
+type = "image"
+title = "Singapore luxury suite"
+
+[[generated]]
+id = "uhH1Qj0lEbTLFMEUj_CG5"
+uri = "file://artifacts/sexolicious/src/assets/images/tokyo.png"
+type = "image"
+title = "Tokyo modern apartment"
+
+[[generated]]
+id = "lyBbryutXuVVX_G-jSGlZ"
+uri = "file://artifacts/sexolicious/src/assets/images/miami.png"
+type = "image"
+title = "Miami oceanfront penthouse"
