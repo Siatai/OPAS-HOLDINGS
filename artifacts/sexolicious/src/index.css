@@ -54,6 +54,12 @@
   font-display: swap;
 }
 @font-face {
+  font-family: 'Sharkon';
+  src: url('/fonts/sharkon-demo.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
   font-family: 'AstronValley';
   src: url('/fonts/astron-valley---regular.otf') format('opentype');
   font-weight: 400;
@@ -120,13 +126,14 @@
 
 /* ── CSS custom properties ──────────────────────────── */
 :root {
-  /* Font stack */
-  --app-font-display: 'BankGothic', sans-serif;
-  --app-font-hero:    'DuneRise', 'BankGothic', sans-serif;
-  --app-font-sans:    'Neuropol', 'Inter', sans-serif;
+  /* Font stack — minimal 3-font palette: DuneRise (OPAS only), Sharkon (display), Nevera (everything else) + Cormorant for italic luxury accents */
+  --app-font-display: 'Sharkon', 'Nevera', sans-serif;
+  --app-font-hero:    'Sharkon', 'Nevera', sans-serif;
+  --app-font-wordmark:'DuneRise', 'Sharkon', sans-serif;
+  --app-font-sans:    'Nevera', 'Inter', sans-serif;
   --app-font-serif:   'Cormorant Garamond', serif;
-  --app-font-mono:    'Xirod', 'Inter', monospace;
-  --app-font-label:   'Rostex', 'Neuropol', sans-serif;
+  --app-font-mono:    'Nevera', 'Inter', monospace;
+  --app-font-label:   'Nevera', 'Inter', sans-serif;
 
   --radius: 0.375rem;
 
@@ -231,6 +238,36 @@ html { scroll-behavior: smooth; }
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Brushed silver / metallic chrome text */
+.metallic-text {
+  background: linear-gradient(180deg, #e8e8ee 0%, #f8f8fb 28%, #9aa0a8 52%, #c9ccd2 76%, #e6e7eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* Warm metallic amber-silver blend */
+.metallic-warm-text {
+  background: linear-gradient(180deg, #f5d98e 0%, #ffe8b8 22%, #c8912a 50%, #f5d98e 75%, #b87d1e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtle metallic surface for borders/panels */
+.metallic-border {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(hsl(222 47% 5% / 0.6), hsl(222 47% 5% / 0.6)) padding-box,
+    linear-gradient(135deg, rgba(232,232,238,0.22), rgba(154,160,168,0.06) 40%, rgba(232,232,238,0.18)) border-box;
+}
+
+.metallic-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(232,232,238,0.35) 50%, transparent 100%);
 }
 
 .amber-glow { box-shadow: 0 0 40px -8px rgba(234, 141, 14, 0.45); }
