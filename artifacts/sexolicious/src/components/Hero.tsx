@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { useWallet } from "./WalletContext";
+import HeroSkylineBg from "./HeroSkylineBg";
 
 const TICKER_ITEMS = [
   "48 properties", "$142M aum", "12,500 investors", "16 countries",
@@ -46,6 +47,9 @@ export default function Hero() {
 
       {/* Faint amber wash on the left */}
       <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_45%_55%_at_22%_55%,rgba(234,141,14,0.04)_0%,transparent_70%)]" />
+
+      {/* Neon data-transfer skyline backdrop */}
+      <HeroSkylineBg />
 
       {/* Refined HUD grid — even more subtle */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03]
