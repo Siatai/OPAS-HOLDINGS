@@ -58,13 +58,131 @@ export default function Footer() {
           </div>
         </div>
         
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-white/30 text-xs font-mono">
-            © {new Date().getFullYear()} Opas Properties Ltd. All rights reserved.
-          </p>
-          <p className="text-white/30 text-[10px] text-center md:text-right max-w-2xl font-mono uppercase tracking-wide">
-            Co-ownership equity interests in real estate carry risk. ROI figures are indicative estimates based on publicly available market data and do not constitute a guarantee of future returns. Past performance is not indicative of future results. This is not financial advice.
-          </p>
+        {/* ── Legal / Disclosure strip ─────────────────────────── */}
+        <div className="relative mt-4">
+          {/* Glowing hairline */}
+          <div className="absolute -top-px inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+          <div className="absolute -top-px left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent blur-[2px]" />
+
+          <div
+            className="relative rounded-2xl overflow-hidden mt-10 px-6 py-8 md:px-10 md:py-9"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(20,28,48,0.55) 0%, rgba(8,12,24,0.85) 100%)",
+              border: "1px solid rgba(220,225,235,0.08)",
+              boxShadow:
+                "inset 0 1px 0 rgba(255,255,255,0.04), 0 30px 80px -40px rgba(234,141,14,0.18)",
+            }}
+          >
+            {/* Faint corner glyphs */}
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute top-3 left-3 w-3 h-3 border-l border-t border-primary/30" />
+              <div className="absolute top-3 right-3 w-3 h-3 border-r border-t border-primary/30" />
+              <div className="absolute bottom-3 left-3 w-3 h-3 border-l border-b border-primary/30" />
+              <div className="absolute bottom-3 right-3 w-3 h-3 border-r border-b border-primary/30" />
+            </div>
+
+            {/* Soft radial highlight */}
+            <div
+              className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 w-[60%] h-40 rounded-full opacity-40 blur-3xl"
+              style={{ background: "radial-gradient(closest-side, rgba(234,141,14,0.25), transparent)" }}
+            />
+
+            <div className="relative grid grid-cols-1 md:grid-cols-[auto_1fr] gap-8 md:gap-12 items-center">
+              {/* Left — Year seal + brand line */}
+              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 min-w-[180px]">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-11 h-11 rounded-full flex items-center justify-center"
+                    style={{
+                      background:
+                        "radial-gradient(circle at 30% 30%, rgba(234,141,14,0.35), rgba(234,141,14,0.05) 70%)",
+                      border: "1px solid rgba(234,141,14,0.45)",
+                      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.15), 0 0 18px -4px rgba(234,141,14,0.4)",
+                    }}
+                  >
+                    <span className="text-[10px] font-mono tracking-[0.18em] text-primary">OP</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-mono tracking-[0.32em] text-white/40 uppercase">
+                      Est. {new Date().getFullYear()}
+                    </span>
+                    <span className="text-[11px] font-mono tracking-[0.22em] text-white/70 uppercase">
+                      Opas Properties Ltd
+                    </span>
+                  </div>
+                </div>
+
+                <div className="hidden md:flex items-center gap-2 mt-1">
+                  <span
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-mono tracking-[0.22em] uppercase"
+                    style={{
+                      background: "rgba(11,181,190,0.08)",
+                      border: "1px solid rgba(11,181,190,0.25)",
+                      color: "#7fdce2",
+                    }}
+                  >
+                    <span className="w-1 h-1 rounded-full bg-[#0BB5BE] animate-pulse" />
+                    SEC · Compliant
+                  </span>
+                  <span className="text-[9px] font-mono tracking-[0.22em] uppercase text-white/35">
+                    All rights reserved
+                  </span>
+                </div>
+              </div>
+
+              {/* Right — Disclosure */}
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-px w-8 bg-gradient-to-r from-primary/60 to-transparent" />
+                  <span className="text-[9px] font-mono tracking-[0.36em] uppercase text-primary/80">
+                    Disclosure
+                  </span>
+                  <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
+                </div>
+
+                <p
+                  className="text-[13px] md:text-[14px] leading-[1.7] text-white/65"
+                  style={{ fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" }}
+                >
+                  Co-ownership equity interests in real estate carry risk. ROI figures are
+                  indicative estimates based on publicly available market data and do not
+                  constitute a guarantee of future returns. Past performance is not
+                  indicative of future results.{" "}
+                  <span className="text-white/90 not-italic font-mono text-[10px] tracking-[0.2em] uppercase">
+                    · This is not financial advice ·
+                  </span>
+                </p>
+
+                {/* Mobile compliance row */}
+                <div className="md:hidden flex items-center gap-2 mt-4">
+                  <span
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-mono tracking-[0.22em] uppercase"
+                    style={{
+                      background: "rgba(11,181,190,0.08)",
+                      border: "1px solid rgba(11,181,190,0.25)",
+                      color: "#7fdce2",
+                    }}
+                  >
+                    <span className="w-1 h-1 rounded-full bg-[#0BB5BE] animate-pulse" />
+                    SEC · Compliant
+                  </span>
+                  <span className="text-[9px] font-mono tracking-[0.22em] uppercase text-white/35">
+                    All rights reserved
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom micro-line: token-style stamp */}
+          <div className="flex items-center justify-center gap-3 mt-5 opacity-60">
+            <span className="h-px w-12 bg-white/10" />
+            <span className="text-[9px] font-mono tracking-[0.42em] uppercase text-white/35">
+              OPA · LDN · 001 · v1.0.4
+            </span>
+            <span className="h-px w-12 bg-white/10" />
+          </div>
         </div>
       </div>
     </footer>
