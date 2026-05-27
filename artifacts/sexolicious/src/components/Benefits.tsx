@@ -44,7 +44,7 @@ export default function Benefits() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-sans font-bold text-white mb-6"
+            className="text-4xl md:text-5xl font-display font-bold text-white mb-2 uppercase tracking-wide"
           >
             The <span className="text-primary">Opas Advantage</span>
           </motion.h2>
@@ -52,8 +52,17 @@ export default function Benefits() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="font-serif italic text-white/70 text-2xl mb-6"
+          >
+            Redefining Wealth Generation
+          </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-white/50 text-lg max-w-2xl mx-auto"
+            className="text-white/50 text-lg max-w-2xl mx-auto font-sans"
           >
             We have engineered away the friction of traditional real estate investing, replacing it with speed, transparency, and unprecedented access.
           </motion.p>

@@ -42,10 +42,19 @@ export default function Testimonials() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-serif text-white mb-6"
+            className="text-4xl md:text-5xl font-display font-bold text-white mb-2 uppercase tracking-wide"
           >
-            Trusted by the <span className="luxury-gradient-text">New Elite</span>
+            Trusted by the <span className="text-primary">New Elite</span>
           </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="font-serif italic text-white/70 text-2xl mb-6"
+          >
+            Voices of Our Investors
+          </motion.p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -62,13 +71,13 @@ export default function Testimonials() {
               
               <div className="text-6xl font-serif text-primary/20 absolute top-6 left-6 leading-none select-none">"</div>
               
-              <p className="text-white/70 leading-relaxed relative z-10 mb-8 font-light text-sm">
+              <p className="text-white/80 leading-relaxed relative z-10 mb-8 text-2xl font-serif italic">
                 {testimonial.quote}
               </p>
               
               <div className="mt-auto border-t border-white/10 pt-6">
                 <div className="text-white font-serif text-lg">{testimonial.name}</div>
-                <div className="text-primary text-xs tracking-widest uppercase mt-1">
+                <div className="text-primary text-xs tracking-widest font-sans uppercase mt-1">
                   {testimonial.role} · {testimonial.location}
                 </div>
               </div>

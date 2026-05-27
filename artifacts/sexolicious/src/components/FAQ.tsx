@@ -43,10 +43,19 @@ export default function FAQ() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-serif text-white mb-6"
+            className="text-4xl md:text-5xl font-display uppercase tracking-wide font-bold text-white mb-2"
           >
-            Clarity & <span className="luxury-gradient-text">Confidence</span>
+            Clarity & <span className="text-primary">Confidence</span>
           </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="font-serif italic text-white/70 text-2xl mb-6"
+          >
+            Uncompromising Transparency
+          </motion.p>
         </div>
 
         <motion.div

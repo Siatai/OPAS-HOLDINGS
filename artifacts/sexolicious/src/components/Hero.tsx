@@ -54,16 +54,16 @@ export default function Hero() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="text-5xl md:text-7xl lg:text-8xl font-sans font-bold text-white leading-tight mb-8 max-w-5xl tracking-tight"
+          className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white leading-tight mb-8 max-w-5xl tracking-wide uppercase"
         >
-          Where Technology Meets <span className="text-primary drop-shadow-[0_0_20px_rgba(232,137,12,0.4)]">Prime Real Estate</span>
+          Where Technology Meets <br /><span className="text-primary drop-shadow-[0_0_20px_rgba(232,137,12,0.4)]">Prime Real Estate</span>
         </motion.h1>
 
         <motion.p 
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="text-lg md:text-xl text-white/60 font-light max-w-3xl mb-12 leading-relaxed"
+          className="text-xl md:text-2xl text-white/70 font-serif italic max-w-3xl mb-12 leading-relaxed"
         >
           Opas Properties uses AI-driven valuation, blockchain fractional ownership, and real-time market intelligence to give every investor access to the world's finest properties — starting at $100.
         </motion.p>

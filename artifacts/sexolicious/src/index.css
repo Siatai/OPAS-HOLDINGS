@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Space+Grotesk:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -40,6 +40,7 @@
   --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-destructive-border: var(--destructive-border);
 
+  --font-display: var(--app-font-display);
   --font-sans: var(--app-font-sans);
   --font-serif: var(--app-font-serif);
   --font-mono: var(--app-font-mono);
@@ -52,9 +53,10 @@
 
 :root {
   /* Force dark mode colors universally for this luxury app */
-  --app-font-sans: 'Space Grotesk', sans-serif;
+  --app-font-display: 'Orbitron', sans-serif;
+  --app-font-sans: 'Rajdhani', sans-serif;
   --app-font-serif: 'Cormorant Garamond', serif;
-  --app-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --app-font-mono: 'Space Grotesk', monospace;
   --radius: 0.5rem;
 
   --background: 220 60% 4%; /* Deep navy-black #05080f */

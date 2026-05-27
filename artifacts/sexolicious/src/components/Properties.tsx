@@ -43,10 +43,19 @@ export default function Properties() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-sans font-bold text-white max-w-2xl leading-tight"
+              className="text-4xl md:text-5xl font-display font-bold text-white max-w-2xl leading-tight uppercase tracking-wide mb-2"
             >
               Asset <span className="text-primary">Portfolio</span>
             </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="font-serif italic text-white/70 text-2xl"
+            >
+              Curated Masterpieces
+            </motion.p>
           </div>
           
           <motion.div
@@ -89,7 +98,7 @@ export default function Properties() {
                 </div>
 
                 <div className="absolute inset-x-0 bottom-0 p-4 z-20 bg-gradient-to-t from-black to-transparent">
-                  <div className="text-white/70 text-xs font-mono mb-1">{property.city}</div>
+                  <div className="text-white/70 text-sm font-display tracking-wider mb-1">{property.city}</div>
                   <h3 className="text-lg font-sans font-bold text-white truncate">{property.title}</h3>
                 </div>
               </div>

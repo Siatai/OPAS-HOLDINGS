@@ -41,7 +41,7 @@ export default function HowItWorks() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
-            className="text-4xl md:text-5xl font-sans font-bold text-white mb-6"
+            className="text-4xl md:text-5xl font-display font-bold text-white mb-2 uppercase tracking-wide"
           >
             The <span className="text-primary">Opas Protocol</span>
           </motion.h2>
@@ -49,8 +49,17 @@ export default function HowItWorks() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="font-serif italic text-white/70 text-2xl mb-6"
+          >
+            A Seamless Pathway to Premium Assets
+          </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-white/50 max-w-2xl mx-auto text-lg"
+            className="text-white/50 max-w-2xl mx-auto text-lg font-sans"
           >
             A frictionless technological bridge to the world's most premium assets.
           </motion.p>

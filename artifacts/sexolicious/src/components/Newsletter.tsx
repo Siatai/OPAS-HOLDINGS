@@ -29,10 +29,13 @@ export default function Newsletter() {
             <Terminal className="w-16 h-16 text-white" />
           </div>
           
-          <h2 className="text-3xl md:text-5xl font-sans font-bold text-white mb-4 relative z-10">
+          <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-2 relative z-10 uppercase tracking-wide">
             Join the Waitlist — <span className="text-primary">Early Access</span>
           </h2>
-          <p className="text-white/50 text-lg mb-10 max-w-xl mx-auto font-light relative z-10">
+          <p className="font-serif italic text-white/70 text-2xl mb-6 relative z-10">
+            Secure Your Position
+          </p>
+          <p className="text-white/50 text-lg mb-10 max-w-xl mx-auto font-sans relative z-10">
             Be first to access exclusive property drops and platform features.
           </p>
 

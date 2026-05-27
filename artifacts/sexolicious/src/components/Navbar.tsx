@@ -34,9 +34,10 @@ export default function Navbar() {
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
         <Link href="/" className="flex items-center space-x-3 group">
           <img src="/opas-logo.png" alt="Opas Logo" className="w-10 h-10 object-contain drop-shadow-[0_0_15px_rgba(232,137,12,0.5)]" />
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-sans font-bold tracking-wide text-white">OPAS PROPERTIES</span>
-            <span className="px-2 py-0.5 text-[10px] font-bold bg-secondary/20 text-secondary border border-secondary/40 rounded-full tracking-widest uppercase">BETA</span>
+          <div className="flex items-center gap-1">
+            <span className="text-2xl font-display font-bold tracking-widest text-white">OPAS</span>
+            <span className="text-xl font-display text-primary/80 font-normal tracking-[0.3em]">PROPERTIES</span>
+            <span className="ml-2 px-2 py-0.5 text-[10px] font-bold bg-secondary/20 text-secondary border border-secondary/40 rounded-full tracking-widest uppercase">BETA</span>
           </div>
         </Link>
 
