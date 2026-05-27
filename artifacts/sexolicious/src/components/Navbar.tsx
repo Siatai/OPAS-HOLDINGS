@@ -33,7 +33,7 @@ export default function Navbar() {
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
         <Link href="/" className="flex items-center space-x-2 group">
           <Hexagon className="w-8 h-8 text-primary group-hover:text-white transition-colors duration-300" />
-          <span className="text-2xl font-serif font-semibold tracking-wide text-white">SEXOLICIOUS</span>
+          <span className="text-2xl font-serif font-semibold tracking-wide text-white">OPAS PROPERTIES</span>
         </Link>
 
         {/* Desktop Nav */}

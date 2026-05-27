@@ -4,7 +4,7 @@ import { Star } from "lucide-react";
 
 const testimonials = [
   {
-    quote: "I've always wanted exposure to the Dubai real estate market, but the barrier to entry was too high. Sexolicious let me build a global portfolio in literally 10 minutes. The monthly yields are flawless.",
+    quote: "I've always wanted exposure to the Dubai real estate market, but the barrier to entry was too high. Opas Properties let me build a global portfolio in literally 10 minutes. The monthly yields are flawless.",
     name: "Alexander C.",
     role: "Tech Entrepreneur",
     location: "San Francisco"

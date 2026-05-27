@@ -12,7 +12,7 @@ export default function Footer() {
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center space-x-2 group mb-6">
               <Hexagon className="w-6 h-6 text-primary" />
-              <span className="text-xl font-serif font-semibold tracking-wide text-white">SEXOLICIOUS</span>
+              <span className="text-xl font-serif font-semibold tracking-wide text-white">OPAS PROPERTIES</span>
             </Link>
             <p className="text-white/50 text-sm leading-relaxed max-w-xs">
               Elite real estate meets democratic access. Own a piece of the world's most iconic properties.
@@ -49,7 +49,7 @@ export default function Footer() {
         
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-white/30 text-xs">
-            © {new Date().getFullYear()} Sexolicious Ltd. All rights reserved.
+            © {new Date().getFullYear()} Opas Properties Ltd. All rights reserved.
           </p>
           <p className="text-white/30 text-xs text-center md:text-right max-w-2xl">
             Fractional real estate investments carry risk. Past performance is not indicative of future results. Information provided is for educational purposes and should not be considered financial advice.
