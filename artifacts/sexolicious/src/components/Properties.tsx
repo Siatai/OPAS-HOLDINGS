@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { useLocation } from "wouter";
 import { ChevronLeft, ChevronRight, TrendingUp, MapPin, ArrowUpRight } from "lucide-react";
 import { useWallet } from "./WalletContext";
@@ -27,22 +27,64 @@ export default function Properties() {
 
   const activeCity = CITIES.find(c => c.id === activeCityId)!;
   const cards = activeCity.properties;
+  const n = cards.length;
 
   // Reset card index when city changes
   useEffect(() => { setActiveCardIdx(0); }, [activeCityId]);
 
-  const next = () => setActiveCardIdx(i => (i + 1) % cards.length);
-  const prev = () => setActiveCardIdx(i => (i - 1 + cards.length) % cards.length);
+  const next = useCallback(() => setActiveCardIdx(i => (i + 1) % n), [n]);
+  const prev = useCallback(() => setActiveCardIdx(i => (i - 1 + n) % n), [n]);
+
+  // Autoplay — rotates every 4.5s. Multiple independent pause reasons
+  // (hover, drag, manual nav timeout). Autoplay only runs when ALL are clear.
+  const [isHovering, setIsHovering] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [manualPause, setManualPause] = useState(false);
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearResumeTimer = () => {
+    if (resumeTimer.current) { clearTimeout(resumeTimer.current); resumeTimer.current = null; }
+  };
+  const pauseFor = useCallback((ms = 6000) => {
+    setManualPause(true);
+    clearResumeTimer();
+    resumeTimer.current = setTimeout(() => setManualPause(false), ms);
+  }, []);
+  const isPaused = isHovering || isDragging || manualPause;
+  useEffect(() => {
+    if (isPaused) return;
+    const id = setInterval(() => setActiveCardIdx(i => (i + 1) % n), 4500);
+    return () => clearInterval(id);
+  }, [isPaused, n]);
+  useEffect(() => () => clearResumeTimer(), []);
+
+  const goNext = () => { next(); pauseFor(); };
+  const goPrev = () => { prev(); pauseFor(); };
+  const goTo = (i: number) => { setActiveCardIdx(i); pauseFor(); };
 
   // Keyboard navigation
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") next();
-      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") goNext();
+      if (e.key === "ArrowLeft") goPrev();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [cards.length]);
+  }, [n]);
+
+  // Swipe handler (mobile + trackpad)
+  const handleDragEnd = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const swipe = info.offset.x + info.velocity.x * 0.25;
+    if (swipe < -60) goNext();
+    else if (swipe > 60) goPrev();
+  };
+
+  // Modular shortest-path offset (gives infinite-loop feel)
+  const wrappedOffset = (idx: number) => {
+    let o = idx - activeCardIdx;
+    if (o > n / 2) o -= n;
+    else if (o < -n / 2) o += n;
+    return o;
+  };
 
   return (
     <section id="properties" className="relative py-20 md:py-28 bg-background overflow-hidden">
@@ -225,7 +267,7 @@ export default function Properties() {
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={prev}
+                onClick={goPrev}
                 aria-label="Previous"
                 className="w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-primary transition-all hover:scale-105"
                 style={{
@@ -240,7 +282,7 @@ export default function Properties() {
                 {String(activeCardIdx + 1).padStart(2, "0")} / {String(cards.length).padStart(2, "0")}
               </span>
               <button
-                onClick={next}
+                onClick={goNext}
                 aria-label="Next"
                 className="w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-primary transition-all hover:scale-105"
                 style={{
@@ -254,67 +296,77 @@ export default function Properties() {
             </div>
           </div>
 
-          {/* Coverflow stage */}
-          <div
-            className="relative h-[440px] sm:h-[460px] md:h-[520px] mt-6 overflow-hidden"
+          {/* Coverflow stage — swipeable */}
+          <motion.div
+            className="relative h-[440px] sm:h-[460px] md:h-[520px] mt-6 overflow-hidden touch-pan-y select-none"
             style={{ perspective: "1600px" }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.18}
+            onDragStart={() => { setIsDragging(true); clearResumeTimer(); }}
+            onDragEnd={(e, info) => { setIsDragging(false); handleDragEnd(e, info); }}
+            onMouseEnter={() => { setIsHovering(true); clearResumeTimer(); }}
+            onMouseLeave={() => setIsHovering(false)}
           >
             {/* Floor reflection */}
             <div className="absolute inset-x-0 bottom-0 h-24 pointer-events-none"
               style={{ background: "radial-gradient(ellipse 60% 100% at 50% 100%, rgba(234,141,14,0.12) 0%, transparent 70%)" }}
             />
 
-            <AnimatePresence mode="popLayout">
-              {cards.map((card, idx) => {
-                const offset = idx - activeCardIdx;
-                const abs = Math.abs(offset);
-                const isCenter = offset === 0;
+            {cards.map((card, idx) => {
+              const offset = wrappedOffset(idx);
+              const abs = Math.abs(offset);
+              const isCenter = offset === 0;
 
-                // Coverflow transforms (pixel-based so spread is independent of card width).
-                // Smaller spread on phone (matches narrower card) so side cards stay on-screen.
-                const x = offset * (isMobile ? 150 : 220);   // px horizontal offset
-                const rotateY = offset * -28;      // turn outwards
-                const scale = isCenter ? 1 : 0.78 - (abs - 1) * 0.08;
-                const z = isCenter ? 0 : -120 * abs;
-                const opacity = abs > 2 ? 0 : abs === 0 ? 1 : abs === 1 ? 0.75 : 0.35;
-                const zIndex = 30 - abs;
+              // Coverflow transforms (pixel-based so spread is independent of card width).
+              const x = offset * (isMobile ? 150 : 220);
+              const rotateY = offset * -28;
+              const scale = isCenter ? 1 : 0.78 - (abs - 1) * 0.08;
+              const z = isCenter ? 0 : -120 * abs;
+              const opacity = abs > 2 ? 0 : abs === 0 ? 1 : abs === 1 ? 0.75 : 0.35;
+              const zIndex = 30 - abs;
+              const pointerEvents = abs > 2 ? "none" : "auto";
 
-                return (
-                  <motion.div
-                    key={`${activeCity.id}-${card.id}`}
-                    onClick={() => !isCenter && setActiveCardIdx(idx)}
-                    className="absolute top-1/2 left-1/2 cursor-pointer"
-                    style={{ transformStyle: "preserve-3d", zIndex }}
-                    initial={{ opacity: 0, scale: 0.6 }}
-                    animate={{
-                      opacity,
-                      x: `calc(-50% + ${x}px)`,
-                      y: "-50%",
-                      rotateY,
-                      scale,
-                      z,
-                    }}
-                    exit={{ opacity: 0, scale: 0.6 }}
-                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    <PropertyCard
-                      card={card}
-                      city={activeCity}
-                      isCenter={isCenter}
-                      onAcquire={openWallet}
-                    />
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </div>
+              return (
+                <motion.div
+                  key={card.id}
+                  onClick={() => !isCenter && goTo(idx)}
+                  className="absolute top-1/2 left-1/2 cursor-pointer"
+                  style={{ transformStyle: "preserve-3d", zIndex, pointerEvents }}
+                  animate={{
+                    opacity,
+                    x: `calc(-50% + ${x}px)`,
+                    y: "-50%",
+                    rotateY,
+                    scale,
+                    z,
+                  }}
+                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <PropertyCard
+                    card={card}
+                    city={activeCity}
+                    isCenter={isCenter}
+                    onAcquire={openWallet}
+                  />
+                </motion.div>
+              );
+            })}
+          </motion.div>
+
+          {/* Swipe hint (mobile only, fades out on first interaction) */}
+          {isMobile && !isPaused && (
+            <div className="text-center mt-3 text-[9px] tracking-[0.32em] uppercase text-white/35" style={NEVERA}>
+              Swipe →
+            </div>
+          )}
 
           {/* Progress dots */}
-          <div className="flex items-center justify-center gap-2 mt-6">
+          <div className="flex items-center justify-center gap-2 mt-4">
             {cards.map((_, idx) => (
               <button
                 key={idx}
-                onClick={() => setActiveCardIdx(idx)}
+                onClick={() => goTo(idx)}
                 aria-label={`Go to card ${idx + 1}`}
                 className="h-1 rounded-full transition-all duration-500"
                 style={{
@@ -355,7 +407,7 @@ function PropertyCard({
     >
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden">
-        <img src={city.image} alt={card.title} className="w-full h-full object-cover" />
+        <img src={card.image} alt={card.title} className="w-full h-full object-cover" draggable={false} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
         {/* Scanline overlay on center card */}
         {isCenter && (

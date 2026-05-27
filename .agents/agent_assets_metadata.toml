@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "tpE9npCUaIE_NPEH0dOzc"
@@ -48,3 +47,63 @@ id = "lyBbryutXuVVX_G-jSGlZ"
 uri = "file://artifacts/sexolicious/src/assets/images/miami.png"
 type = "image"
 title = "Miami oceanfront penthouse"
+
+[[outputs]]
+id = "n-I6a-D2zKc5TGM7Equgj"
+uri = "file://attached_assets/stock_images/lux_skyscraper.jpg"
+type = "image"
+title = "ultra modern luxury apartment building skyscraper facade glass"
+
+[[outputs]]
+id = "KLHXsICcIaoFh1jQ-xIL9"
+uri = "file://attached_assets/stock_images/lux_penthouse_skyline.jpg"
+type = "image"
+title = "luxury penthouse interior with city skyline view, floor-to-ceiling windows, modern"
+
+[[outputs]]
+id = "WPqLDiPsJ2rJaRhbY4qX_"
+uri = "file://attached_assets/stock_images/lux_villa_pool.jpg"
+type = "image"
+title = "luxury modern villa exterior at dusk with pool, dramatic lighting"
+
+[[outputs]]
+id = "xRL9RfETmxDbQjpqdH0nT"
+uri = "file://attached_assets/stock_images/lux_townhouse.jpg"
+type = "image"
+title = "elegant historic townhouse facade luxury european"
+
+[[outputs]]
+id = "YW555seOh2dsNx52NuXgK"
+uri = "file://attached_assets/stock_images/lux_beachfront.jpg"
+type = "image"
+title = "luxury beachfront condo balcony ocean view sunset"
+
+[[outputs]]
+id = "38hD_kFkhuRGgSRGFJqYm"
+uri = "file://attached_assets/stock_images/lux_living_gold.jpg"
+type = "image"
+title = "modern minimalist luxury living room interior gold accent"
+
+[[outputs]]
+id = "gu90SHcmhWYSgzQNfXSbe"
+uri = "file://attached_assets/stock_images/lux_suite_marble.jpg"
+type = "image"
+title = "luxury hotel suite bedroom city night view marble"
+
+[[outputs]]
+id = "V9ylzPzbp-fH2_MLYSahK"
+uri = "file://attached_assets/stock_images/lux_loft_warm.jpg"
+type = "image"
+title = "luxury duplex loft interior industrial warm wood"
+
+[[outputs]]
+id = "-C40uN2FeeNUU_2R9yu5l"
+uri = "file://attached_assets/stock_images/lux_mansion_night.jpg"
+type = "image"
+title = "luxury mansion exterior architecture night lights dramatic"
+
+[[outputs]]
+id = "71L0gpNSiUXar2COW_h01"
+uri = "file://attached_assets/stock_images/lux_rooftop_pool.jpg"
+type = "image"
+title = "luxury rooftop apartment infinity pool city panorama"
