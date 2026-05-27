@@ -51,8 +51,8 @@ export default function Stats() {
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent shadow-[0_0_10px_rgba(232,137,12,0.5)]" />
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent shadow-[0_0_10px_rgba(232,137,12,0.5)]" />
       
-      <div className="container mx-auto px-6 md:px-12 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 divide-x divide-white/5">
+      <div className="container mx-auto px-4 sm:px-6 md:px-12 relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 md:gap-8 md:divide-x md:divide-white/5">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -62,13 +62,13 @@ export default function Stats() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="flex flex-col items-center text-center px-4"
+                className="flex flex-col items-center text-center px-2 sm:px-4"
               >
-                <div className="mb-4 p-3 rounded-full bg-white/5 border border-white/10">
-                  <Icon className="w-5 h-5 text-secondary" />
+                <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-full bg-white/5 border border-white/10">
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
                 </div>
                 <div
-                  className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight"
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 tracking-tight"
                   style={{ fontFamily: "Rostex, BankGothic, sans-serif" }}
                 >
                   <Counter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} decimal={stat.decimal} />

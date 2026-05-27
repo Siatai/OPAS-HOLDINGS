@@ -36,14 +36,14 @@ const faqs = [
 
 export default function FAQ() {
   return (
-    <section id="faq" className="py-32 bg-black relative">
-      <div className="container mx-auto px-6 md:px-12 max-w-4xl">
-        <div className="text-center mb-16">
+    <section id="faq" className="py-20 md:py-32 bg-black relative">
+      <div className="container mx-auto px-4 sm:px-6 md:px-12 max-w-4xl">
+        <div className="text-center mb-12 md:mb-16">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-display uppercase tracking-wide font-bold text-white mb-2"
+            className="text-2xl sm:text-3xl md:text-5xl font-display uppercase tracking-wide font-bold text-white mb-2"
           >
             Clarity & <span className="text-primary">Confidence</span>
           </motion.h2>
@@ -52,7 +52,7 @@ export default function FAQ() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="font-serif italic text-white/70 text-2xl mb-6"
+            className="font-serif italic text-white/70 text-lg sm:text-xl md:text-2xl mb-6"
           >
             Uncompromising Transparency
           </motion.p>
@@ -65,11 +65,11 @@ export default function FAQ() {
         >
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`} className="border-white/10 mb-4 bg-[#0a0a0a] px-6 rounded-lg data-[state=open]:border-primary/30 transition-colors">
-                <AccordionTrigger className="text-white hover:text-primary hover:no-underline font-serif text-lg py-6 text-left">
+              <AccordionItem key={index} value={`item-${index}`} className="border-white/10 mb-4 bg-[#0a0a0a] px-4 sm:px-6 rounded-lg data-[state=open]:border-primary/30 transition-colors">
+                <AccordionTrigger className="text-white hover:text-primary hover:no-underline font-serif text-base sm:text-lg py-5 sm:py-6 text-left">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-white/60 leading-relaxed pb-6">
+                <AccordionContent className="text-white/60 leading-relaxed pb-6 text-sm sm:text-base">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

@@ -25,9 +25,9 @@ const testimonials = [
 
 export default function Testimonials() {
   return (
-    <section className="py-32 bg-[#050505] relative">
-      <div className="container mx-auto px-6 md:px-12">
-        <div className="text-center mb-20">
+    <section className="py-20 md:py-32 bg-[#050505] relative">
+      <div className="container mx-auto px-4 sm:px-6 md:px-12">
+        <div className="text-center mb-14 md:mb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -42,7 +42,7 @@ export default function Testimonials() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-display font-bold text-white mb-2 uppercase tracking-wide"
+            className="text-2xl sm:text-3xl md:text-5xl font-display font-bold text-white mb-2 uppercase tracking-wide"
           >
             Trusted by the <span className="text-primary">New Elite</span>
           </motion.h2>
@@ -51,7 +51,7 @@ export default function Testimonials() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="font-serif italic text-white/70 text-2xl mb-6"
+            className="font-serif italic text-white/70 text-lg sm:text-xl md:text-2xl mb-6"
           >
             Voices of Our Investors
           </motion.p>
@@ -65,13 +65,13 @@ export default function Testimonials() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.2 }}
-              className="glass-panel p-10 border border-white/5 hover:border-primary/30 transition-colors duration-500 relative group"
+              className="glass-panel p-6 sm:p-10 border border-white/5 hover:border-primary/30 transition-colors duration-500 relative group"
             >
               <div className="absolute top-0 left-10 w-10 h-px bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
               
-              <div className="text-6xl font-serif text-primary/20 absolute top-6 left-6 leading-none select-none">"</div>
+              <div className="text-5xl sm:text-6xl font-serif text-primary/20 absolute top-4 left-4 sm:top-6 sm:left-6 leading-none select-none">"</div>
               
-              <p className="text-white/80 leading-relaxed relative z-10 mb-8 text-2xl font-serif italic">
+              <p className="text-white/80 leading-relaxed relative z-10 mb-8 text-lg sm:text-xl md:text-2xl font-serif italic">
                 {testimonial.quote}
               </p>
               

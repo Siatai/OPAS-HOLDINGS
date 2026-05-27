@@ -37,14 +37,14 @@ const benefits = [
 
 export default function Benefits() {
   return (
-    <section id="benefits" className="py-32 bg-background relative">
-      <div className="container mx-auto px-6 md:px-12">
-        <div className="text-center mb-20">
+    <section id="benefits" className="py-20 md:py-32 bg-background relative">
+      <div className="container mx-auto px-4 sm:px-6 md:px-12">
+        <div className="text-center mb-14 md:mb-20">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-display font-bold text-white mb-2 uppercase tracking-wide"
+            className="text-2xl sm:text-3xl md:text-5xl font-display font-bold text-white mb-2 uppercase tracking-wide"
           >
             The <span className="text-primary">Opas Advantage</span>
           </motion.h2>
@@ -53,7 +53,7 @@ export default function Benefits() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="font-serif italic text-white/70 text-2xl mb-6"
+            className="font-serif italic text-white/70 text-lg sm:text-xl md:text-2xl mb-6"
           >
             Redefining Wealth Generation
           </motion.p>
@@ -62,7 +62,7 @@ export default function Benefits() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-white/50 text-lg max-w-2xl mx-auto font-sans"
+            className="text-white/50 text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-sans"
           >
             We have engineered away the friction of traditional real estate investing, replacing it with speed, transparency, and unprecedented access.
           </motion.p>
@@ -78,17 +78,17 @@ export default function Benefits() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 * index }}
-                className="bg-card border border-white/5 p-8 rounded-lg relative overflow-hidden group hover:bg-white/[0.02] transition-colors"
+                className="bg-card border border-white/5 p-5 sm:p-8 rounded-lg relative overflow-hidden group hover:bg-white/[0.02] transition-colors"
               >
                 {/* Glowing left border */}
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity shadow-[0_0_15px_rgba(232,137,12,0.8)]" />
                 
-                <div className="flex items-start gap-6">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                    <Icon className="w-6 h-6 text-primary" />
+                <div className="flex items-start gap-4 sm:gap-6">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                   </div>
-                  <div>
-                    <h3 className="text-xl font-sans font-bold text-white mb-2">{benefit.title}</h3>
+                  <div className="min-w-0">
+                    <h3 className="text-lg sm:text-xl font-sans font-bold text-white mb-2">{benefit.title}</h3>
                     <p className="text-white/50 text-sm leading-relaxed">{benefit.description}</p>
                   </div>
                 </div>

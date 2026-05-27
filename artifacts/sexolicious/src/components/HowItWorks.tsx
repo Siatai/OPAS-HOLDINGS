@@ -31,17 +31,17 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-32 bg-background relative overflow-hidden">
+    <section id="how-it-works" className="py-20 md:py-32 bg-background relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
       
-      <div className="container mx-auto px-6 md:px-12">
-        <div className="text-center mb-24">
+      <div className="container mx-auto px-4 sm:px-6 md:px-12">
+        <div className="text-center mb-16 md:mb-24">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
-            className="text-4xl md:text-5xl font-display font-bold text-white mb-2 uppercase tracking-wide"
+            className="text-2xl sm:text-3xl md:text-5xl font-display font-bold text-white mb-2 uppercase tracking-wide"
           >
             The <span className="text-primary">Opas Protocol</span>
           </motion.h2>
@@ -50,7 +50,7 @@ export default function HowItWorks() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="font-serif italic text-white/70 text-2xl mb-6"
+            className="font-serif italic text-white/70 text-lg sm:text-xl md:text-2xl mb-6"
           >
             A Seamless Pathway to Premium Assets
           </motion.p>
@@ -59,7 +59,7 @@ export default function HowItWorks() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-white/50 max-w-2xl mx-auto text-lg font-sans"
+            className="text-white/50 max-w-2xl mx-auto text-sm sm:text-base md:text-lg font-sans"
           >
             A frictionless technological bridge to the world's most premium assets.
           </motion.p>

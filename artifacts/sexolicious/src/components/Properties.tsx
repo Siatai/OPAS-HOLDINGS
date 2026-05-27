@@ -118,6 +118,16 @@ export default function Properties() {
   const { openWallet } = useWallet();
   const [activeCityId, setActiveCityId] = useState<string>(CITIES[0].id);
   const [activeCardIdx, setActiveCardIdx] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Reactive viewport check for coverflow spread (avoids SSR drift + resizes live)
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   const activeCity = CITIES.find(c => c.id === activeCityId)!;
   const cards = activeCity.properties;
@@ -139,7 +149,7 @@ export default function Properties() {
   }, [cards.length]);
 
   return (
-    <section id="properties" className="relative py-28 bg-background overflow-hidden">
+    <section id="properties" className="relative py-20 md:py-28 bg-background overflow-hidden">
       {/* Atmospheric backdrop */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.04]
         bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)]
@@ -147,10 +157,10 @@ export default function Properties() {
         [mask-image:radial-gradient(ellipse_70%_60%_at_50%_50%,#000_15%,transparent_100%)]" />
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_50%_60%_at_50%_40%,rgba(234,141,14,0.05)_0%,transparent_70%)]" />
 
-      <div className="container mx-auto px-6 md:px-12 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 md:px-12 relative z-10">
 
         {/* ── Section header ── */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-14 gap-6">
           <div>
             <motion.div
               initial={{ opacity: 0, x: -16 }}
@@ -167,7 +177,7 @@ export default function Properties() {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-3xl md:text-5xl leading-[1.05] tracking-wide mb-2"
+              className="text-2xl sm:text-3xl md:text-5xl leading-[1.05] tracking-wide mb-2"
               style={SHARKON}
             >
               <span className="metallic-text">Asset</span>{" "}
@@ -178,7 +188,7 @@ export default function Properties() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-white/55 text-xl md:text-2xl"
+              className="text-white/55 text-base sm:text-xl md:text-2xl"
               style={SERIF}
             >
               Curated masterpieces — select a city to explore.
@@ -290,7 +300,7 @@ export default function Properties() {
                   Hot in {activeCity.name} · {activeCity.country}
                 </span>
               </div>
-              <h3 className="text-2xl md:text-3xl tracking-wide" style={SHARKON}>
+              <h3 className="text-xl sm:text-2xl md:text-3xl tracking-wide" style={SHARKON}>
                 <span className="metallic-text">Trending</span>{" "}
                 <span className="metallic-warm-text">listings</span>
               </h3>
@@ -328,7 +338,7 @@ export default function Properties() {
 
           {/* Coverflow stage */}
           <div
-            className="relative h-[460px] md:h-[520px] mt-6 overflow-hidden"
+            className="relative h-[440px] sm:h-[460px] md:h-[520px] mt-6 overflow-hidden"
             style={{ perspective: "1600px" }}
           >
             {/* Floor reflection */}
@@ -342,8 +352,9 @@ export default function Properties() {
                 const abs = Math.abs(offset);
                 const isCenter = offset === 0;
 
-                // Coverflow transforms (pixel-based so spread is independent of card width)
-                const x = offset * 220;            // px horizontal offset
+                // Coverflow transforms (pixel-based so spread is independent of card width).
+                // Smaller spread on phone (matches narrower card) so side cards stay on-screen.
+                const x = offset * (isMobile ? 150 : 220);   // px horizontal offset
                 const rotateY = offset * -28;      // turn outwards
                 const scale = isCenter ? 1 : 0.78 - (abs - 1) * 0.08;
                 const z = isCenter ? 0 : -120 * abs;
@@ -415,7 +426,7 @@ function PropertyCard({
 }) {
   return (
     <div
-      className="relative w-[300px] md:w-[360px] rounded-xl overflow-hidden"
+      className="relative w-[260px] sm:w-[300px] md:w-[360px] rounded-xl overflow-hidden"
       style={{
         background: "linear-gradient(160deg, rgba(20,28,48,0.96) 0%, rgba(14,20,36,0.96) 60%, rgba(28,20,12,0.96) 100%)",
         border: isCenter ? "1px solid rgba(234,141,14,0.4)" : "1px solid rgba(220,225,235,0.16)",
