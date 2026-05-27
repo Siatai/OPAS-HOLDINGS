@@ -48,6 +48,12 @@ uri = "file://artifacts/sexolicious/src/assets/images/miami.png"
 type = "image"
 title = "Miami oceanfront penthouse"
 
+[[generated]]
+id = "p17Il2TnlAqiN72zczNJ9"
+uri = "file://attached_assets/generated_images/ultra_wide_panoramic_silhouette_24aa.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "n-I6a-D2zKc5TGM7Equgj"
 uri = "file://attached_assets/stock_images/lux_skyscraper.jpg"

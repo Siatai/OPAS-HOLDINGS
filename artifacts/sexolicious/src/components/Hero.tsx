@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { useWallet } from "./WalletContext";
-import HeroSkylineBg from "./HeroSkylineBg";
+import worldSkyline from "@/assets/images/world_skyline.png";
 
 const TICKER_ITEMS = [
   "48 properties", "$142M aum", "12,500 investors", "16 countries",
@@ -48,8 +48,31 @@ export default function Hero() {
       {/* Faint amber wash on the left */}
       <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_45%_55%_at_22%_55%,rgba(234,141,14,0.04)_0%,transparent_70%)]" />
 
-      {/* Neon data-transfer skyline backdrop */}
-      <HeroSkylineBg />
+      {/* World-landmarks skyline backdrop */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%] z-0 overflow-hidden">
+        <img
+          src={worldSkyline}
+          alt=""
+          className="absolute inset-x-0 bottom-0 w-full h-full object-cover object-bottom"
+          style={{ filter: "saturate(1.05) contrast(1.05)" }}
+        />
+        {/* Top fade — blend image into the dark hero background */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, hsl(222,47%,5%) 0%, rgba(8,12,24,0.55) 35%, transparent 70%)",
+          }}
+        />
+        {/* Subtle amber horizon kiss */}
+        <div
+          className="absolute inset-x-0 bottom-[28%] h-32 opacity-40"
+          style={{
+            background:
+              "radial-gradient(ellipse 60% 100% at 50% 100%, rgba(234,141,14,0.35), transparent 70%)",
+          }}
+        />
+      </div>
 
       {/* Refined HUD grid — even more subtle */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03]
