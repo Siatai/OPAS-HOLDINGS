@@ -7,6 +7,7 @@ import { WalletProvider } from "@/components/WalletContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Home from "@/pages/Home";
+import CityPage from "@/pages/CityPage";
 import NotFound from "@/pages/not-found";
 import LoaderScreen from "@/components/LoaderScreen";
 import { AnimatePresence } from "framer-motion";
@@ -17,6 +18,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/city/:cityId" component={CityPage} />
       <Route component={NotFound} />
     </Switch>
   );
