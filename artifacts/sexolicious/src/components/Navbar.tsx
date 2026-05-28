@@ -18,10 +18,10 @@ export default function Navbar() {
   });
 
   const navLinks = [
-    { label: "Properties", href: "#properties" },
-    { label: "Protocol", href: "#how-it-works" },
-    { label: "Advantage", href: "#benefits" },
-    { label: "FAQ", href: "#faq" },
+    { label: "Properties",  href: "#properties" },
+    { label: "Marketplace", href: "/marketplace", internal: true },
+    { label: "Protocol",    href: "#how-it-works" },
+    { label: "FAQ",         href: "#faq" },
   ];
 
   return (
@@ -65,7 +65,16 @@ export default function Navbar() {
 
         {/* ── Desktop nav ── */}
         <nav className="hidden md:flex items-center gap-7">
-          {navLinks.map((link) => (
+          {navLinks.map((link) => link.internal ? (
+            <Link
+              key={link.label}
+              href={link.href}
+              className="text-xs text-white/55 hover:text-primary transition-colors duration-200 tracking-[0.15em] uppercase"
+              style={{ fontFamily: "Neuropol, sans-serif" }}
+            >
+              {link.label}
+            </Link>
+          ) : (
             <a
               key={link.label}
               href={link.href}
@@ -125,7 +134,17 @@ export default function Navbar() {
           animate={{ opacity: 1, y: 0 }}
           className="md:hidden absolute top-full left-0 right-0 bg-[#050810]/98 backdrop-blur-2xl border-b border-white/5 px-6 py-8 flex flex-col gap-6"
         >
-          {navLinks.map((link) => (
+          {navLinks.map((link) => link.internal ? (
+            <Link
+              key={link.label}
+              href={link.href}
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-sm tracking-[0.25em] text-white/60 hover:text-primary transition-colors uppercase"
+              style={{ fontFamily: "Neuropol, sans-serif" }}
+            >
+              {link.label}
+            </Link>
+          ) : (
             <a
               key={link.label}
               href={link.href}

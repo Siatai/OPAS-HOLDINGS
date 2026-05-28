@@ -9,8 +9,10 @@ import {
 import {
   getHoldings, getProposals, castVote, lookupProperty,
   ownershipPct, portfolioStats, tally,
+  createListing, fairValuePerShare,
   type Holding, type Proposal,
 } from "@/lib/portfolio";
+import { Tag } from "lucide-react";
 import { useWallet } from "@/components/WalletContext";
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
@@ -42,6 +44,31 @@ export default function Portfolio() {
 
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [listFor, setListFor] = useState<{ propertyId: string; qty: number; ask: number } | null>(null);
+  const [toast, setToast] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  const openListModal = (propertyId: string) => {
+    const fair = Math.round(fairValuePerShare(propertyId));
+    setListFor({ propertyId, qty: 1, ask: fair });
+  };
+
+  const submitListing = () => {
+    if (!listFor || !address) return;
+    const res = createListing(address, listFor.propertyId, listFor.qty, listFor.ask);
+    if (!res.ok) {
+      setToast({ kind: "err", msg: res.reason ?? "Listing failed." });
+      return;
+    }
+    setHoldings(getHoldings(address));
+    setListFor(null);
+    setToast({ kind: "ok", msg: `Listed ${listFor.qty} share${listFor.qty === 1 ? "" : "s"} on the marketplace.` });
+  };
 
   useEffect(() => {
     if (address) {
@@ -123,6 +150,9 @@ export default function Portfolio() {
           </div>
 
           <div className="flex flex-wrap gap-2">
+            <Link href="/marketplace" className="px-4 py-2.5 text-[10px] tracking-[0.22em] text-primary hover:text-primary uppercase border border-primary/40 hover:bg-primary/10 rounded-sm transition-colors" style={NEVERA}>
+              Open marketplace →
+            </Link>
             <Link href="/" className="px-4 py-2.5 text-[10px] tracking-[0.22em] text-white/55 hover:text-white uppercase border border-white/10 hover:border-white/25 rounded-sm transition-colors" style={NEVERA}>
               ← Back to home
             </Link>
@@ -249,6 +279,15 @@ export default function Portfolio() {
                           View <ChevronRight className="w-3 h-3" />
                         </Link>
                       </div>
+
+                      <button
+                        onClick={() => openListModal(h.propertyId)}
+                        data-testid={`list-${h.propertyId}`}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 text-[10px] tracking-[0.22em] uppercase border border-secondary/40 text-secondary hover:bg-secondary/10 rounded-sm transition-colors"
+                        style={NEVERA}
+                      >
+                        <Tag className="w-3 h-3" /> List for sale
+                      </button>
                     </div>
                   </motion.div>
                 );
@@ -380,6 +419,113 @@ export default function Portfolio() {
           </div>
         </section>
       </div>
+
+      {/* List-for-sale modal */}
+      {listFor && (() => {
+        const meta = lookupProperty(listFor.propertyId);
+        const holding = holdings.find((h) => h.propertyId === listFor.propertyId);
+        if (!meta || !holding) return null;
+        const fair = fairValuePerShare(listFor.propertyId);
+        const total = listFor.qty * listFor.ask;
+        const delta = fair ? ((listFor.ask - fair) / fair) * 100 : 0;
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4"
+            onClick={() => setListFor(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0, y: 12 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="metallic-border relative w-full max-w-md rounded-xl p-7 space-y-5"
+              style={{ background: "linear-gradient(160deg, rgba(12,18,32,0.96) 0%, rgba(8,12,24,0.96) 100%)" }}
+              data-testid="list-modal"
+            >
+              <div>
+                <div className="text-[8.5px] tracking-[0.32em] uppercase text-secondary mb-1 font-mono">
+                  {meta.prop.token} · List ask
+                </div>
+                <h3 className="text-2xl text-white" style={SHARKON}>{meta.prop.title}</h3>
+                <div className="text-[11px] text-white/45 mt-1" style={NEVERA}>
+                  You hold {holding.shares} shares · Fair value {fmtUsd(fair)} / share
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <label className="block">
+                  <span className="text-[8.5px] tracking-[0.32em] uppercase text-white/45" style={NEVERA}>Quantity (max {holding.shares})</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={holding.shares}
+                    value={listFor.qty}
+                    onChange={(e) => setListFor({ ...listFor, qty: Math.max(1, Math.min(holding.shares, parseInt(e.target.value || "1", 10))) })}
+                    data-testid="list-qty"
+                    className="mt-1 w-full px-3 py-2.5 text-lg bg-[rgba(20,28,48,0.6)] border border-white/10 focus:border-primary/40 outline-none rounded-md text-white"
+                    style={SHARKON}
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-[8.5px] tracking-[0.32em] uppercase text-white/45" style={NEVERA}>Ask / share (USD)</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={listFor.ask}
+                    onChange={(e) => setListFor({ ...listFor, ask: Math.max(1, parseInt(e.target.value || "0", 10)) })}
+                    data-testid="list-ask"
+                    className="mt-1 w-full px-3 py-2.5 text-lg bg-[rgba(20,28,48,0.6)] border border-white/10 focus:border-primary/40 outline-none rounded-md text-white"
+                    style={SHARKON}
+                  />
+                </label>
+              </div>
+
+              <div className="rounded-md p-3 space-y-1.5"
+                style={{ background: "rgba(20,28,48,0.6)", border: "1px solid rgba(220,225,235,0.08)" }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[9.5px] tracking-[0.28em] uppercase text-white/45" style={NEVERA}>Gross proceeds</span>
+                  <span className="text-[13px] text-primary" style={SHARKON}>{fmtUsd(total)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[9.5px] tracking-[0.28em] uppercase text-white/45" style={NEVERA}>vs Fair value</span>
+                  <span className={`text-[11px] font-mono ${delta >= 0 ? "text-emerald-300" : "text-rose-300"}`}>
+                    {delta >= 0 ? "+" : ""}{delta.toFixed(1)}% {delta >= 0 ? "premium" : "discount"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setListFor(null)}
+                  className="flex-1 px-5 py-3 text-[10.5px] tracking-[0.22em] uppercase text-white/60 border border-white/10 hover:border-white/25 rounded-sm"
+                  style={NEVERA}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitListing}
+                  data-testid="confirm-list"
+                  className="flex-1 px-5 py-3 text-[11px] font-bold tracking-[0.22em] uppercase text-[#050810] bg-primary hover:bg-primary/90 rounded-sm amber-glow"
+                  style={{ fontFamily: "BankGothic, sans-serif" }}
+                >
+                  List on market
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        );
+      })()}
+
+      {/* Toast */}
+      {toast && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-md text-[12px] font-mono tracking-wider border ${toast.kind === "ok" ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-200" : "border-rose-400/40 bg-rose-400/10 text-rose-200"}`}
+        >
+          {toast.msg}
+        </motion.div>
+      )}
     </div>
   );
 }

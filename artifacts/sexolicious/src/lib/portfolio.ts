@@ -145,3 +145,163 @@ export function portfolioStats(holdings: Holding[]) {
 }
 
 export const TOTAL_SUPPLY_CONST = TOTAL_SUPPLY;
+
+// ─────────────────────────────────────────────────────────────
+// Secondary market
+// ─────────────────────────────────────────────────────────────
+
+export type Listing = {
+  id: string;
+  propertyId: string;
+  seller: string;          // wallet address (lowercased) — "vault" for synthetic liquidity
+  shares: number;
+  askPerShare: number;     // USD
+  createdAt: number;
+};
+
+const LIST_KEY = "opas:marketplace";
+
+const SEED_LISTINGS: Omit<Listing, "id" | "createdAt">[] = [
+  { propertyId: "dxb-2", seller: "vault", shares: 8,  askPerShare: 165 },
+  { propertyId: "dxb-5", seller: "vault", shares: 4,  askPerShare: 232 },
+  { propertyId: "ldn-2", seller: "vault", shares: 12, askPerShare: 248 },
+  { propertyId: "nyc-1", seller: "vault", shares: 18, askPerShare: 142 },
+  { propertyId: "par-3", seller: "vault", shares: 22, askPerShare: 118 },
+  { propertyId: "hkg-2", seller: "vault", shares: 14, askPerShare: 196 },
+  { propertyId: "sgp-4", seller: "vault", shares: 10, askPerShare: 174 },
+  { propertyId: "mia-1", seller: "vault", shares: 26, askPerShare: 128 },
+];
+
+function rid() {
+  return `lst_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+export function getListings(): Listing[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(LIST_KEY);
+    if (raw) return JSON.parse(raw) as Listing[];
+  } catch {}
+  const now = Date.now();
+  const seeded: Listing[] = SEED_LISTINGS.map((l, i) => ({
+    ...l,
+    id: rid() + "_" + i,
+    createdAt: now - (i + 1) * 1000 * 60 * 60 * 3,
+  }));
+  window.localStorage.setItem(LIST_KEY, JSON.stringify(seeded));
+  return seeded;
+}
+
+function saveListings(l: Listing[]) {
+  window.localStorage.setItem(LIST_KEY, JSON.stringify(l));
+}
+
+export function createListing(
+  seller: string,
+  propertyId: string,
+  shares: number,
+  askPerShare: number,
+): { ok: boolean; reason?: string; listings?: Listing[] } {
+  const holdings = getHoldings(seller);
+  const h = holdings.find((x) => x.propertyId === propertyId);
+  if (!h)               return { ok: false, reason: "You don't own this property." };
+  if (shares <= 0)      return { ok: false, reason: "Shares must be greater than zero." };
+  if (shares > h.shares) return { ok: false, reason: `You only hold ${h.shares} shares.` };
+  if (askPerShare <= 0) return { ok: false, reason: "Ask price must be positive." };
+
+  // Escrow: remove from holdings
+  const next = holdings
+    .map((x) => x.propertyId === propertyId ? { ...x, shares: x.shares - shares } : x)
+    .filter((x) => x.shares > 0);
+  setHoldings(seller, next);
+
+  const all = getListings();
+  const created: Listing = {
+    id: rid(),
+    propertyId,
+    seller: seller.toLowerCase(),
+    shares,
+    askPerShare,
+    createdAt: Date.now(),
+  };
+  const updated = [created, ...all];
+  saveListings(updated);
+  return { ok: true, listings: updated };
+}
+
+export function cancelListing(listingId: string, caller: string): Listing[] {
+  const all = getListings();
+  const target = all.find((l) => l.id === listingId);
+  if (!target) return all;
+  if (target.seller !== caller.toLowerCase() && target.seller !== "vault") return all;
+
+  // Return shares to seller (if not synthetic)
+  if (target.seller !== "vault") {
+    const holdings = getHoldings(target.seller);
+    const existing = holdings.find((h) => h.propertyId === target.propertyId);
+    const next = existing
+      ? holdings.map((h) => h.propertyId === target.propertyId ? { ...h, shares: h.shares + target.shares } : h)
+      : [...holdings, {
+          propertyId: target.propertyId,
+          cityId: lookupProperty(target.propertyId)?.city ?? "",
+          shares: target.shares,
+          acquiredAt: Date.now(),
+          costBasisUsd: target.shares * target.askPerShare,
+        } as Holding];
+    setHoldings(target.seller, next);
+  }
+  const filtered = all.filter((l) => l.id !== listingId);
+  saveListings(filtered);
+  return filtered;
+}
+
+export function buyListing(
+  listingId: string,
+  buyer: string,
+  buyShares: number,
+): { ok: boolean; reason?: string; listings?: Listing[]; holdings?: Holding[] } {
+  if (buyShares <= 0) return { ok: false, reason: "Quantity must be positive." };
+  const all = getListings();
+  const idx = all.findIndex((l) => l.id === listingId);
+  if (idx === -1) return { ok: false, reason: "Listing no longer exists." };
+  const listing = all[idx];
+  if (listing.seller === buyer.toLowerCase()) return { ok: false, reason: "You can't buy your own listing." };
+  if (buyShares > listing.shares) return { ok: false, reason: `Only ${listing.shares} shares available.` };
+
+  // Credit buyer
+  const buyerHoldings = getHoldings(buyer);
+  const cost = buyShares * listing.askPerShare;
+  const existing = buyerHoldings.find((h) => h.propertyId === listing.propertyId);
+  const nextBuyer: Holding[] = existing
+    ? buyerHoldings.map((h) =>
+        h.propertyId === listing.propertyId
+          ? { ...h, shares: h.shares + buyShares, costBasisUsd: h.costBasisUsd + cost }
+          : h,
+      )
+    : [
+        ...buyerHoldings,
+        {
+          propertyId: listing.propertyId,
+          cityId: lookupProperty(listing.propertyId)?.city ?? "",
+          shares: buyShares,
+          acquiredAt: Date.now(),
+          costBasisUsd: cost,
+        },
+      ];
+  setHoldings(buyer, nextBuyer);
+
+  // Decrement / remove listing
+  const remaining = listing.shares - buyShares;
+  const nextListings = remaining > 0
+    ? all.map((l, i) => i === idx ? { ...l, shares: remaining } : l)
+    : all.filter((_, i) => i !== idx);
+  saveListings(nextListings);
+
+  return { ok: true, listings: nextListings, holdings: nextBuyer };
+}
+
+export function fairValuePerShare(propertyId: string) {
+  const meta = lookupProperty(propertyId);
+  if (!meta) return 0;
+  return (meta.prop.price * 1000) / TOTAL_SUPPLY * 6.66;
+}
