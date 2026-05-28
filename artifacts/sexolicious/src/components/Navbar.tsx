@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "wouter";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Wallet } from "lucide-react";
+import { useAccount } from "wagmi";
 import { useWallet } from "./WalletContext";
 
 export default function Navbar() {
@@ -9,6 +10,8 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { scrollY } = useScroll();
   const { openWallet } = useWallet();
+  const { address, isConnected } = useAccount();
+  const shortAddr = address ? `${address.slice(0, 6)}…${address.slice(-4)}` : "";
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 60);
@@ -73,18 +76,37 @@ export default function Navbar() {
             </a>
           ))}
           <div className="w-px h-5 bg-white/10" />
-          <button
-            onClick={openWallet}
-            className="relative group overflow-hidden px-5 py-2.5 text-[11px] font-bold tracking-[0.2em] text-[#050810] bg-primary uppercase rounded-sm transition-all duration-300 hover:bg-primary/90 amber-glow"
-            style={{ fontFamily: "BankGothic, sans-serif" }}
-          >
-            <motion.span
-              className="absolute inset-0 border border-primary/60 rounded-sm"
-              animate={{ scale: [1, 1.12, 1], opacity: [0.6, 0, 0.6] }}
-              transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut" }}
-            />
-            <span className="relative z-10">Connect Wallet</span>
-          </button>
+          {isConnected ? (
+            <div className="flex items-center gap-2">
+              <Link
+                href="/portfolio"
+                className="px-4 py-2 text-[10.5px] tracking-[0.22em] uppercase text-white/70 hover:text-primary border border-white/10 hover:border-primary/40 rounded-sm transition-colors"
+                style={{ fontFamily: "Neuropol, sans-serif" }}
+              >
+                Portfolio
+              </Link>
+              <button
+                onClick={openWallet}
+                className="flex items-center gap-2 px-4 py-2 text-[10.5px] tracking-[0.18em] uppercase text-primary border border-primary/40 hover:bg-primary/10 rounded-sm transition-colors font-mono"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                {shortAddr}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={openWallet}
+              className="relative group overflow-hidden px-5 py-2.5 text-[11px] font-bold tracking-[0.2em] text-[#050810] bg-primary uppercase rounded-sm transition-all duration-300 hover:bg-primary/90 amber-glow"
+              style={{ fontFamily: "BankGothic, sans-serif" }}
+            >
+              <motion.span
+                className="absolute inset-0 border border-primary/60 rounded-sm"
+                animate={{ scale: [1, 1.12, 1], opacity: [0.6, 0, 0.6] }}
+                transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut" }}
+              />
+              <span className="relative z-10">Connect Wallet</span>
+            </button>
+          )}
         </nav>
 
         {/* ── Mobile toggle ── */}
@@ -114,12 +136,23 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
+          {isConnected && (
+            <Link
+              href="/portfolio"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full text-center py-3 text-xs tracking-[0.22em] uppercase text-white/80 border border-white/10 rounded-sm"
+              style={{ fontFamily: "Neuropol, sans-serif" }}
+            >
+              Portfolio
+            </Link>
+          )}
           <button
             onClick={() => { setMobileMenuOpen(false); openWallet(); }}
-            className="w-full py-3.5 text-xs font-bold tracking-[0.2em] text-[#050810] bg-primary uppercase rounded-sm mt-2"
+            className="w-full py-3.5 text-xs font-bold tracking-[0.2em] text-[#050810] bg-primary uppercase rounded-sm mt-2 flex items-center justify-center gap-2"
             style={{ fontFamily: "BankGothic, sans-serif" }}
           >
-            Connect Wallet
+            <Wallet className="w-3.5 h-3.5" />
+            {isConnected ? shortAddr : "Connect Wallet"}
           </button>
         </motion.div>
       )}

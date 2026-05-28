@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { WagmiProvider } from "wagmi";
+import { wagmiConfig } from "@/lib/wagmi";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WalletProvider } from "@/components/WalletContext";
@@ -8,6 +10,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Home from "@/pages/Home";
 import CityPage from "@/pages/CityPage";
+import Portfolio from "@/pages/Portfolio";
 import NotFound from "@/pages/not-found";
 import LoaderScreen from "@/components/LoaderScreen";
 import { AnimatePresence } from "framer-motion";
@@ -19,6 +22,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/city/:cityId" component={CityPage} />
+      <Route path="/portfolio" component={Portfolio} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -28,6 +32,7 @@ function App() {
   const [loaded, setLoaded] = useState(false);
 
   return (
+    <WagmiProvider config={wagmiConfig}>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WalletProvider>
@@ -47,6 +52,7 @@ function App() {
         </WalletProvider>
       </TooltipProvider>
     </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 
