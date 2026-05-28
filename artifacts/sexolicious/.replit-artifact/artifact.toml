@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "Sexolicious — Fractional Property"
+title = "Opas Properties"
 version = "1.0.0"
 id = "artifacts/sexolicious"
 router = "path"
