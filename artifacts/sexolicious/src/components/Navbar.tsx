@@ -88,11 +88,11 @@ export default function Navbar() {
           {isConnected ? (
             <div className="flex items-center gap-2">
               <Link
-                href="/portfolio"
+                href="/dashboard"
                 className="px-4 py-2 text-[10.5px] tracking-[0.22em] uppercase text-white/70 hover:text-primary border border-white/10 hover:border-primary/40 rounded-sm transition-colors"
                 style={{ fontFamily: "Neuropol, sans-serif" }}
               >
-                Portfolio
+                Dashboard
               </Link>
               <button
                 onClick={openWallet}
@@ -157,12 +157,12 @@ export default function Navbar() {
           ))}
           {isConnected && (
             <Link
-              href="/portfolio"
+              href="/dashboard"
               onClick={() => setMobileMenuOpen(false)}
               className="w-full text-center py-3 text-xs tracking-[0.22em] uppercase text-white/80 border border-white/10 rounded-sm"
               style={{ fontFamily: "Neuropol, sans-serif" }}
             >
-              Portfolio
+              Dashboard
             </Link>
           )}
           <button

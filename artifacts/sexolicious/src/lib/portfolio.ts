@@ -96,12 +96,20 @@ export function castVote(
   weight: number,
 ): Proposal[] {
   const all = getProposals();
+  const target = all.find((p) => p.id === proposalId);
   const next = all.map((p) =>
     p.id === proposalId
       ? { ...p, votes: { ...p.votes, [voter.toLowerCase()]: { choice, weight } } }
       : p,
   );
   window.localStorage.setItem(PROP_KEY, JSON.stringify(next));
+  if (target) {
+    logActivity(voter, {
+      kind: "vote",
+      propertyId: target.propertyId,
+      note: `Voted ${choice.toUpperCase()} · ${target.title}`,
+    });
+  }
   return next;
 }
 
@@ -226,6 +234,10 @@ export function createListing(
   };
   const updated = [created, ...all];
   saveListings(updated);
+  logActivity(seller, {
+    kind: "list", propertyId, shares, usd: shares * askPerShare,
+    note: `Listed @ ${askPerShare}/share`,
+  });
   return { ok: true, listings: updated };
 }
 
@@ -252,6 +264,12 @@ export function cancelListing(listingId: string, caller: string): Listing[] {
   }
   const filtered = all.filter((l) => l.id !== listingId);
   saveListings(filtered);
+  if (target.seller !== "vault") {
+    logActivity(caller, {
+      kind: "cancel", propertyId: target.propertyId, shares: target.shares,
+      note: "Listing cancelled · shares returned",
+    });
+  }
   return filtered;
 }
 
@@ -297,6 +315,16 @@ export function buyListing(
     : all.filter((_, i) => i !== idx);
   saveListings(nextListings);
 
+  logActivity(buyer, {
+    kind: "buy", propertyId: listing.propertyId, shares: buyShares, usd: cost,
+    note: listing.seller === "vault" ? "Filled from vault liquidity" : `Filled from ${listing.seller.slice(0, 6)}…`,
+  });
+  if (listing.seller !== "vault") {
+    logActivity(listing.seller, {
+      kind: "sell", propertyId: listing.propertyId, shares: buyShares, usd: cost,
+      note: `Settled to ${buyer.slice(0, 6)}…`,
+    });
+  }
   return { ok: true, listings: nextListings, holdings: nextBuyer };
 }
 
@@ -304,4 +332,109 @@ export function fairValuePerShare(propertyId: string) {
   const meta = lookupProperty(propertyId);
   if (!meta) return 0;
   return (meta.prop.price * 1000) / TOTAL_SUPPLY * 6.66;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Activity ledger (per-wallet)
+// ─────────────────────────────────────────────────────────────
+
+export type ActivityKind = "buy" | "sell" | "list" | "cancel" | "rent" | "vote";
+
+export type Activity = {
+  id: string;
+  kind: ActivityKind;
+  propertyId: string;
+  at: number;
+  shares?: number;
+  usd?: number;       // gross USD value
+  note?: string;
+};
+
+const ACT_KEY = (addr: string) => `opas:activity:${addr.toLowerCase()}`;
+
+function aid() {
+  return `act_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function readActivity(address: string): Activity[] {
+  if (typeof window === "undefined" || !address) return [];
+  try {
+    const raw = window.localStorage.getItem(ACT_KEY(address));
+    if (raw) return JSON.parse(raw) as Activity[];
+  } catch {}
+  return [];
+}
+
+function writeActivity(address: string, a: Activity[]) {
+  window.localStorage.setItem(ACT_KEY(address), JSON.stringify(a.slice(0, 200)));
+}
+
+export function logActivity(address: string, ev: Omit<Activity, "id" | "at"> & { at?: number }) {
+  if (!address) return;
+  const all = readActivity(address);
+  const item: Activity = { id: aid(), at: ev.at ?? Date.now(), ...ev };
+  writeActivity(address, [item, ...all]);
+}
+
+const ACT_SEEDED = (addr: string) => `opas:activity:seeded:${addr.toLowerCase()}`;
+
+export function getActivity(address: string): Activity[] {
+  if (typeof window === "undefined" || !address) return [];
+  const existing = readActivity(address);
+  // Seed historical rental + buy events once per wallet
+  if (!window.localStorage.getItem(ACT_SEEDED(address))) {
+    const holdings = getHoldings(address);
+    const now = Date.now();
+    const day = 1000 * 60 * 60 * 24;
+    const seeded: Activity[] = [];
+    holdings.forEach((h, i) => {
+      const meta = lookupProperty(h.propertyId);
+      if (!meta) return;
+      const fair = fairValuePerShare(h.propertyId);
+      const monthly = (h.shares * fair * (parseFloat(meta.prop.rentalYield) || 0) / 100) / 12;
+      // initial buy receipt
+      seeded.push({
+        id: aid(),
+        kind: "buy",
+        propertyId: h.propertyId,
+        at: h.acquiredAt,
+        shares: h.shares,
+        usd: h.costBasisUsd,
+        note: "Initial position",
+      });
+      // 3 monthly rent collections
+      for (let m = 1; m <= 3; m++) {
+        seeded.push({
+          id: aid(),
+          kind: "rent",
+          propertyId: h.propertyId,
+          at: now - m * 30 * day + i * day,
+          usd: Math.round(monthly),
+          note: `Month ${4 - m} distribution`,
+        });
+      }
+    });
+    seeded.sort((a, b) => b.at - a.at);
+    writeActivity(address, [...seeded, ...existing]);
+    window.localStorage.setItem(ACT_SEEDED(address), "1");
+    return readActivity(address);
+  }
+  return existing;
+}
+
+export function rentalSummary(holdings: Holding[]) {
+  let monthly = 0;
+  let annual = 0;
+  const perProperty: { propertyId: string; monthly: number; yield: number }[] = [];
+  for (const h of holdings) {
+    const meta = lookupProperty(h.propertyId);
+    if (!meta) continue;
+    const fair = fairValuePerShare(h.propertyId);
+    const yld = parseFloat(meta.prop.rentalYield) || 0;
+    const m = (h.shares * fair * (yld / 100)) / 12;
+    monthly += m;
+    annual += m * 12;
+    perProperty.push({ propertyId: h.propertyId, monthly: m, yield: yld });
+  }
+  return { monthly, annual, perProperty };
 }

@@ -12,6 +12,7 @@ import Home from "@/pages/Home";
 import CityPage from "@/pages/CityPage";
 import Portfolio from "@/pages/Portfolio";
 import Marketplace from "@/pages/Marketplace";
+import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/not-found";
 import LoaderScreen from "@/components/LoaderScreen";
 import { AnimatePresence } from "framer-motion";
@@ -23,6 +24,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/city/:cityId" component={CityPage} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/portfolio" component={Portfolio} />
       <Route path="/marketplace" component={Marketplace} />
       <Route component={NotFound} />

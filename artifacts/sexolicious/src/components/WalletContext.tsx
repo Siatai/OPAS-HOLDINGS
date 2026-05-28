@@ -300,11 +300,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                       </div>
 
                       <div className="w-full flex flex-col gap-2">
-                        <Link href="/portfolio" onClick={closeWallet}
+                        <Link href="/dashboard" onClick={closeWallet}
                           className="w-full text-center px-5 py-3 text-[11px] font-bold tracking-[0.22em] text-[#050810] bg-primary uppercase rounded-sm amber-glow"
                           style={{ fontFamily: "BankGothic, sans-serif" }}
                         >
-                          Open Portfolio
+                          Open Dashboard
                         </Link>
                         <button onClick={() => disconnect()}
                           className="w-full px-5 py-2.5 text-[10.5px] tracking-[0.22em] text-white/55 hover:text-white uppercase border border-white/10 hover:border-white/25 rounded-sm transition-colors"
