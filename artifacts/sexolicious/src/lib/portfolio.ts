@@ -133,12 +133,11 @@ export function portfolioStats(holdings: Holding[]) {
   let totalCost  = 0;
   let monthlyYield = 0;
   for (const h of holdings) {
-    const meta = lookupProperty(h.propertyId);
-    if (!meta) continue;
-    const pricePerShare = (meta.prop.price * 1000) / TOTAL_SUPPLY * 6.66;
-    const value = h.shares * pricePerShare;
+    const value = h.shares * fairValuePerShare(h.propertyId);
     totalValue += value;
     totalCost  += h.costBasisUsd;
+    const meta = lookupProperty(h.propertyId);
+    if (!meta) continue;
     const ry = parseFloat(meta.prop.rentalYield) || 0;
     monthlyYield += (value * (ry / 100)) / 12;
   }
@@ -328,10 +327,26 @@ export function buyListing(
   return { ok: true, listings: nextListings, holdings: nextBuyer };
 }
 
+// Fair value/share = primary launch price compounded by the property's
+// real capital-growth figure (Knight Frank / JLL data baked into cities.ts).
+// e.g. Burj Khalifa Penthouse: $150 × (1 + 17.2%) = $175.80/share.
 export function fairValuePerShare(propertyId: string) {
   const meta = lookupProperty(propertyId);
   if (!meta) return 0;
-  return (meta.prop.price * 1000) / TOTAL_SUPPLY * 6.66;
+  const growthStr = (meta.prop as any).capitalGrowth ?? "0%";
+  const growth = parseFloat(String(growthStr).replace(/[+%\s]/g, "")) || 0;
+  return meta.prop.price * (1 + growth / 100);
+}
+
+// Display helper: compact $K / $M / $B formatting for stat tiles & headers.
+export function fmtUsdCompact(n: number): string {
+  if (!isFinite(n)) return "$0";
+  const sign = n < 0 ? "-" : "";
+  const abs = Math.abs(n);
+  if (abs >= 1e9) return `${sign}$${(abs / 1e9).toFixed(abs >= 1e10 ? 1 : 2)}B`;
+  if (abs >= 1e6) return `${sign}$${(abs / 1e6).toFixed(abs >= 1e7 ? 1 : 2)}M`;
+  if (abs >= 1e3) return `${sign}$${(abs / 1e3).toFixed(abs >= 1e4 ? 1 : 2)}K`;
+  return `${sign}$${abs.toFixed(0)}`;
 }
 
 // ─────────────────────────────────────────────────────────────

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import {
   getListings, buyListing, cancelListing, lookupProperty, fairValuePerShare,
+  fmtUsdCompact,
   type Listing,
 } from "@/lib/portfolio";
 import { useWallet } from "@/components/WalletContext";
@@ -135,7 +136,7 @@ export default function Marketplace() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
           {[
             { label: "Open listings",      value: String(totals.count),       icon: Tag,        tone: "text-white" },
-            { label: "Liquidity (USD)",    value: fmtUsd(totals.tvl),         icon: TrendingUp, tone: "text-primary" },
+            { label: "Liquidity (USD)",    value: fmtUsdCompact(totals.tvl),  icon: TrendingUp, tone: "text-primary" },
             { label: "Shares available",   value: totals.tot.toLocaleString(), icon: Store,      tone: "text-secondary" },
             { label: "Your listings",      value: String(totals.mineCount),   icon: Wallet,     tone: "text-emerald-300" },
           ].map((s) => (

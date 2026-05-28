@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import {
   getHoldings, getProposals, getListings, getActivity,
-  portfolioStats, rentalSummary, lookupProperty, fairValuePerShare,
+  portfolioStats, rentalSummary, lookupProperty, fmtUsdCompact,
   type Holding, type Proposal, type Listing, type Activity, type ActivityKind,
 } from "@/lib/portfolio";
 import { useWallet } from "@/components/WalletContext";
@@ -133,7 +133,7 @@ export default function Dashboard() {
       href: "#rentals",
       tone: "from-amber-400/20 to-amber-400/0 border-amber-400/30",
       iconTone: "text-amber-300",
-      meta: `${fmtUsd(rentals.monthly)} / mo`,
+      meta: `${fmtUsdCompact(rentals.monthly)} / mo`,
     },
     {
       label: "Governance",
@@ -192,10 +192,10 @@ export default function Dashboard() {
         {/* ── Snapshot stats ── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
           {[
-            { label: "Vault value",   value: fmtUsd(stats.totalValue),   icon: Coins,      tone: "text-primary" },
-            { label: "Net P&L",       value: fmtUsd(stats.pnl),           sub: fmtPct(stats.pnlPct), icon: stats.pnl >= 0 ? TrendingUp : TrendingDown, tone: stats.pnl >= 0 ? "text-emerald-300" : "text-rose-300" },
-            { label: "Monthly yield", value: fmtUsd(rentals.monthly),     icon: Receipt,    tone: "text-amber-300" },
-            { label: "Rent collected",value: fmtUsd(rentLifetime),        icon: BadgePercent, tone: "text-secondary" },
+            { label: "Vault value",   value: fmtUsdCompact(stats.totalValue),   icon: Coins,      tone: "text-primary" },
+            { label: "Net P&L",       value: fmtUsdCompact(stats.pnl),           sub: fmtPct(stats.pnlPct), icon: stats.pnl >= 0 ? TrendingUp : TrendingDown, tone: stats.pnl >= 0 ? "text-emerald-300" : "text-rose-300" },
+            { label: "Monthly yield", value: fmtUsdCompact(rentals.monthly),     icon: Receipt,    tone: "text-amber-300" },
+            { label: "Rent collected",value: fmtUsdCompact(rentLifetime),        icon: BadgePercent, tone: "text-secondary" },
           ].map((s) => (
             <div key={s.label}
               className="rounded-lg p-3 sm:p-4 min-w-0"
@@ -287,7 +287,7 @@ export default function Dashboard() {
                 <span className="metallic-text">Rental income</span>
               </h2>
               <span className="text-[10px] tracking-[0.32em] uppercase text-white/30" style={NEVERA}>
-                {fmtUsd(rentals.annual)} / yr
+                {fmtUsdCompact(rentals.annual)} / yr
               </span>
             </div>
 
@@ -321,7 +321,7 @@ export default function Dashboard() {
                   })}
                   <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-amber-400/8 to-transparent">
                     <span className="text-[10px] tracking-[0.28em] uppercase text-amber-300/80 font-mono">Total monthly</span>
-                    <span className="text-base sm:text-lg text-amber-300" style={SHARKON}>{fmtUsd(rentals.monthly)}</span>
+                    <span className="text-base sm:text-lg text-amber-300" style={SHARKON}>{fmtUsdCompact(rentals.monthly)}</span>
                   </div>
                 </div>
               )}

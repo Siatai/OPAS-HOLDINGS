@@ -9,7 +9,7 @@ import {
 import {
   getHoldings, getProposals, castVote, lookupProperty,
   ownershipPct, portfolioStats, tally,
-  createListing, fairValuePerShare,
+  createListing, fairValuePerShare, fmtUsdCompact,
   type Holding, type Proposal,
 } from "@/lib/portfolio";
 import { Tag } from "lucide-react";
@@ -171,9 +171,9 @@ export default function Portfolio() {
         {/* Stat tiles */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
           {[
-            { label: "Vault value", value: fmtUsd(stats.totalValue), icon: Coins,       tone: "text-primary" },
-            { label: "Net P&L",     value: fmtUsd(stats.pnl),         sub: fmtPct(stats.pnlPct), icon: TrendingUp, tone: stats.pnl >= 0 ? "text-emerald-300" : "text-rose-300" },
-            { label: "Monthly yield", value: fmtUsd(stats.monthlyYield), icon: Wallet,    tone: "text-secondary" },
+            { label: "Vault value", value: fmtUsdCompact(stats.totalValue), icon: Coins,       tone: "text-primary" },
+            { label: "Net P&L",     value: fmtUsdCompact(stats.pnl),         sub: fmtPct(stats.pnlPct), icon: TrendingUp, tone: stats.pnl >= 0 ? "text-emerald-300" : "text-rose-300" },
+            { label: "Monthly yield", value: fmtUsdCompact(stats.monthlyYield), icon: Wallet,    tone: "text-secondary" },
             { label: "Properties",  value: String(stats.properties),  icon: Building2,   tone: "text-white" },
           ].map((s) => (
             <div key={s.label}
@@ -217,7 +217,7 @@ export default function Portfolio() {
                 if (!meta) return null;
                 const { prop, city } = meta;
                 const pct = ownershipPct(h.shares);
-                const pricePerShare = (prop.price * 1000) / 1000 * 6.66;
+                const pricePerShare = fairValuePerShare(h.propertyId);
                 const value = h.shares * pricePerShare;
                 const cost  = h.costBasisUsd;
                 const pnl   = value - cost;
