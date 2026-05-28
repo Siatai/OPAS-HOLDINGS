@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Loader2 } from "lucide-react";
-import BuildingIllustration from "./BuildingIllustration";
+import { X, Loader2, Shield, Zap, Globe2 } from "lucide-react";
+import worldSkyline from "@/assets/images/world_skyline.png";
 
 interface WalletContextType {
   isOpen: boolean;
@@ -52,20 +52,103 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                 <X className="w-5 h-5" />
               </button>
 
-              <div className="grid grid-cols-1 md:grid-cols-2">
+              <div className="grid grid-cols-1 md:grid-cols-[1.05fr_1fr]">
 
-                {/* ── Left: Anime building illustration ── */}
-                <div className="relative h-[280px] md:h-auto md:min-h-[440px] flex items-center justify-center bg-[radial-gradient(ellipse_70%_60%_at_50%_55%,rgba(234,141,14,0.12)_0%,transparent_70%)] overflow-hidden">
-                  <div className="absolute inset-0 opacity-30 bg-[linear-gradient(rgba(255,255,255,0.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.6)_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_20%,transparent_100%)]" />
-                  <div className="relative w-[200px] md:w-[260px]" style={{ aspectRatio: "408/540" }}>
-                    <BuildingIllustration />
+                {/* ── Left: Skyline hero panel ── */}
+                <div className="relative h-[220px] md:h-auto md:min-h-[480px] overflow-hidden">
+                  {/* Skyline image */}
+                  <img
+                    src={worldSkyline}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover object-bottom"
+                    style={{ filter: "saturate(1.05) contrast(1.05)" }}
+                  />
+                  {/* Top-down fade */}
+                  <div className="absolute inset-0"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, rgba(8,12,24,0.6) 0%, rgba(8,12,24,0.15) 35%, rgba(8,12,24,0.5) 80%, rgba(8,12,24,0.9) 100%)",
+                    }}
+                  />
+                  {/* Right edge fade into right panel */}
+                  <div className="hidden md:block absolute inset-y-0 right-0 w-32"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, transparent 0%, rgba(8,12,24,0.85) 100%)",
+                    }}
+                  />
+                  {/* Amber horizon kiss */}
+                  <div className="absolute inset-x-0 bottom-[18%] h-32 opacity-60 pointer-events-none"
+                    style={{
+                      background:
+                        "radial-gradient(ellipse 60% 100% at 50% 100%, rgba(234,141,14,0.35), transparent 70%)",
+                    }}
+                  />
+
+                  {/* Glowing OPAS seal — floating */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%]"
+                  >
+                    <div className="relative">
+                      {/* Outer pulsing ring */}
+                      <motion.div
+                        className="absolute inset-0 rounded-full"
+                        style={{ border: "1px solid rgba(234,141,14,0.45)" }}
+                        animate={{ scale: [1, 1.55], opacity: [0.6, 0] }}
+                        transition={{ repeat: Infinity, duration: 2.6, ease: "easeOut" }}
+                      />
+                      <motion.div
+                        className="absolute inset-0 rounded-full"
+                        style={{ border: "1px solid rgba(11,181,190,0.4)" }}
+                        animate={{ scale: [1, 1.8], opacity: [0.5, 0] }}
+                        transition={{ repeat: Infinity, duration: 3.2, ease: "easeOut", delay: 0.4 }}
+                      />
+                      {/* Seal */}
+                      <div
+                        className="relative w-[110px] h-[110px] rounded-full flex items-center justify-center"
+                        style={{
+                          background:
+                            "radial-gradient(circle at 30% 30%, rgba(234,141,14,0.55), rgba(234,141,14,0.08) 70%)",
+                          border: "1px solid rgba(234,141,14,0.55)",
+                          boxShadow:
+                            "inset 0 1px 0 rgba(255,255,255,0.2), 0 0 50px -5px rgba(234,141,14,0.55)",
+                        }}
+                      >
+                        <div className="text-center">
+                          <div
+                            className="text-[22px] tracking-[0.18em] text-white"
+                            style={{ fontFamily: "Sharkon, Nevera, sans-serif" }}
+                          >
+                            OPAS
+                          </div>
+                          <div
+                            className="text-[7px] tracking-[0.4em] uppercase text-primary mt-0.5"
+                            style={NEVERA}
+                          >
+                            Vault · 001
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Corner glyphs */}
+                  <div className="absolute top-4 left-4 flex items-center gap-1.5 z-10">
+                    <span className="w-1 h-1 rounded-full bg-secondary animate-pulse" />
+                    <span className="text-[8px] font-mono tracking-[0.32em] uppercase text-white/55">
+                      Encrypted · TLS 1.3
+                    </span>
                   </div>
-                  {/* Vertical divider on desktop */}
-                  <div className="hidden md:block absolute top-8 bottom-8 right-0 w-px bg-gradient-to-b from-transparent via-white/15 to-transparent" />
+                  <div className="absolute bottom-4 left-4 z-10 text-[8px] font-mono tracking-[0.32em] uppercase text-white/35">
+                    16 markets · 8 cities · live
+                  </div>
                 </div>
 
                 {/* ── Right: Connection content ── */}
-                <div className="flex flex-col items-start text-left p-8 md:p-10 space-y-5">
+                <div className="relative flex flex-col items-start text-left p-7 md:p-9 space-y-5 bg-[rgba(8,12,24,0.6)]">
                   <div className="metallic-border inline-flex items-center gap-2 px-3 py-1 rounded-full">
                     <span className="w-1 h-1 rounded-full bg-secondary animate-pulse" />
                     <span className="text-[8.5px] tracking-[0.32em] uppercase metallic-text" style={NEVERA}>
@@ -74,15 +157,38 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                   </div>
 
                   <div>
-                    <h3 className="text-[26px] md:text-[30px] leading-[1.1] mb-3" style={SHARKON}>
+                    <h3 className="text-[26px] md:text-[30px] leading-[1.05] mb-3" style={SHARKON}>
                       <span className="metallic-text">Acquire your</span>
                       <br />
                       <span className="metallic-warm-text">equity interest.</span>
                     </h3>
-                    <p className="text-white/45 text-sm leading-relaxed" style={NEVERA}>
+                    <p className="text-white/55 text-[13.5px] leading-relaxed" style={NEVERA}>
                       Establishing secure connection to decentralized wallet protocols.
                       Your ownership in luxury real estate begins here.
                     </p>
+                  </div>
+
+                  {/* Feature chips — replace empty space with substance */}
+                  <div className="w-full grid grid-cols-3 gap-2">
+                    {[
+                      { icon: Shield, label: "Audited" },
+                      { icon: Zap,    label: "Instant" },
+                      { icon: Globe2, label: "Global" },
+                    ].map(({ icon: Icon, label }) => (
+                      <div
+                        key={label}
+                        className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-md"
+                        style={{
+                          background: "rgba(20,28,48,0.6)",
+                          border: "1px solid rgba(220,225,235,0.08)",
+                        }}
+                      >
+                        <Icon className="w-3.5 h-3.5 text-primary/80" />
+                        <span className="text-[8.5px] tracking-[0.28em] uppercase text-white/55" style={NEVERA}>
+                          {label}
+                        </span>
+                      </div>
+                    ))}
                   </div>
 
                   {/* Animated progress bar */}
