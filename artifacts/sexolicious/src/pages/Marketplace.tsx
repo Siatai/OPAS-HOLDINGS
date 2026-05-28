@@ -96,7 +96,7 @@ export default function Marketplace() {
 
   return (
     <div className="min-h-screen pt-28 md:pt-32 pb-24">
-      <div className="container mx-auto px-6 lg:px-12 max-w-7xl space-y-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl space-y-6 md:space-y-8">
 
         {/* Header */}
         <motion.div
@@ -111,7 +111,7 @@ export default function Marketplace() {
                 Secondary market · 24/7
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl leading-[1.05]" style={SHARKON}>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl leading-[1.05] break-words" style={SHARKON}>
               <span className="metallic-text">Marketplace.</span>{" "}
               <span className="metallic-warm-text">Trade ownership.</span>
             </h1>
@@ -122,17 +122,17 @@ export default function Marketplace() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Link href="/portfolio" className="px-4 py-2.5 text-[10px] tracking-[0.22em] text-primary hover:text-primary uppercase border border-primary/40 hover:bg-primary/10 rounded-sm transition-colors" style={NEVERA}>
+            <Link href="/portfolio" className="px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] text-primary hover:text-primary uppercase border border-primary/40 hover:bg-primary/10 rounded-sm transition-colors" style={NEVERA}>
               List shares for sale →
             </Link>
-            <Link href="/" className="px-4 py-2.5 text-[10px] tracking-[0.22em] text-white/55 hover:text-white uppercase border border-white/10 hover:border-white/25 rounded-sm transition-colors" style={NEVERA}>
+            <Link href="/" className="px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] text-white/55 hover:text-white uppercase border border-white/10 hover:border-white/25 rounded-sm transition-colors" style={NEVERA}>
               ← Home
             </Link>
           </div>
         </motion.div>
 
         {/* Market stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
           {[
             { label: "Open listings",      value: String(totals.count),       icon: Tag,        tone: "text-white" },
             { label: "Liquidity (USD)",    value: fmtUsd(totals.tvl),         icon: TrendingUp, tone: "text-primary" },
@@ -140,14 +140,14 @@ export default function Marketplace() {
             { label: "Your listings",      value: String(totals.mineCount),   icon: Wallet,     tone: "text-emerald-300" },
           ].map((s) => (
             <div key={s.label}
-              className="rounded-lg p-4"
+              className="rounded-lg p-3 sm:p-4 min-w-0"
               style={{ background: "rgba(20,28,48,0.5)", border: "1px solid rgba(220,225,235,0.08)" }}
             >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[8.5px] tracking-[0.32em] uppercase text-white/40" style={NEVERA}>{s.label}</span>
-                <s.icon className={`w-3.5 h-3.5 ${s.tone}`} />
+              <div className="flex items-center justify-between mb-2 sm:mb-3 gap-2 min-w-0">
+                <span className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 truncate" style={NEVERA}>{s.label}</span>
+                <s.icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${s.tone}`} />
               </div>
-              <div className={`text-2xl ${s.tone}`} style={SHARKON}>{s.value}</div>
+              <div className={`text-base sm:text-xl md:text-2xl truncate ${s.tone}`} style={SHARKON}>{s.value}</div>
             </div>
           ))}
         </div>
@@ -155,23 +155,23 @@ export default function Marketplace() {
         {/* Controls */}
         <div className="flex flex-col lg:flex-row lg:items-center gap-3">
           {/* Tabs */}
-          <div className="inline-flex p-1 rounded-md border border-white/10 bg-[rgba(20,28,48,0.4)] shrink-0">
+          <div className="inline-flex p-1 rounded-md border border-white/10 bg-[rgba(20,28,48,0.4)] shrink-0 self-start">
             {(["all", "mine"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
                 disabled={t === "mine" && !isConnected}
-                className={`px-4 py-2 text-[10px] tracking-[0.24em] uppercase transition-colors rounded-sm ${tab === t ? "bg-primary/15 text-primary" : "text-white/55 hover:text-white"} disabled:opacity-30 disabled:cursor-not-allowed`}
+                className={`px-3 sm:px-4 py-2 text-[10px] tracking-[0.2em] sm:tracking-[0.24em] uppercase transition-colors rounded-sm ${tab === t ? "bg-primary/15 text-primary" : "text-white/55 hover:text-white"} disabled:opacity-30 disabled:cursor-not-allowed`}
                 style={NEVERA}
                 data-testid={`tab-${t}`}
               >
-                {t === "all" ? "All listings" : "My listings"}
+                {t === "all" ? "All" : "Mine"}
               </button>
             ))}
           </div>
 
           {/* Search */}
-          <div className="relative flex-1">
+          <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/35" />
             <input
               value={search}
@@ -182,34 +182,36 @@ export default function Marketplace() {
             />
           </div>
 
-          {/* City filter */}
-          <select
-            value={cityFilter}
-            onChange={(e) => setCityFilter(e.target.value)}
-            className="px-3 py-2.5 text-[11px] tracking-[0.18em] uppercase bg-[rgba(20,28,48,0.4)] border border-white/10 hover:border-white/25 rounded-md text-white/75 outline-none cursor-pointer"
-            style={NEVERA}
-          >
-            <option value="all">All cities</option>
-            {CITIES.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-
-          {/* Sort */}
-          <div className="relative">
-            <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-white/35 pointer-events-none" />
+          <div className="flex gap-2 min-w-0">
+            {/* City filter */}
             <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortKey)}
-              className="pl-8 pr-3 py-2.5 text-[11px] tracking-[0.18em] uppercase bg-[rgba(20,28,48,0.4)] border border-white/10 hover:border-white/25 rounded-md text-white/75 outline-none cursor-pointer"
+              value={cityFilter}
+              onChange={(e) => setCityFilter(e.target.value)}
+              className="flex-1 min-w-0 px-3 py-2.5 text-[11px] tracking-[0.18em] uppercase bg-[rgba(20,28,48,0.4)] border border-white/10 hover:border-white/25 rounded-md text-white/75 outline-none cursor-pointer"
               style={NEVERA}
             >
-              <option value="newest">Newest</option>
-              <option value="discount">Best discount</option>
-              <option value="yield">Highest yield</option>
-              <option value="price_asc">Price ↑</option>
-              <option value="price_desc">Price ↓</option>
+              <option value="all">All cities</option>
+              {CITIES.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
             </select>
+
+            {/* Sort */}
+            <div className="relative flex-1 min-w-0">
+              <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-white/35 pointer-events-none" />
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value as SortKey)}
+                className="w-full pl-8 pr-2 py-2.5 text-[11px] tracking-[0.18em] uppercase bg-[rgba(20,28,48,0.4)] border border-white/10 hover:border-white/25 rounded-md text-white/75 outline-none cursor-pointer"
+                style={NEVERA}
+              >
+                <option value="newest">Newest</option>
+                <option value="discount">Best discount</option>
+                <option value="yield">Highest yield</option>
+                <option value="price_asc">Price ↑</option>
+                <option value="price_desc">Price ↓</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -274,14 +276,14 @@ export default function Marketplace() {
                   </div>
 
                   <div className="p-4 space-y-3 flex-1 flex flex-col">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
+                    <div className="grid grid-cols-2 gap-3 min-w-0">
+                      <div className="min-w-0">
                         <div className="text-[8.5px] tracking-[0.28em] uppercase text-white/35" style={NEVERA}>Ask / share</div>
-                        <div className="text-lg text-white" style={SHARKON}>{fmtUsd(listing.askPerShare)}</div>
+                        <div className="text-base sm:text-lg text-white truncate" style={SHARKON}>{fmtUsd(listing.askPerShare)}</div>
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <div className="text-[8.5px] tracking-[0.28em] uppercase text-white/35" style={NEVERA}>Fair value</div>
-                        <div className="text-lg text-white/65" style={SHARKON}>{fmtUsd(fair)}</div>
+                        <div className="text-base sm:text-lg text-white/65 truncate" style={SHARKON}>{fmtUsd(fair)}</div>
                       </div>
                     </div>
 

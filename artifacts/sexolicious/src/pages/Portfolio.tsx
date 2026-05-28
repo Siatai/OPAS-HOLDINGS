@@ -132,7 +132,7 @@ export default function Portfolio() {
 
   return (
     <div className="min-h-screen pt-28 md:pt-32 pb-24">
-      <div className="container mx-auto px-6 lg:px-12 max-w-7xl space-y-10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl space-y-8 md:space-y-10">
 
         {/* Header */}
         <motion.div
@@ -148,7 +148,7 @@ export default function Portfolio() {
                 Vault · Live
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl leading-[1.05]" style={SHARKON}>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl leading-[1.05] break-words" style={SHARKON}>
               <span className="metallic-text">Your equity </span>
               <span className="metallic-warm-text">interest.</span>
             </h1>
@@ -159,17 +159,17 @@ export default function Portfolio() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Link href="/marketplace" className="px-4 py-2.5 text-[10px] tracking-[0.22em] text-primary hover:text-primary uppercase border border-primary/40 hover:bg-primary/10 rounded-sm transition-colors" style={NEVERA}>
+            <Link href="/marketplace" className="px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] text-primary hover:text-primary uppercase border border-primary/40 hover:bg-primary/10 rounded-sm transition-colors" style={NEVERA}>
               Open marketplace →
             </Link>
-            <Link href="/" className="px-4 py-2.5 text-[10px] tracking-[0.22em] text-white/55 hover:text-white uppercase border border-white/10 hover:border-white/25 rounded-sm transition-colors" style={NEVERA}>
-              ← Back to home
+            <Link href="/" className="px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] text-white/55 hover:text-white uppercase border border-white/10 hover:border-white/25 rounded-sm transition-colors" style={NEVERA}>
+              ← Home
             </Link>
           </div>
         </motion.div>
 
         {/* Stat tiles */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
           {[
             { label: "Vault value", value: fmtUsd(stats.totalValue), icon: Coins,       tone: "text-primary" },
             { label: "Net P&L",     value: fmtUsd(stats.pnl),         sub: fmtPct(stats.pnlPct), icon: TrendingUp, tone: stats.pnl >= 0 ? "text-emerald-300" : "text-rose-300" },
@@ -177,16 +177,16 @@ export default function Portfolio() {
             { label: "Properties",  value: String(stats.properties),  icon: Building2,   tone: "text-white" },
           ].map((s) => (
             <div key={s.label}
-              className="rounded-lg p-4"
+              className="rounded-lg p-3 sm:p-4 min-w-0"
               style={{ background: "rgba(20,28,48,0.5)", border: "1px solid rgba(220,225,235,0.08)" }}
             >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[8.5px] tracking-[0.32em] uppercase text-white/40" style={NEVERA}>{s.label}</span>
-                <s.icon className={`w-3.5 h-3.5 ${s.tone}`} />
+              <div className="flex items-center justify-between mb-2 sm:mb-3 gap-2 min-w-0">
+                <span className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 truncate" style={NEVERA}>{s.label}</span>
+                <s.icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${s.tone}`} />
               </div>
-              <div className={`text-2xl ${s.tone}`} style={SHARKON}>{s.value}</div>
+              <div className={`text-base sm:text-xl md:text-2xl truncate ${s.tone}`} style={SHARKON}>{s.value}</div>
               {"sub" in s && s.sub && (
-                <div className={`text-[10px] mt-1 font-mono ${s.tone}`}>{s.sub}</div>
+                <div className={`text-[9px] sm:text-[10px] mt-1 font-mono ${s.tone}`}>{s.sub}</div>
               )}
             </div>
           ))}
@@ -263,18 +263,18 @@ export default function Portfolio() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-2 pt-1">
-                        <div>
-                          <div className="text-[8.5px] tracking-[0.28em] uppercase text-white/35" style={NEVERA}>Value</div>
-                          <div className="text-sm text-white" style={SHARKON}>{fmtUsd(value)}</div>
+                      <div className="grid grid-cols-3 gap-2 pt-1 min-w-0">
+                        <div className="min-w-0">
+                          <div className="text-[8px] sm:text-[8.5px] tracking-[0.22em] sm:tracking-[0.28em] uppercase text-white/35" style={NEVERA}>Value</div>
+                          <div className="text-[13px] sm:text-sm text-white truncate" style={SHARKON}>{fmtUsd(value)}</div>
                         </div>
-                        <div>
-                          <div className="text-[8.5px] tracking-[0.28em] uppercase text-white/35" style={NEVERA}>Cost</div>
-                          <div className="text-sm text-white/70" style={SHARKON}>{fmtUsd(cost)}</div>
+                        <div className="min-w-0">
+                          <div className="text-[8px] sm:text-[8.5px] tracking-[0.22em] sm:tracking-[0.28em] uppercase text-white/35" style={NEVERA}>Cost</div>
+                          <div className="text-[13px] sm:text-sm text-white/70 truncate" style={SHARKON}>{fmtUsd(cost)}</div>
                         </div>
-                        <div>
-                          <div className="text-[8.5px] tracking-[0.28em] uppercase text-white/35" style={NEVERA}>P&L</div>
-                          <div className={`text-sm ${pnl >= 0 ? "text-emerald-300" : "text-rose-300"}`} style={SHARKON}>
+                        <div className="min-w-0">
+                          <div className="text-[8px] sm:text-[8.5px] tracking-[0.22em] sm:tracking-[0.28em] uppercase text-white/35" style={NEVERA}>P&L</div>
+                          <div className={`text-[13px] sm:text-sm truncate ${pnl >= 0 ? "text-emerald-300" : "text-rose-300"}`} style={SHARKON}>
                             {fmtUsd(pnl)}
                           </div>
                         </div>
