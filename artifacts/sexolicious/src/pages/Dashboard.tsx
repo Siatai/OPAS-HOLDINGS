@@ -149,8 +149,8 @@ export default function Dashboard() {
   const recent = activity.slice(0, 10);
 
   return (
-    <div className="min-h-screen pt-28 md:pt-32 pb-24">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl space-y-8 md:space-y-10">
+    <div className="min-h-screen pt-28 md:pt-32 pb-24 overflow-x-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl space-y-8 md:space-y-10 min-w-0">
 
         {/* ── Header ── */}
         <motion.div
@@ -166,13 +166,13 @@ export default function Dashboard() {
                 Vault dashboard · Live
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl leading-[1.05] break-words" style={SHARKON}>
+            <h1 className="text-[26px] sm:text-3xl md:text-4xl lg:text-5xl leading-[1.05] break-words" style={SHARKON}>
               <span className="metallic-text">Welcome back, </span>
               <span className="metallic-warm-text">investor.</span>
             </h1>
-            <div className="flex items-center gap-2 text-[10px] tracking-[0.32em] uppercase text-white/40 font-mono">
-              <ShieldCheck className="w-3.5 h-3.5 text-primary/70" />
-              {address?.slice(0, 6)}…{address?.slice(-4)} · chain {chainId}
+            <div className="flex items-center gap-2 text-[9px] sm:text-[10px] tracking-[0.22em] sm:tracking-[0.32em] uppercase text-white/40 font-mono min-w-0">
+              <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary/70 shrink-0" />
+              <span className="truncate">{address?.slice(0, 6)}…{address?.slice(-4)} · chain {chainId}</span>
             </div>
           </div>
 
@@ -215,30 +215,30 @@ export default function Dashboard() {
         </div>
 
         {/* ── Nav cards ── */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl md:text-2xl" style={SHARKON}>
+        <section className="space-y-3 min-w-0">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg sm:text-xl md:text-2xl truncate" style={SHARKON}>
               <span className="metallic-text">Navigate</span>
             </h2>
-            <span className="text-[10px] tracking-[0.32em] uppercase text-white/30" style={NEVERA}>4 modules</span>
+            <span className="text-[9px] sm:text-[10px] tracking-[0.22em] sm:tracking-[0.32em] uppercase text-white/30 shrink-0" style={NEVERA}>4 modules</span>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
             {navCards.map((c) => {
               const isAnchor = c.href.startsWith("#");
               const inner = (
                 <motion.div
                   whileHover={{ y: -3 }}
-                  className={`group relative rounded-xl p-4 sm:p-5 h-full overflow-hidden bg-gradient-to-br ${c.tone} border transition-shadow hover:shadow-[0_18px_50px_-20px_rgba(234,141,14,0.4)]`}
+                  className={`group relative rounded-xl p-3 sm:p-5 h-full overflow-hidden min-w-0 bg-gradient-to-br ${c.tone} border transition-shadow hover:shadow-[0_18px_50px_-20px_rgba(234,141,14,0.4)]`}
                   data-testid={`nav-${c.label.toLowerCase()}`}
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <c.icon className={`w-7 h-7 ${c.iconTone}`} />
-                    <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  <div className="flex items-start justify-between mb-3 sm:mb-4">
+                    <c.icon className={`w-5 h-5 sm:w-7 sm:h-7 ${c.iconTone}`} />
+                    <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/30 group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
                   </div>
-                  <div className="text-base sm:text-lg text-white mb-1" style={SHARKON}>{c.label}</div>
-                  <div className="text-[10.5px] text-white/55 mb-3" style={NEVERA}>{c.desc}</div>
-                  <div className={`text-[9.5px] tracking-[0.24em] uppercase font-mono ${c.iconTone}`}>
+                  <div className="text-[13px] sm:text-base md:text-lg leading-tight text-white mb-1 break-words" style={SHARKON}>{c.label}</div>
+                  <div className="text-[9.5px] sm:text-[10.5px] text-white/55 mb-2 sm:mb-3 leading-snug" style={NEVERA}>{c.desc}</div>
+                  <div className={`text-[8.5px] sm:text-[9.5px] tracking-[0.18em] sm:tracking-[0.24em] uppercase font-mono truncate ${c.iconTone}`}>
                     {c.meta}
                   </div>
                 </motion.div>
@@ -280,14 +280,14 @@ export default function Dashboard() {
         <div className="grid lg:grid-cols-[1.1fr_1fr] gap-4 md:gap-6">
 
           {/* Rentals */}
-          <section id="rentals" className="space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="text-xl md:text-2xl flex items-center gap-2.5" style={SHARKON}>
-                <Receipt className="w-5 h-5 text-amber-300" />
-                <span className="metallic-text">Rental income</span>
+          <section id="rentals" className="space-y-3 min-w-0">
+            <div className="flex items-center justify-between gap-2 min-w-0">
+              <h2 className="text-base sm:text-xl md:text-2xl flex items-center gap-2 sm:gap-2.5 min-w-0 truncate" style={SHARKON}>
+                <Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 shrink-0" />
+                <span className="metallic-text truncate">Rental income</span>
               </h2>
-              <span className="text-[10px] tracking-[0.32em] uppercase text-white/30" style={NEVERA}>
-                {fmtUsdCompact(rentals.annual)} / yr
+              <span className="text-[9px] sm:text-[10px] tracking-[0.22em] sm:tracking-[0.32em] uppercase text-white/30 shrink-0 font-mono" style={NEVERA}>
+                {fmtUsdCompact(rentals.annual)}/yr
               </span>
             </div>
 
@@ -339,13 +339,13 @@ export default function Dashboard() {
           </section>
 
           {/* Activity */}
-          <section className="space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="text-xl md:text-2xl flex items-center gap-2.5" style={SHARKON}>
-                <ActivityIcon className="w-5 h-5 text-secondary" />
-                <span className="metallic-text">Recent activity</span>
+          <section className="space-y-3 min-w-0">
+            <div className="flex items-center justify-between gap-2 min-w-0">
+              <h2 className="text-base sm:text-xl md:text-2xl flex items-center gap-2 sm:gap-2.5 min-w-0 truncate" style={SHARKON}>
+                <ActivityIcon className="w-4 h-4 sm:w-5 sm:h-5 text-secondary shrink-0" />
+                <span className="metallic-text truncate">Recent activity</span>
               </h2>
-              <span className="text-[10px] tracking-[0.32em] uppercase text-white/30" style={NEVERA}>
+              <span className="text-[9px] sm:text-[10px] tracking-[0.22em] sm:tracking-[0.32em] uppercase text-white/30 shrink-0 font-mono" style={NEVERA}>
                 {activity.length} events
               </span>
             </div>
