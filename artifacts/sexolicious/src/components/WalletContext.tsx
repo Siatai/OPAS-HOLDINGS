@@ -59,7 +59,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeWallet}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4"
+            className="fixed inset-0 z-50 flex items-start md:items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto"
           >
             <motion.div
               initial={{ scale: 0.96, opacity: 0, y: 24 }}
@@ -67,7 +67,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
               exit={{ scale: 0.96, opacity: 0, y: 24 }}
               transition={{ delay: 0.05, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               onClick={(e) => e.stopPropagation()}
-              className="metallic-border relative w-full max-w-3xl rounded-xl overflow-hidden shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)]"
+              className="metallic-border relative w-full max-w-3xl my-auto rounded-xl overflow-hidden shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] max-h-[calc(100vh-2rem)] overflow-y-auto"
               style={{
                 background:
                   "linear-gradient(160deg, rgba(12,18,32,0.96) 0%, rgba(8,12,24,0.96) 55%, rgba(20,12,4,0.96) 100%)",
@@ -75,16 +75,23 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             >
               <button
                 onClick={closeWallet}
-                className="absolute top-4 right-4 z-20 text-white/40 hover:text-primary transition-colors"
+                className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-[#050810]/70 backdrop-blur border border-white/10 text-white/70 hover:text-primary hover:border-primary/40 transition-colors text-[10px] tracking-[0.22em] uppercase font-mono"
+                aria-label="Back"
+              >
+                ← Back
+              </button>
+              <button
+                onClick={closeWallet}
+                className="absolute top-3 right-3 z-20 p-1.5 rounded-md bg-[#050810]/70 backdrop-blur border border-white/10 text-white/50 hover:text-primary hover:border-primary/40 transition-colors"
                 aria-label="Close"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
 
               <div className="grid grid-cols-1 md:grid-cols-[1.05fr_1fr]">
 
                 {/* ── Left: Skyline hero panel ── */}
-                <div className="relative h-[220px] md:h-auto md:min-h-[520px] overflow-hidden">
+                <div className="relative h-[180px] md:h-auto md:min-h-[480px] overflow-hidden">
                   <img
                     src={worldSkyline}
                     alt=""

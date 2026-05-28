@@ -109,13 +109,22 @@ export default function Portfolio() {
             Your portfolio, ownership stake and governance votes are scoped to your wallet address.
             Connect MetaMask or Trust Wallet to continue.
           </p>
-          <button
-            onClick={openWallet}
-            className="px-7 py-3.5 text-[11px] font-bold tracking-[0.22em] text-[#050810] bg-primary uppercase rounded-sm amber-glow"
-            style={{ fontFamily: "BankGothic, sans-serif" }}
-          >
-            Connect Wallet
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+            <button
+              onClick={openWallet}
+              className="px-7 py-3.5 text-[11px] font-bold tracking-[0.22em] text-[#050810] bg-primary uppercase rounded-sm amber-glow"
+              style={{ fontFamily: "BankGothic, sans-serif" }}
+            >
+              Connect Wallet
+            </button>
+            <Link
+              href="/"
+              className="px-7 py-3.5 text-[11px] tracking-[0.22em] uppercase text-white/65 hover:text-white border border-white/15 hover:border-white/35 rounded-sm transition-colors"
+              style={NEVERA}
+            >
+              ← Back to home
+            </Link>
+          </div>
         </div>
       </div>
     );
