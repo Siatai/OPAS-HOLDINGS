@@ -112,9 +112,9 @@ export default function Marketplace() {
                 Secondary market · 24/7
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl leading-[1.05] break-words" style={SHARKON}>
-              <span className="metallic-text">Marketplace.</span>{" "}
-              <span className="metallic-warm-text">Trade ownership.</span>
+            <h1 className="text-2xl sm:text-4xl md:text-5xl leading-[1.15]" style={SHARKON}>
+              <span className="metallic-text block whitespace-nowrap">Marketplace.</span>
+              <span className="metallic-warm-text block whitespace-nowrap">Trade ownership.</span>
             </h1>
             <p className="text-white/55 text-sm max-w-2xl leading-relaxed" style={NEVERA}>
               Peer-to-peer order book for OPA equity tokens. Lift an ask from another investor,
