@@ -112,7 +112,7 @@ export default function Marketplace() {
                 Secondary market · 24/7
               </span>
             </div>
-            <h1 className="text-2xl sm:text-4xl md:text-5xl leading-[1.15]" style={SHARKON}>
+            <h1 className="text-[17px] sm:text-3xl md:text-5xl leading-[1.2]" style={SHARKON}>
               <span className="metallic-text block whitespace-nowrap">Marketplace.</span>
               <span className="metallic-warm-text block whitespace-nowrap">Trade ownership.</span>
             </h1>
