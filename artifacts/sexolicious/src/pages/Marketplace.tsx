@@ -69,6 +69,22 @@ export default function Marketplace() {
     return enriched;
   }, [listings, tab, catFilter, sort, search, address]);
 
+  // Per-class listing counts (respect the active tab + search, ignore the class filter itself).
+  const catCounts = useMemo(() => {
+    let base = [...listings];
+    if (tab === "mine" && address) base = base.filter((x) => x.seller === address.toLowerCase());
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      base = base.filter((x) => {
+        const m = lookupProperty(x.propertyId);
+        return m && (m.prop.title.toLowerCase().includes(q) || m.prop.token.toLowerCase().includes(q));
+      });
+    }
+    const counts: Record<string, number> = { all: base.length };
+    for (const c of CATEGORIES) counts[c.id] = base.filter((x) => categoryOf(x.propertyId) === c.id).length;
+    return counts;
+  }, [listings, tab, search, address]);
+
   const totals = useMemo(() => {
     const tvl = listings.reduce((a, l) => a + l.shares * l.askPerShare, 0);
     const tot = listings.reduce((a, l) => a + l.shares, 0);
@@ -154,51 +170,38 @@ export default function Marketplace() {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-          {/* Tabs */}
-          <div className="inline-flex p-1 rounded-md border border-white/10 bg-[rgba(20,28,48,0.4)] shrink-0 self-start">
-            {(["all", "mine"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                disabled={t === "mine" && !isConnected}
-                className={`px-3 sm:px-4 py-2 text-[10px] tracking-[0.2em] sm:tracking-[0.24em] uppercase transition-colors rounded-sm ${tab === t ? "bg-primary/15 text-primary" : "text-white/55 hover:text-white"} disabled:opacity-30 disabled:cursor-not-allowed`}
-                style={NEVERA}
-                data-testid={`tab-${t}`}
-              >
-                {t === "all" ? "All" : "Mine"}
-              </button>
-            ))}
-          </div>
-
-          {/* Search */}
-          <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/35" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search property or token…"
-              className="w-full pl-9 pr-3 py-2.5 text-[12px] bg-[rgba(20,28,48,0.4)] border border-white/10 focus:border-primary/40 outline-none rounded-md text-white/85 placeholder:text-white/30"
-              style={NEVERA}
-            />
-          </div>
-
-          <div className="flex gap-2 min-w-0">
-            {/* Asset-class filter */}
-            <select
-              value={catFilter}
-              onChange={(e) => setCatFilter(e.target.value as AssetCategory | "all")}
-              className="flex-1 min-w-0 px-3 py-2.5 text-[11px] tracking-[0.18em] uppercase bg-[rgba(20,28,48,0.4)] border border-white/10 hover:border-white/25 rounded-md text-white/75 outline-none cursor-pointer"
-              style={NEVERA}
-            >
-              <option value="all">All classes</option>
-              {CATEGORIES.map((c) => (
-                <option key={c.id} value={c.id}>{c.label}</option>
+        <div className="space-y-3">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+            {/* Tabs */}
+            <div className="inline-flex p-1 rounded-md border border-white/10 bg-[rgba(20,28,48,0.4)] shrink-0 self-start">
+              {(["all", "mine"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  disabled={t === "mine" && !isConnected}
+                  className={`px-3 sm:px-4 py-2 text-[10px] tracking-[0.2em] sm:tracking-[0.24em] uppercase transition-colors rounded-sm ${tab === t ? "bg-primary/15 text-primary" : "text-white/55 hover:text-white"} disabled:opacity-30 disabled:cursor-not-allowed`}
+                  style={NEVERA}
+                  data-testid={`tab-${t}`}
+                >
+                  {t === "all" ? "All" : "Mine"}
+                </button>
               ))}
-            </select>
+            </div>
+
+            {/* Search */}
+            <div className="relative flex-1 min-w-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/35" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search asset or token…"
+                className="w-full pl-9 pr-3 py-2.5 text-[12px] bg-[rgba(20,28,48,0.4)] border border-white/10 focus:border-primary/40 outline-none rounded-md text-white/85 placeholder:text-white/30"
+                style={NEVERA}
+              />
+            </div>
 
             {/* Sort */}
-            <div className="relative flex-1 min-w-0">
+            <div className="relative w-full lg:w-56 min-w-0 shrink-0">
               <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-white/35 pointer-events-none" />
               <select
                 value={sort}
@@ -213,6 +216,39 @@ export default function Marketplace() {
                 <option value="price_desc">Price ↓</option>
               </select>
             </div>
+          </div>
+
+          {/* Asset-class filter chips */}
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by asset class">
+            <span className="text-[8.5px] tracking-[0.3em] uppercase text-white/30 mr-1 hidden sm:inline" style={NEVERA}>Filter</span>
+            <button
+              onClick={() => setCatFilter("all")}
+              data-testid="catfilter-all"
+              aria-pressed={catFilter === "all"}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 text-[9.5px] sm:text-[10px] tracking-[0.2em] uppercase rounded-md border transition-colors ${catFilter === "all" ? "text-primary border-primary/55 bg-primary/10" : "text-white/55 hover:text-white border-white/10 hover:border-white/25"}`}
+              style={NEVERA}
+            >
+              All classes
+              <span className="text-[9px] opacity-60">{catCounts.all}</span>
+            </button>
+            {CATEGORIES.map((c) => {
+              const active = catFilter === c.id;
+              const n = catCounts[c.id] ?? 0;
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => setCatFilter(c.id)}
+                  data-testid={`catfilter-${c.id}`}
+                  aria-pressed={active}
+                  className={`inline-flex items-center gap-1.5 px-3 py-2 text-[9.5px] sm:text-[10px] tracking-[0.2em] uppercase rounded-md border transition-colors ${active ? "" : "text-white/55 hover:text-white border-white/10 hover:border-white/25"} ${n === 0 ? "opacity-40" : ""}`}
+                  style={active ? { ...NEVERA, color: c.accent, borderColor: `${c.accent}66`, background: `${c.accent}14` } : NEVERA}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: c.accent }} />
+                  {c.label}
+                  <span className="text-[9px] opacity-60">{n}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
