@@ -187,7 +187,7 @@ export type Listing = {
   createdAt: number;
 };
 
-const LIST_KEY = "opas:marketplace";
+const LIST_KEY = "opas:marketplace:v2";
 
 const SEED_LISTINGS: Omit<Listing, "id" | "createdAt">[] = [
   { propertyId: "dxb-2", seller: "vault", shares: 8,  askPerShare: 165 },
@@ -199,11 +199,20 @@ const SEED_LISTINGS: Omit<Listing, "id" | "createdAt">[] = [
   { propertyId: "sgp-4", seller: "vault", shares: 10, askPerShare: 174 },
   { propertyId: "mia-1", seller: "vault", shares: 26, askPerShare: 128 },
   { propertyId: "car-1",   seller: "vault", shares: 12, askPerShare: 102 },
+  { propertyId: "car-2",   seller: "vault", shares: 5,  askPerShare: 128 },
   { propertyId: "car-3",   seller: "vault", shares: 20, askPerShare: 68 },
+  { propertyId: "car-4",   seller: "vault", shares: 4,  askPerShare: 116 },
+  { propertyId: "car-5",   seller: "vault", shares: 16, askPerShare: 82 },
   { propertyId: "car-6",   seller: "vault", shares: 3,  askPerShare: 152 },
   { propertyId: "yacht-1", seller: "vault", shares: 9,  askPerShare: 246 },
+  { propertyId: "yacht-2", seller: "vault", shares: 12, askPerShare: 188 },
   { propertyId: "yacht-3", seller: "vault", shares: 18, askPerShare: 148 },
+  { propertyId: "yacht-4", seller: "vault", shares: 3,  askPerShare: 372 },
+  { propertyId: "yacht-5", seller: "vault", shares: 6,  askPerShare: 204 },
   { propertyId: "jet-1",   seller: "vault", shares: 7,  askPerShare: 328 },
+  { propertyId: "jet-2",   seller: "vault", shares: 9,  askPerShare: 312 },
+  { propertyId: "jet-3",   seller: "vault", shares: 14, askPerShare: 214 },
+  { propertyId: "jet-4",   seller: "vault", shares: 20, askPerShare: 168 },
   { propertyId: "jet-5",   seller: "vault", shares: 16, askPerShare: 136 },
 ];
 

@@ -20,7 +20,7 @@ const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
 const fmtUsd = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
-type SortKey = "newest" | "discount" | "yield" | "price_asc" | "price_desc";
+type SortKey = "available" | "newest" | "discount" | "yield" | "price_asc" | "price_desc";
 
 export default function Marketplace() {
   const { address, isConnected } = useAccount();
@@ -28,7 +28,7 @@ export default function Marketplace() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [tab, setTab] = useState<"all" | "mine">("all");
   const [catFilter, setCatFilter] = useState<AssetCategory | "all">("all");
-  const [sort, setSort] = useState<SortKey>("newest");
+  const [sort, setSort] = useState<SortKey>("available");
   const [search, setSearch] = useState("");
   const [buyState, setBuyState] = useState<{ listing: Listing; qty: number } | null>(null);
   const [toast, setToast] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
@@ -60,6 +60,7 @@ export default function Marketplace() {
       return { listing: x, fair, discount, yld };
     });
     switch (sort) {
+      case "available":  enriched.sort((a, b) => b.listing.shares - a.listing.shares); break;
       case "discount":   enriched.sort((a, b) => b.discount - a.discount); break;
       case "yield":      enriched.sort((a, b) => b.yld - a.yld); break;
       case "price_asc":  enriched.sort((a, b) => a.listing.askPerShare - b.listing.askPerShare); break;
@@ -209,6 +210,7 @@ export default function Marketplace() {
                 className="w-full pl-8 pr-2 py-2.5 text-[11px] tracking-[0.18em] uppercase bg-[rgba(20,28,48,0.4)] border border-white/10 hover:border-white/25 rounded-md text-white/75 outline-none cursor-pointer"
                 style={NEVERA}
               >
+                <option value="available">Most available</option>
                 <option value="newest">Newest</option>
                 <option value="discount">Best discount</option>
                 <option value="yield">Highest yield</option>
