@@ -69,7 +69,7 @@ export default function Hero() {
               alt=""
               draggable={false}
               className={`h-full w-auto object-cover object-bottom select-none ${i % 2 === 1 ? "-scale-x-100" : ""}`}
-              style={{ filter: "brightness(0.42) saturate(0.62) contrast(1.02)" }}
+              style={{ filter: "brightness(0.7) saturate(0.8) contrast(1.03)" }}
             />
           ))}
         </div>
@@ -78,7 +78,7 @@ export default function Hero() {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, hsl(222,47%,5%) 0%, rgba(8,12,24,0.7) 30%, rgba(8,12,24,0.22) 62%, transparent 100%)",
+              "linear-gradient(180deg, hsl(222,47%,5%) 0%, rgba(8,12,24,0.55) 30%, rgba(8,12,24,0.12) 62%, transparent 100%)",
           }}
         />
         {/* Side vignette fades — keep the loop edges soft & refined */}
