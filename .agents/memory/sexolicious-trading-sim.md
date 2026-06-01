@@ -40,18 +40,29 @@ reviews for both `createListing/cancelListing` and the swap path.
 - Listing/swap lifecycle must be **basis-neutral unless an actual sale occurs**.
 
 ## Fees must be economically real, not just displayed
-`FEES` is the single source of truth (`buySell` 7%, `trade`/swap 5%,
-`maintenanceMonthly` 5%). A fee that is only shown in UI/logs but never changes
-state is a review failure.
+`FEES` is the single source of truth. Current policy: `buySell` 7%, **`trade`/swap
+= 0 (FREE)**, `maintenanceMonthly` 5%. A fee that is only shown in UI/logs but
+never changes state is a review failure.
+**Why:** user removed the swap ("exchange of assets") fee — fees apply only to
+deposit (buy 7%), withdrawal (sell 7%), and monthly maintenance (5%).
 
 **How to apply:**
 - Buy: buyer cost basis = ask + 7%. Seller activity logs proceeds net of 7%.
-- Swap settle: received asset basis = carried/given basis **+ 5% fee** (so the
-  fee lowers future P&L).
+- Swap settle: received asset basis = carried/given basis, **no fee added**.
+  Settlement must NOT add `offer.feeUsd` — legacy localStorage offers can carry a
+  stale non-zero `feeUsd` from when swaps cost 5%; ignore it at settlement so the
+  free-swap policy holds for pre-existing pending offers (no migration needed).
 - Maintenance: seeded rent activity in `getActivity` is logged **net** of 5%, so
   Dashboard's lifetime "Rent collected" (sum of rent entries) stays consistent
   with `rentalSummary`'s net model. Show gross and net explicitly in UI.
-- Reference `FEES` in every UI fee label to avoid drift.
+- Reference `FEES`/`FEE_LABEL` in every UI fee label to avoid drift.
+
+## Currency rails (copy/framing only — do NOT convert $ valuations)
+Asset valuations stay in USD ($). Settlement rails are framing only: **capital in
+= $OPAS**, **yield/sale distributions out = USDT**. Withdraw page (`/withdraw`)
+cashes out accumulated USDT proceeds; available = sum(rent+sell usd) − sum(withdraw
+usd), clamped ≥0, single-sourced via `proceedsFromActivity(activity)` (and
+`proceedsBalance(address)` wrapper) so Dashboard + Withdraw never drift.
 
 ## Known non-blocking warning
 Console: "Cannot update a component (WalletProvider) while rendering Hydrate" —

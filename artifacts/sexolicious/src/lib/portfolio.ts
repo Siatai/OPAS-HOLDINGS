@@ -177,18 +177,18 @@ export const TOTAL_SUPPLY_CONST = TOTAL_SUPPLY;
 // ─────────────────────────────────────────────────────────────
 // Platform fees
 //   buySell      — 7% charged on every primary/secondary buy & sell
-//   trade        — 5% charged on equity-for-equity swaps
+//   trade        — none; equity-for-equity swaps settle free
 //   maintenance  — 5% monthly fee the operator takes from gross income
 // ─────────────────────────────────────────────────────────────
 export const FEES = {
   buySell: 0.07,
-  trade: 0.05,
+  trade: 0,
   maintenanceMonthly: 0.05,
 } as const;
 
 export const FEE_LABEL = {
   buySell: "7%",
-  trade: "5%",
+  trade: "Free",
   maintenance: "5%",
 } as const;
 
@@ -566,7 +566,7 @@ export function rentalSummary(holdings: Holding[]) {
 // Equity-for-equity swap protocol
 //   A holder can list a position to exchange for another asset's equity.
 //   The counterparty is notified and can accept (assets switch hands) or
-//   decline. A 5% trade fee applies on settlement.
+//   decline. Swaps settle free — no trade fee.
 // ─────────────────────────────────────────────────────────────
 
 export type SwapStatus = "pending" | "accepted" | "declined" | "cancelled";
@@ -579,7 +579,7 @@ export type SwapOffer = {
   giveShares: number;
   receiveId: string;                  // asset the current wallet receives
   receiveShares: number;
-  feeUsd: number;                     // 5% trade fee on notional
+  feeUsd: number;                     // trade fee on notional (swaps are free → 0)
   escrowBasisUsd?: number;            // original cost basis of escrowed (given) shares
   status: SwapStatus;
   createdAt: number;
@@ -734,17 +734,18 @@ export function respondSwapOffer(
     return { ok: true, offers: next };
   }
 
-  // accept (incoming): give up giveId, receive receiveId, pay 5% trade fee.
+  // accept (incoming): give up giveId, receive receiveId — swaps are free.
   const basisRemoved = removeShares(address, offer.giveId, offer.giveShares);
   if (basisRemoved === null) return { ok: false, reason: "You no longer hold the shares for this swap." };
   // Like-kind exchange: carry the given position's basis into the received
-  // asset, plus the 5% trade fee paid — so the fee is reflected in P&L.
-  addShares(address, offer.receiveId, offer.receiveShares, basisRemoved + offer.feeUsd);
+  // asset. Swaps are free, so no fee is added even for legacy offers that
+  // stored a non-zero feeUsd before the fee was removed.
+  addShares(address, offer.receiveId, offer.receiveShares, basisRemoved);
   const next = all.map((o) => o.id === id ? { ...o, status: "accepted" as SwapStatus } : o);
   writeSwaps(address, next);
   logActivity(address, {
     kind: "swap", propertyId: offer.receiveId, shares: offer.receiveShares, usd: swapNotional(offer.receiveId, offer.receiveShares),
-    note: `Swapped ${lookupProperty(offer.giveId)?.prop.token ?? offer.giveId} → ${lookupProperty(offer.receiveId)?.prop.token ?? offer.receiveId} · 5% fee ${fmtUsdCompact(offer.feeUsd)}`,
+    note: `Swapped ${lookupProperty(offer.giveId)?.prop.token ?? offer.giveId} → ${lookupProperty(offer.receiveId)?.prop.token ?? offer.receiveId} · no swap fee`,
   });
   return { ok: true, offers: next };
 }
@@ -771,7 +772,7 @@ export function cancelSwapOffer(
 
 // Simulated order-book fill: a counterparty accepts the user's outgoing offer.
 // The escrowed asset is gone; the requested asset is credited, carrying the
-// escrowed basis plus the 5% trade fee.
+// escrowed basis (swaps are free, so no fee is added).
 export function settleOutgoingSwap(
   address: string,
   id: string,
@@ -780,14 +781,15 @@ export function settleOutgoingSwap(
   const offer = all.find((o) => o.id === id);
   if (!offer || offer.direction !== "outgoing" || offer.status !== "pending")
     return { ok: false, reason: "Offer not settleable." };
-  const carriedBasis = (offer.escrowBasisUsd ?? swapNotional(offer.giveId, offer.giveShares)) + offer.feeUsd;
+  // Swaps are free — ignore any legacy stored feeUsd in the basis carryover.
+  const carriedBasis = offer.escrowBasisUsd ?? swapNotional(offer.giveId, offer.giveShares);
   addShares(address, offer.receiveId, offer.receiveShares, carriedBasis);
   const taker = SIM_TAKERS[Math.floor(Math.random() * SIM_TAKERS.length)];
   const next = all.map((o) => o.id === id ? { ...o, status: "accepted" as SwapStatus, counterparty: taker } : o);
   writeSwaps(address, next);
   logActivity(address, {
     kind: "swap", propertyId: offer.receiveId, shares: offer.receiveShares, usd: swapNotional(offer.receiveId, offer.receiveShares),
-    note: `Swap filled by ${taker} · ${lookupProperty(offer.giveId)?.prop.token ?? offer.giveId} → ${lookupProperty(offer.receiveId)?.prop.token ?? offer.receiveId} · 5% fee ${fmtUsdCompact(offer.feeUsd)}`,
+    note: `Swap filled by ${taker} · ${lookupProperty(offer.giveId)?.prop.token ?? offer.giveId} → ${lookupProperty(offer.receiveId)?.prop.token ?? offer.receiveId} · no swap fee`,
   });
   return { ok: true, offers: next };
 }

@@ -267,8 +267,8 @@ export default function Portfolio() {
         </div>
 
         <div className="flex items-center justify-between pt-2 border-t border-white/5">
-          <span className="text-[9.5px] tracking-[0.22em] uppercase text-white/40 font-mono">Trade fee · 5%</span>
-          <span className="text-[12px] text-secondary" style={SHARKON}>{fmtUsd(s.feeUsd)}</span>
+          <span className="text-[9.5px] tracking-[0.22em] uppercase text-white/40 font-mono">Trade fee</span>
+          <span className="text-[12px] text-emerald-300" style={SHARKON}>Free</span>
         </div>
 
         {s.status === "pending" && (
@@ -626,7 +626,7 @@ export default function Portfolio() {
             <ArrowLeftRight className="w-3.5 h-3.5 mt-px text-secondary shrink-0" />
             <span style={NEVERA}>
               Exchange equity in one asset for equity in another. The counterparty is notified and must accept before
-              assets switch hands. A 5% trade fee applies on settlement.
+              assets switch hands. Swaps settle free — no trade fee.
             </span>
           </div>
 
@@ -955,8 +955,8 @@ export default function Portfolio() {
                   </div>
                   <div className="h-px bg-white/10 my-1" />
                   <div className="flex items-center justify-between">
-                    <span className="text-[9.5px] tracking-[0.28em] uppercase text-white/45" style={NEVERA}>Trade fee · 5%</span>
-                    <span className="text-[13px] text-secondary" style={SHARKON}>{fmtUsd(fee)}</span>
+                    <span className="text-[9.5px] tracking-[0.28em] uppercase text-white/45" style={NEVERA}>Trade fee</span>
+                    <span className="text-[13px] text-emerald-300" style={SHARKON}>Free</span>
                   </div>
                 </div>
               </div>
