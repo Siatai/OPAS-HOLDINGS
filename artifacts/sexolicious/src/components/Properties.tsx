@@ -31,7 +31,7 @@ const COMING_SOON = [
 export default function Properties() {
   const { openWallet } = useWallet();
   const [, navigate] = useLocation();
-  const cityRail = useAutoRail(2800);
+  const cityRail = useLoopRail(2800);
 
   // One flagship residence per city for the real-estate row.
   const seenCity = new Set<string>();
@@ -121,25 +121,25 @@ export default function Properties() {
             </div>
           </div>
           <div className="relative -mx-4 sm:-mx-6 md:-mx-12">
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-12 z-10 bg-gradient-to-r from-background to-transparent" />
-            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-12 z-10 bg-gradient-to-l from-background to-transparent" />
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-5 sm:w-10 z-10 bg-gradient-to-r from-background to-transparent" />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-5 sm:w-10 z-10 bg-gradient-to-l from-background to-transparent" />
             <div
               ref={cityRail.railRef}
               {...cityRail.pauseHandlers}
-              className="flex gap-3 md:gap-4 overflow-x-auto snap-x snap-mandatory px-4 sm:px-6 md:px-12 pb-5 pt-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
+              className="flex gap-3 md:gap-4 overflow-x-auto snap-x snap-proximity px-4 sm:px-6 md:px-12 pb-5 pt-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
             >
-              {CITIES.map((city, idx) => (
-                <motion.button
-                  key={city.id}
+              {[0, 1, 2].flatMap((copy) => CITIES.map((city) => ({ city, copy }))).map(({ city, copy }) => (
+                <div
+                  key={`${city.id}-${copy}`}
+                  data-card
+                  className="asset-loop-card snap-center shrink-0"
+                  aria-hidden={copy === 1 ? undefined : true}
+                >
+                <button
                   onClick={() => navigate(`/city/${city.id}`)}
                   aria-label={`View ${city.name} listings`}
-                  data-card
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.5, delay: idx * 0.04 }}
-                  whileHover={{ y: -4 }}
-                  className="group relative snap-start shrink-0 w-[150px] sm:w-[170px] aspect-[3/4] rounded-lg overflow-hidden cursor-pointer"
+                  tabIndex={copy === 1 ? 0 : -1}
+                  className="group relative w-[150px] sm:w-[170px] aspect-[3/4] rounded-lg overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
                 style={{
                   border: "1px solid rgba(220,225,235,0.12)",
                   boxShadow: "0 10px 30px -15px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)",
@@ -186,7 +186,8 @@ export default function Properties() {
                     <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 text-white/40 opacity-0 -translate-x-1 group-hover:text-primary group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                   </div>
                 </div>
-                </motion.button>
+                </button>
+                </div>
               ))}
             </div>
           </div>
@@ -213,45 +214,6 @@ export default function Properties() {
   );
 }
 
-/* ─────────────────────── Simple auto-scrolling rail hook ───────────────────────
-   Used by the gateway-cities rail: auto-advance one tile, loop back at the end. */
-function useAutoRail(autoMs: number) {
-  const railRef = useRef<HTMLDivElement>(null);
-  const [paused, setPaused] = useState(false);
-
-  const scrollByDir = (dir: 1 | -1) => {
-    const el = railRef.current;
-    if (!el) return;
-    el.scrollBy({ left: el.clientWidth * 0.82 * dir, behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    if (paused) return;
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    const el = railRef.current;
-    if (!el) return;
-    const id = window.setInterval(() => {
-      const first = el.querySelector<HTMLElement>("[data-card]");
-      const step = first ? first.offsetWidth + 16 : el.clientWidth * 0.8;
-      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 12) {
-        el.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        el.scrollBy({ left: step, behavior: "smooth" });
-      }
-    }, autoMs);
-    return () => clearInterval(id);
-  }, [paused, autoMs]);
-
-  const pauseHandlers = {
-    onMouseEnter: () => setPaused(true),
-    onMouseLeave: () => setPaused(false),
-    onTouchStart: () => setPaused(true),
-    onTouchEnd: () => setPaused(false),
-  };
-
-  return { railRef, scrollByDir, pauseHandlers };
-}
-
 /* ───────────────────── Roundabout (infinite loop) rail hook ─────────────────────
    The cards are rendered in three identical copies. We keep the scroll position
    parked inside the middle copy and silently jump by one copy-width whenever the
@@ -267,15 +229,11 @@ function useLoopRail(autoMs: number) {
     return first ? first.offsetWidth + 20 : el.clientWidth * 0.8;
   };
 
-  // Seamless wrap + centre-card spotlight. Runs on scroll/resize (rAF throttled).
-  const update = () => {
+  // Spotlight whichever card sits closest to the centre. Cheap — runs every rAF
+  // while scrolling, and only toggles a class when the centred card changes.
+  const spotlight = () => {
     const el = railRef.current;
     if (!el) return;
-    const third = el.scrollWidth / 3;
-    if (third > el.clientWidth) {
-      if (el.scrollLeft < third * 0.5) el.scrollLeft += third;
-      else if (el.scrollLeft > third * 1.5) el.scrollLeft -= third;
-    }
     const mid = el.scrollLeft + el.clientWidth / 2;
     let best: HTMLElement | null = null;
     let bestDist = Infinity;
@@ -291,6 +249,33 @@ function useLoopRail(autoMs: number) {
     }
   };
 
+  // Graceful re-centre — jump by exactly one copy-width so we land on an
+  // identical card. Runs ONLY after the scroll has settled (debounced), never
+  // mid-flight, so autoplay never visibly stutters. Pulls back toward the middle
+  // copy once we drift past half a copy, leaving buffer on both sides.
+  const wrap = () => {
+    const el = railRef.current;
+    if (!el) return;
+    const third = el.scrollWidth / 3;
+    if (third <= el.clientWidth) return;
+    if (el.scrollLeft < third * 0.5) el.scrollLeft += third;
+    else if (el.scrollLeft > third * 1.5) el.scrollLeft -= third;
+  };
+
+  // Hard-edge guard — runs every rAF while scrolling. Sustained manual drags can
+  // outrun the debounced wrap and reach the very first/last clone; the edges line
+  // up with identical cards one copy over, so shifting by `third` is invisible
+  // and prevents the rail from ever hitting a dead stop.
+  const guard = () => {
+    const el = railRef.current;
+    if (!el) return;
+    const third = el.scrollWidth / 3;
+    if (third <= el.clientWidth) return;
+    const max = el.scrollWidth - el.clientWidth;
+    if (el.scrollLeft <= 1) el.scrollLeft += third;
+    else if (el.scrollLeft >= max - 1) el.scrollLeft -= third;
+  };
+
   // Park scroll in the middle copy on mount (card widths are fixed, so layout is
   // stable immediately — no need to wait for images).
   useEffect(() => {
@@ -299,19 +284,22 @@ function useLoopRail(autoMs: number) {
     const t = window.setTimeout(() => {
       const third = el.scrollWidth / 3;
       if (third > el.clientWidth) el.scrollLeft = third;
-      update();
+      spotlight();
     }, 60);
     return () => clearTimeout(t);
   }, []);
 
-  // rAF-throttled scroll/resize handler keeps the loop + spotlight in sync.
+  // Spotlight follows every frame; the wrap is debounced to fire only once the
+  // scroll comes to rest, which keeps the transition buttery-smooth.
   useEffect(() => {
     const el = railRef.current;
     if (!el) return;
     let raf = 0;
+    let settle = 0;
     const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => { raf = 0; update(); });
+      if (!raf) raf = requestAnimationFrame(() => { raf = 0; guard(); spotlight(); });
+      window.clearTimeout(settle);
+      settle = window.setTimeout(() => { wrap(); spotlight(); }, 90);
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
@@ -319,6 +307,7 @@ function useLoopRail(autoMs: number) {
       el.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);
+      window.clearTimeout(settle);
     };
   }, []);
 
@@ -428,7 +417,7 @@ function AssetRow({
         <div
           ref={railRef}
           {...pauseHandlers}
-          className="flex gap-4 md:gap-5 overflow-x-auto snap-x snap-mandatory px-4 sm:px-6 md:px-12 pb-5 pt-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
+          className="flex gap-4 md:gap-5 overflow-x-auto snap-x snap-proximity px-4 sm:px-6 md:px-12 pb-5 pt-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
         >
           {loop.map(({ a, copy }) => (
             <div

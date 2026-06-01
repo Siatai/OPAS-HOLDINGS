@@ -27,3 +27,12 @@ canonical (middle) copy.
 on the card nearest centre) should be done imperatively in a rAF-throttled scroll
 handler, and should only mutate the DOM when the centred element actually *changes*
 (track it in a ref) — not re-toggle every card every frame.
+
+## Smooth wrap (avoiding the visible "jump")
+
+A clone-based infinite rail glitches if the seamless wrap (`scrollLeft += copyWidth`) fires **during** an in-flight smooth scroll. Split the work:
+- **spotlight** (centre-card class toggle) + a **hard-edge guard** run every rAF on scroll.
+- the **graceful re-centre** wrap (pull back toward middle copy once past half a copy) is **debounced ~90ms** to fire only after scroll settles — never mid-animation.
+- the hard-edge guard only shifts by one copy when `scrollLeft` is at the very first/last clone (`<=1` or `>= max-1`); those edges line up with identical cards, so the shift is invisible and stops sustained manual drags from hitting a dead edge before the debounced wrap runs.
+
+**Why:** instant repositioning mid smooth-scroll makes the browser visibly jump. Debounce removes autoplay jank; the rAF edge-guard keeps manual scrolling seamless. Use `snap-proximity` (not `snap-mandatory`) so native snap doesn't fight programmatic smooth scrolling.
