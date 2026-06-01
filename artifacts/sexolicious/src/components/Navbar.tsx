@@ -55,7 +55,7 @@ export default function Navbar() {
               className="text-[10px] tracking-[0.35em] text-primary/80 uppercase"
               style={{ fontFamily: "BankGothic, sans-serif", fontWeight: 300 }}
             >
-              PROPERTIES
+              HOLDINGS
             </span>
           </div>
           <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[9px] font-mono font-bold bg-secondary/15 text-secondary border border-secondary/30 rounded-full tracking-widest uppercase">
