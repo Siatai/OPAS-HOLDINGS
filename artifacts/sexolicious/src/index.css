@@ -282,6 +282,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
   isolation: isolate;
   color: #190d01;
   background:
+    linear-gradient(180deg, rgba(11, 181, 190, 0.16) 0%, rgba(11, 181, 190, 0.035) 32%, transparent 58%),
     linear-gradient(180deg, #ffe9af 0%, #f6c25b 17%, #ea8d0e 49%, #b16808 82%, #f4cb74 100%);
   border: 1px solid rgba(255, 230, 165, 0.6);
   text-shadow: 0 1px 0 rgba(255, 240, 200, 0.5);
@@ -309,6 +310,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
   isolation: isolate;
   color: #eef0f4;
   background:
+    linear-gradient(180deg, rgba(11, 181, 190, 0.14) 0%, rgba(11, 181, 190, 0.03) 42%, transparent 66%),
     linear-gradient(180deg, rgba(236, 238, 244, 0.16) 0%, rgba(150, 156, 166, 0.05) 52%, rgba(228, 231, 238, 0.11) 100%),
     linear-gradient(hsl(222 47% 7%), hsl(222 47% 7%));
   border: 1px solid rgba(220, 225, 235, 0.3);
