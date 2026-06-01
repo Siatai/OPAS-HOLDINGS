@@ -5,6 +5,7 @@ import { ArrowLeft, TrendingUp, MapPin, Coins } from "lucide-react";
 import { getCityById, type Property } from "@/data/cities";
 import { useWallet } from "@/components/WalletContext";
 import MarqueeText from "@/components/MarqueeText";
+import FitText, { FitTextGroup } from "@/components/FitText";
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
@@ -265,11 +266,13 @@ function PropertyCard({
 
       {/* Stats body */}
       <div className="p-4 sm:p-5">
-        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
-          <Stat label="Rental yield" value={p.rentalYield} />
-          <Stat label="Cap. growth" value={p.capitalGrowth} accent />
-          <Stat label="Total ROI" value={p.totalRoi} accent />
-        </div>
+        <FitTextGroup>
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
+            <Stat label="Rental yield" value={p.rentalYield} />
+            <Stat label="Cap. growth" value={p.capitalGrowth} accent />
+            <Stat label="Total ROI" value={p.totalRoi} accent />
+          </div>
+        </FitTextGroup>
 
         <div className="flex items-center justify-between text-[11px] tracking-[0.22em] uppercase text-white/55 mb-4" style={NEVERA}>
           <span>From <span className="text-white/85">${p.price}</span></span>
@@ -292,16 +295,18 @@ function PropertyCard({
 function Stat({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) {
   return (
     <div
-      className="rounded-md px-2 py-2 sm:py-2.5 text-center"
+      className="rounded-md px-2 py-2 sm:py-2.5 text-center flex flex-col justify-center"
       style={{
         background: "rgba(220,225,235,0.04)",
         border: "1px solid rgba(220,225,235,0.10)",
       }}
     >
-      <div className="text-[8px] sm:text-[9px] tracking-[0.22em] uppercase text-white/45 mb-0.5" style={NEVERA}>
+      <FitText align="center" className="text-[8px] sm:text-[9px] tracking-[0.22em] uppercase text-white/45 mb-0.5" style={NEVERA}>
         {label}
-      </div>
-      <div
+      </FitText>
+      <FitText
+        share
+        align="center"
         className="text-sm sm:text-base tracking-wide"
         style={{
           ...SHARKON,
@@ -309,7 +314,7 @@ function Stat({ label, value, accent = false }: { label: string; value: string; 
         }}
       >
         {value}
-      </div>
+      </FitText>
     </div>
   );
 }

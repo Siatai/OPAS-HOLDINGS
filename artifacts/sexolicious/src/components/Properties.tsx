@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { useWallet } from "./WalletContext";
 import MarqueeText from "./MarqueeText";
-import FitText from "./FitText";
+import FitText, { FitTextGroup } from "./FitText";
 import { CITIES } from "@/data/cities";
 import {
   CATEGORIES, assetsByCategory, getCategory,
@@ -544,22 +544,24 @@ function AssetCard({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { l: rentalNoun, v: card.rentalYield,   c: "text-secondary"     },
-            { l: "Growth",   v: card.capitalGrowth, c: "metallic-text"      },
-            { l: "ROI",      v: card.totalRoi,      c: "metallic-warm-text" },
-          ].map((d) => (
-            <div
-              key={d.l}
-              className="rounded p-2 text-center"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(220,225,235,0.06)" }}
-            >
-              <FitText align="center" className="text-[8px] tracking-[0.24em] uppercase text-white/35 mb-1" style={NEVERA}>{d.l}</FitText>
-              <FitText align="center" className="text-[13px]" style={SHARKON}><span className={d.c}>{d.v}</span></FitText>
-            </div>
-          ))}
-        </div>
+        <FitTextGroup>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { l: rentalNoun, v: card.rentalYield,   c: "text-secondary"     },
+              { l: "Growth",   v: card.capitalGrowth, c: "metallic-text"      },
+              { l: "ROI",      v: card.totalRoi,      c: "metallic-warm-text" },
+            ].map((d) => (
+              <div
+                key={d.l}
+                className="rounded p-2 text-center flex flex-col justify-center"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(220,225,235,0.06)" }}
+              >
+                <FitText align="center" className="text-[8px] tracking-[0.24em] uppercase text-white/35 mb-1" style={NEVERA}>{d.l}</FitText>
+                <FitText share align="center" className="h-[15px] text-[13px]" style={SHARKON}><span className={d.c}>{d.v}</span></FitText>
+              </div>
+            ))}
+          </div>
+        </FitTextGroup>
 
         <button
           onClick={onAcquire}

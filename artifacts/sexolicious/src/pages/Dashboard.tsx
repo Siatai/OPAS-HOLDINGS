@@ -14,6 +14,7 @@ import {
 } from "@/lib/portfolio";
 import { useWallet } from "@/components/WalletContext";
 import MarqueeText from "@/components/MarqueeText";
+import FitText, { FitTextGroup } from "@/components/FitText";
 import OpasPriceTag from "@/components/OpasPriceTag";
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
@@ -206,6 +207,7 @@ export default function Dashboard() {
         </motion.div>
 
         {/* ── Snapshot stats ── */}
+        <FitTextGroup>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
           {[
             { label: "Vault value",   value: fmtUsdCompact(stats.totalValue),   icon: Coins,      tone: "text-primary" },
@@ -222,13 +224,14 @@ export default function Dashboard() {
                 <MarqueeText className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 min-w-0 flex-1" style={NEVERA}>{s.label}</MarqueeText>
                 <s.icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${s.tone}`} />
               </div>
-              <div className={`text-base sm:text-xl md:text-2xl truncate ${s.tone}`} style={SHARKON}>{s.value}</div>
+              <FitText share className={`text-base sm:text-xl md:text-2xl ${s.tone}`} style={SHARKON}>{s.value}</FitText>
               {"sub" in s && s.sub && (
                 <div className={`text-[9px] sm:text-[10px] mt-1 font-mono ${s.tone}`}>{s.sub}</div>
               )}
             </div>
           ))}
         </div>
+        </FitTextGroup>
 
         {/* ── Nav cards ── */}
         <section className="space-y-3 min-w-0">

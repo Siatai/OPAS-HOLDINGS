@@ -14,6 +14,7 @@ import {
 } from "@/lib/portfolio";
 import { useWallet } from "@/components/WalletContext";
 import MarqueeText from "@/components/MarqueeText";
+import FitText, { FitTextGroup } from "@/components/FitText";
 import OpasPriceTag from "@/components/OpasPriceTag";
 import { useOpasPrice, usdToOpas, fmtOpas, fmtOpasRate } from "@/lib/opasPrice";
 import { CATEGORIES, getCategory, categoryOf, type AssetCategory } from "@/data/assets";
@@ -216,6 +217,7 @@ export default function Marketplace() {
         </motion.div>
 
         {/* Market stats */}
+        <FitTextGroup>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
           {[
             { label: "Open listings",      value: String(totals.count),       icon: Tag,        tone: "text-white" },
@@ -231,10 +233,11 @@ export default function Marketplace() {
                 <MarqueeText className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 min-w-0 flex-1" style={NEVERA}>{s.label}</MarqueeText>
                 <s.icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${s.tone}`} />
               </div>
-              <div className={`text-base sm:text-xl md:text-2xl truncate ${s.tone}`} style={SHARKON}>{s.value}</div>
+              <FitText share className={`text-base sm:text-xl md:text-2xl ${s.tone}`} style={SHARKON}>{s.value}</FitText>
             </div>
           ))}
         </div>
+        </FitTextGroup>
 
         {/* Controls */}
         <div className="space-y-3">
@@ -442,16 +445,18 @@ export default function Marketplace() {
                       </span>
                       <MarqueeText className="text-[8px] tracking-[0.22em] uppercase text-white/35 font-mono min-w-0 flex-1">{prop.tier}</MarqueeText>
                     </div>
-                    <div className="grid grid-cols-2 gap-3 min-w-0">
-                      <div className="min-w-0">
-                        <div className="text-[8.5px] tracking-[0.28em] uppercase text-white/35" style={NEVERA}>Ask / share</div>
-                        <div className="text-base sm:text-lg text-white truncate" style={SHARKON}>{fmtUsd(listing.askPerShare)}</div>
+                    <FitTextGroup>
+                      <div className="grid grid-cols-2 gap-3 min-w-0">
+                        <div className="min-w-0">
+                          <div className="text-[8.5px] tracking-[0.28em] uppercase text-white/35" style={NEVERA}>Ask / share</div>
+                          <FitText share className="text-base sm:text-lg text-white" style={SHARKON}>{fmtUsd(listing.askPerShare)}</FitText>
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-[8.5px] tracking-[0.28em] uppercase text-white/35" style={NEVERA}>Fair value</div>
+                          <FitText share className="text-base sm:text-lg text-white/65" style={SHARKON}>{fmtUsd(fair)}</FitText>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <div className="text-[8.5px] tracking-[0.28em] uppercase text-white/35" style={NEVERA}>Fair value</div>
-                        <div className="text-base sm:text-lg text-white/65 truncate" style={SHARKON}>{fmtUsd(fair)}</div>
-                      </div>
-                    </div>
+                    </FitTextGroup>
 
                     <div className="flex items-center justify-between text-[10.5px]" style={NEVERA}>
                       <span className="tracking-[0.22em] uppercase text-white/40">Available</span>

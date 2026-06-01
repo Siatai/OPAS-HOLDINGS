@@ -1,4 +1,54 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
+
+type GroupCtx = {
+  report: (id: string, ratio: number) => void;
+  release: (id: string) => void;
+  scale: number;
+};
+
+const FitGroup = createContext<GroupCtx | null>(null);
+
+/**
+ * Wrap a row/grid of value <FitText share /> tiles so they all render at ONE
+ * shared scale — the size the widest value needs — instead of each shrinking on
+ * its own. This keeps a row of figures visually even (e.g. "$480M", "120",
+ * "18K" all the same size). Only instances with the `share` prop participate, so
+ * labels can live inside the same group without affecting the values' scale.
+ */
+export function FitTextGroup({ children }: { children: ReactNode }) {
+  const [ratios, setRatios] = useState<Record<string, number>>({});
+
+  const report = useCallback((id: string, r: number) => {
+    setRatios((prev) => (prev[id] === r ? prev : { ...prev, [id]: r }));
+  }, []);
+
+  const release = useCallback((id: string) => {
+    setRatios((prev) => {
+      if (!(id in prev)) return prev;
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }, []);
+
+  const vals = Object.values(ratios);
+  const scale = vals.length ? Math.min(1, ...vals) : 1;
+
+  const ctx = useMemo<GroupCtx>(() => ({ report, release, scale }), [report, release, scale]);
+
+  return <FitGroup.Provider value={ctx}>{children}</FitGroup.Provider>;
+}
 
 type FitTextProps = {
   children: ReactNode;
@@ -7,13 +57,16 @@ type FitTextProps = {
   title?: string;
   align?: "left" | "center";
   min?: number;
+  /** Participate in the surrounding <FitTextGroup> shared scale. */
+  share?: boolean;
 };
 
 /**
  * Shrinks its text on a single line so it always fits the container width —
- * never clips, never marquees. CSS transforms don't change `offsetWidth`, so we
- * read the inner span's natural (unscaled) width and apply a `scale()` to make
- * it fit. Re-measures on resize and after the wide display fonts swap in.
+ * never clips, never marquees — and keeps the (scaled) text vertically centred
+ * within its box. CSS transforms don't change `offsetWidth`, so we read the
+ * inner span's natural (unscaled) width and apply a `scale()` to make it fit.
+ * Re-measures on resize and after the wide display fonts swap in.
  */
 export default function FitText({
   children,
@@ -22,10 +75,20 @@ export default function FitText({
   title,
   align = "left",
   min = 0.5,
+  share = false,
 }: FitTextProps) {
+  const group = useContext(FitGroup);
+  const grouped = share && !!group;
+  const id = useId();
   const containerRef = useRef<HTMLSpanElement>(null);
   const measureRef = useRef<HTMLSpanElement>(null);
-  const [scale, setScale] = useState(1);
+  const [localScale, setLocalScale] = useState(1);
+
+  // Read the group through a ref so the measuring effect never re-subscribes when
+  // the shared scale changes — only its identity changes, and depending on it
+  // directly would make cleanup release()/report() loop forever.
+  const groupRef = useRef(group);
+  groupRef.current = group;
 
   useEffect(() => {
     let raf = 0;
@@ -37,7 +100,9 @@ export default function FitText({
       const cw = c.clientWidth;
       const nw = m.offsetWidth; // layout width — unaffected by the transform
       if (cw === 0 || nw === 0) return;
-      setScale(nw > cw ? Math.max(min, cw / nw) : 1);
+      const ratio = nw > cw ? Math.max(min, cw / nw) : 1;
+      if (grouped) groupRef.current!.report(id, ratio);
+      else setLocalScale(ratio);
     };
 
     const schedule = () => {
@@ -61,22 +126,25 @@ export default function FitText({
       cancelAnimationFrame(raf);
       ro.disconnect();
       timers.forEach((t) => window.clearTimeout(t));
+      if (grouped) groupRef.current!.release(id);
     };
-  }, [min]);
+  }, [min, grouped, id]);
+
+  const scale = grouped ? group!.scale : localScale;
 
   return (
     <span
       ref={containerRef}
-      className={`block overflow-hidden ${align === "center" ? "text-center" : ""} ${className ?? ""}`}
+      className={`flex items-center overflow-hidden ${align === "center" ? "justify-center" : "justify-start"} ${className ?? ""}`}
       style={style}
       title={title}
     >
       <span
         ref={measureRef}
-        className="inline-block whitespace-nowrap align-top will-change-transform"
+        className="inline-block whitespace-nowrap will-change-transform"
         style={{
           transform: scale < 1 ? `scale(${scale})` : undefined,
-          transformOrigin: align === "center" ? "top center" : "top left",
+          transformOrigin: align === "center" ? "center" : "left center",
         }}
       >
         {children}
