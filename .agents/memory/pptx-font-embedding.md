@@ -17,4 +17,6 @@ The slides `exportSlides({format:"pptx"})` pipeline emits **editable** text runs
 
 Validate after: zip.testzip() is None, and presentation.xml / rels / Content_Types parse as well-formed XML.
 
+**CRITICAL — internal name must match the run typeface.** PowerPoint registers an embedded font under the font binary's *own* name-table family name, then matches slide runs by that name — NOT by the `typeface` attr in embeddedFontLst. Self-hosted brand fonts often have CSS family names that differ from their internal names (e.g. file used as CSS `DuneRise` is internally "Dune Rise"; `Sharkon` is internally "Sharkon Demo"). If they differ, the run says `DuneRise`, no installed font is named exactly that, and PowerPoint silently falls back to a default sans — even though the font box shows the right name. Fix: before embedding, rewrite name IDs 1/4/6 (and 16 if present), on every platform record, so the internal family name === the exact `typeface` string used in the slide runs. Browser @font-face ignores this (it keys off the CSS family), so it looks fine live but breaks in PPTX.
+
 **Caveat:** Google web fonts used in a deck but not self-hosted (e.g. Cormorant Garamond) have no local file to embed — those runs still substitute. Only fonts present on disk can be embedded.

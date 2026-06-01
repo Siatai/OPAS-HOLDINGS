@@ -196,16 +196,16 @@ title = "luxury rooftop apartment infinity pool city panorama"
 id = "xkXhSzCL5KDvd3NLZn-Cc"
 uri = "file://.local/outputs/Opas-Holdings---Investor-Deck.pptx"
 type = "slides"
-title = "Opas Holdings — Investor Deck (PPTX, fonts embedded)"
+title = "Opas Holdings — Investor Deck (PPTX, fonts fixed)"
 
 [[outputs]]
 id = "ONirlvTQSweO6-VvcvfDq"
 uri = "file://.local/outputs/Opas-Holdings---How-It-Works.pptx"
 type = "slides"
-title = "Opas Holdings — How It Works / Customer (PPTX, fonts embedded)"
+title = "Opas Holdings — How It Works / Customer (PPTX, fonts fixed)"
 
 [[outputs]]
 id = "GD0wmF7t0Lk_guJB50Tn1"
 uri = "file://.local/outputs/Opas-Holdings---Overview.pptx"
 type = "slides"
-title = "Opas Holdings — Overview (PPTX, fonts embedded)"
+title = "Opas Holdings — Overview (PPTX, fonts fixed)"
