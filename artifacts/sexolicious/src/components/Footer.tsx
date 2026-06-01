@@ -12,7 +12,7 @@ export default function Footer() {
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center space-x-3 group mb-4">
               <img src="/opas-logo.png" alt="Opas Logo" className="w-10 h-10 object-contain" />
-              <span className="text-xl font-sans font-bold tracking-wide text-white">OPAS PROPERTIES</span>
+              <span className="text-xl font-sans font-bold tracking-wide text-white">OPAS HOLDINGS</span>
             </Link>
             <p className="text-primary font-mono text-xs uppercase tracking-widest mb-6">
               Tokenized Assets · Real Estate · Supercars · Yachts · Jets · Web3
@@ -108,7 +108,7 @@ export default function Footer() {
                       Est. {new Date().getFullYear()}
                     </span>
                     <span className="text-[11px] font-mono tracking-[0.22em] text-white/70 uppercase">
-                      Opas Properties Ltd
+                      Opas Holdings Ltd
                     </span>
                   </div>
                 </div>

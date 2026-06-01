@@ -1,6 +1,6 @@
-# Opas Properties
+# Opas Holdings
 
-Luxury PropTech fractional property investment landing page. Dark navy + amber-gold (#EA8D0E) + electric teal (#0BB5BE). Cinematic, billionaire-grade aesthetic.
+Luxury tokenized-asset investment platform — real estate, supercars, yachts & private jets. Dark navy + amber-gold (#EA8D0E) + electric teal (#0BB5BE). Cinematic, billionaire-grade aesthetic. (Formerly "Opas Properties" — renamed once multi-asset.)
 
 ## Run & Operate
 
@@ -66,7 +66,7 @@ CSS utility classes: `.font-hero`, `.font-display`, `.font-sans`, `.font-serif`,
 
 ## Product
 
-Opas Properties is a luxury tokenized-asset investment platform spanning four asset classes: **real estate, supercars, yachts, and private jets**. Users browse curated assets with real yield/ROI data and connect a Web3 wallet to acquire equity interests starting from $100. The site showcases the AI valuation engine, blockchain co-ownership, and 24/7 secondary market capabilities.
+Opas Holdings is a luxury tokenized-asset investment platform spanning four asset classes: **real estate, supercars, yachts, and private jets**. Users browse curated assets with real yield/ROI data and connect a Web3 wallet to acquire equity interests starting from $100. The site showcases the AI valuation engine, blockchain co-ownership, and 24/7 secondary market capabilities.
 
 - `src/data/assets.ts` is the single source of truth for ALL tokenized assets (real estate flattened from `cities.ts` + curated cars/yachts/jets). `src/lib/portfolio.ts` indexes via `ASSET_INDEX` from there.
 - Non-real-estate assets have `city = ""` — any `/city/:id` link must be conditional on a truthy city (see Portfolio + Marketplace).
