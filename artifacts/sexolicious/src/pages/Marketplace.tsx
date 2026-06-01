@@ -5,12 +5,15 @@ import { Link } from "wouter";
 import {
   Store, TrendingUp, TrendingDown, Tag, ShoppingCart, X as XIcon,
   Wallet, Search, ArrowUpDown, ChevronRight, Gavel, Minus, Plus, Loader2,
+  Heart, Bell, ArrowLeftRight, Check,
 } from "lucide-react";
 import {
   getListings, buyListing, cancelListing, lookupProperty, fairValuePerShare,
   fmtUsdCompact, FEES,
   getBids, createBid, cancelBid, settleBid, bidBounds, BID_VARIANCE,
-  type Listing, type Bid,
+  getInterest, simulateIncomingInterest, markInterestRead, markAllInterestRead,
+  dismissInterest, unreadInterestCount, expressInterest,
+  type Listing, type Bid, type InterestMessage,
 } from "@/lib/portfolio";
 import { useWallet } from "@/components/WalletContext";
 import MarqueeText from "@/components/MarqueeText";
@@ -24,6 +27,16 @@ const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
 
 const fmtUsd = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+
+const timeAgo = (ts: number) => {
+  const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+  if (s < 60) return "just now";
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+};
 
 type SortKey = "available" | "newest" | "discount" | "yield" | "price_asc" | "price_desc";
 
@@ -39,10 +52,12 @@ export default function Marketplace() {
   const [buyState, setBuyState] = useState<{ listing: Listing; qty: number } | null>(null);
   const [bidState, setBidState] = useState<{ propertyId: string; qty: number; perShare: number } | null>(null);
   const [bids, setBids] = useState<Bid[]>([]);
+  const [interest, setInterest] = useState<InterestMessage[]>([]);
   const [toast, setToast] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
 
   useEffect(() => { setListings(getListings()); }, []);
   useEffect(() => { setBids(address ? getBids(address) : []); }, [address]);
+  useEffect(() => { setInterest(address ? getInterest(address) : []); }, [address]);
 
   useEffect(() => {
     if (!toast) return;
@@ -131,7 +146,7 @@ export default function Marketplace() {
     const res = createBid(address, bidState.propertyId, bidState.qty, bidState.perShare);
     if (!res.ok) { setToast({ kind: "err", msg: res.reason ?? "Bid failed." }); return; }
     setBids(res.bids!);
-    setToast({ kind: "ok", msg: `Bid placed for ${bidState.qty} share${bidState.qty === 1 ? "" : "s"}.` });
+    setToast({ kind: "ok", msg: `Bid placed for ${bidState.qty} share${bidState.qty === 1 ? "" : "s"} — the owner has been notified you're interested.` });
     setBidState(null);
   };
 
@@ -139,6 +154,14 @@ export default function Marketplace() {
     if (!address) return;
     setBids(cancelBid(address, id));
     setToast({ kind: "ok", msg: "Bid withdrawn." });
+  };
+
+  const handleExpressInterest = (listing: Listing) => {
+    if (!isConnected || !address) { openWallet(); return; }
+    const res = expressInterest(address, listing);
+    if (!res.ok) { setToast({ kind: "err", msg: res.reason ?? "Couldn't send interest." }); return; }
+    const token = lookupProperty(listing.propertyId)?.prop.token ?? listing.propertyId;
+    setToast({ kind: "ok", msg: `Interest sent — the owner of ${token} has been notified.` });
   };
 
   // Simulated order book: a seller fills the user's pending bids after a moment.
@@ -177,6 +200,43 @@ export default function Marketplace() {
     () => bids.filter((b) => b.status === "pending" || b.status === "filled").slice(0, 6),
     [bids],
   );
+
+  // ── Interest received on the user's own listings ──
+  const myListingIds = useMemo(
+    () => new Set(address ? listings.filter((l) => l.seller === address.toLowerCase()).map((l) => l.id) : []),
+    [listings, address],
+  );
+  const hasOwnListings = myListingIds.size > 0;
+  const unreadInterest = useMemo(() => unreadInterestCount(interest), [interest]);
+  // Count of interested parties per listing id (for per-card badges).
+  const interestByListing = useMemo(() => {
+    const map = new Map<string, number>();
+    interest.forEach((m) => {
+      if (m.listingId) map.set(m.listingId, (map.get(m.listingId) ?? 0) + 1);
+    });
+    return map;
+  }, [interest]);
+
+  const onMarkRead = (id: string) => { if (address) setInterest(markInterestRead(address, id)); };
+  const onMarkAllRead = () => { if (address) setInterest(markAllInterestRead(address)); };
+  const onDismissInterest = (id: string) => { if (address) setInterest(dismissInterest(address, id)); };
+
+  // Simulated inbound: while the user holds active listings, a buyer signals
+  // interest every so often so the owner sees live notifications.
+  useEffect(() => {
+    if (!address || !hasOwnListings) return;
+    const acct = address;
+    const tick = () => {
+      const next = simulateIncomingInterest(acct);
+      if (next) {
+        setInterest(next);
+        setToast({ kind: "ok", msg: "New interest on one of your listings." });
+      }
+    };
+    const first = setTimeout(tick, 5000);
+    const loop = setInterval(tick, 22000);
+    return () => { clearTimeout(first); clearInterval(loop); };
+  }, [address, hasOwnListings]);
 
   return (
     <div className="min-h-screen pt-28 md:pt-32 pb-24">
@@ -371,6 +431,83 @@ export default function Marketplace() {
           </div>
         )}
 
+        {/* Interest inbox — buyers interested in your listings */}
+        {tab === "mine" && (
+          <div className="rounded-lg p-4 space-y-3"
+            style={{ background: "rgba(20,28,48,0.4)", border: "1px solid rgba(11,181,190,0.22)" }}
+            data-testid="interest-inbox"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="relative inline-flex">
+                  <Bell className="w-3.5 h-3.5 text-secondary" />
+                  {unreadInterest > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] px-1 rounded-full bg-secondary text-[8px] leading-[14px] text-[#050810] font-bold text-center">
+                      {unreadInterest}
+                    </span>
+                  )}
+                </span>
+                <span className="text-[9.5px] tracking-[0.3em] uppercase text-white/55" style={NEVERA}>
+                  Interest in your listings
+                </span>
+              </div>
+              {unreadInterest > 0 && (
+                <button
+                  onClick={onMarkAllRead}
+                  data-testid="mark-all-read"
+                  className="flex items-center gap-1 text-[8.5px] tracking-[0.22em] uppercase text-white/45 hover:text-secondary transition-colors"
+                  style={NEVERA}
+                >
+                  <Check className="w-3 h-3" /> Mark all read
+                </button>
+              )}
+            </div>
+
+            {interest.length === 0 ? (
+              <div className="text-[11px] text-white/45 py-3" style={NEVERA}>
+                {hasOwnListings
+                  ? "No interest yet — buyers who bid, express interest or propose a swap on your listings will appear here."
+                  : "List an asset to start receiving interest from buyers."}
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 gap-2.5">
+                {interest.map((m) => {
+                  const Icon = m.kind === "bid" ? Gavel : m.kind === "swap" ? ArrowLeftRight : Heart;
+                  const tone = m.kind === "bid" ? "text-primary" : m.kind === "swap" ? "text-secondary" : "text-rose-300";
+                  return (
+                    <div
+                      key={m.id}
+                      onClick={() => !m.read && onMarkRead(m.id)}
+                      data-testid={`interest-${m.id}`}
+                      className={`relative flex items-start gap-2.5 rounded-md px-3 py-2.5 cursor-default transition-colors ${m.read ? "" : "ring-1 ring-secondary/30"}`}
+                      style={{ background: "rgba(8,12,24,0.6)", border: "1px solid rgba(220,225,235,0.06)" }}
+                    >
+                      {!m.read && <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-secondary" />}
+                      <Icon className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${tone}`} />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-white font-mono">{m.from}</span>
+                          <span className={`text-[7.5px] tracking-[0.22em] uppercase ${tone} font-mono`}>{m.kind}</span>
+                        </div>
+                        <div className="text-[10.5px] text-white/60 leading-snug" style={NEVERA}>{m.note}</div>
+                        <div className="text-[8.5px] text-white/30 font-mono mt-0.5">{timeAgo(m.createdAt)}</div>
+                      </div>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onDismissInterest(m.id); }}
+                        className="text-white/30 hover:text-rose-300 shrink-0"
+                        aria-label="Dismiss"
+                        data-testid={`dismiss-interest-${m.id}`}
+                      >
+                        <XIcon className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Listings grid */}
         {filtered.length === 0 ? (
           <div className="rounded-lg p-12 text-center"
@@ -414,8 +551,15 @@ export default function Marketplace() {
                         {prop.token}
                       </div>
                       {mine ? (
-                        <div className="px-2 py-0.5 rounded-sm text-[8.5px] tracking-[0.28em] uppercase text-emerald-300 border border-emerald-400/40 bg-emerald-400/10 font-mono">
-                          Your ask
+                        <div className="flex flex-col items-end gap-1">
+                          <div className="px-2 py-0.5 rounded-sm text-[8.5px] tracking-[0.28em] uppercase text-emerald-300 border border-emerald-400/40 bg-emerald-400/10 font-mono">
+                            Your ask
+                          </div>
+                          {(interestByListing.get(listing.id) ?? 0) > 0 && (
+                            <div className="flex items-center gap-1 px-2 py-0.5 rounded-sm text-[8.5px] tracking-[0.22em] uppercase text-secondary border border-secondary/40 bg-secondary/10 font-mono">
+                              <Bell className="w-2.5 h-2.5" /> {interestByListing.get(listing.id)} interested
+                            </div>
+                          )}
                         </div>
                       ) : listing.seller === "vault" ? (
                         <div className="px-2 py-0.5 rounded-sm text-[8.5px] tracking-[0.28em] uppercase text-secondary border border-secondary/40 bg-secondary/10 font-mono">
@@ -505,6 +649,15 @@ export default function Marketplace() {
                           >
                             <Gavel className="w-3.5 h-3.5" />
                             Bid
+                          </button>
+                          <button
+                            onClick={() => handleExpressInterest(listing)}
+                            data-testid={`express-interest-${listing.id}`}
+                            title="Notify the owner you're interested"
+                            aria-label="Express interest — notify the owner"
+                            className="px-3 py-2.5 text-secondary border border-secondary/40 hover:bg-secondary/10 rounded-sm transition-colors flex items-center"
+                          >
+                            <Heart className="w-3.5 h-3.5" />
                           </button>
                         </>
                       )}

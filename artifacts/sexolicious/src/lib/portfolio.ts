@@ -942,3 +942,150 @@ export function settleBid(
   });
   return { ok: true, bids: next };
 }
+
+// ─────────────────────────────────────────────────────────────
+// Interest inbox — buyers signalling interest in YOUR listings.
+//   A buyer can Bid, Express interest (no price) or propose a Swap on a
+//   listing. The listing owner is notified via this per-wallet inbox.
+//   This is the seller-side mirror of bids/swaps: messages here are interest
+//   RECEIVED on the current wallet's own listings (simulated counterparties).
+// ─────────────────────────────────────────────────────────────
+
+export type InterestKind = "bid" | "interest" | "swap";
+
+export type InterestMessage = {
+  id: string;
+  propertyId: string;        // the listed asset a buyer is interested in
+  listingId?: string;
+  kind: InterestKind;
+  from: string;              // short counterparty label
+  shares?: number;           // bid / swap quantity
+  perShare?: number;         // bid price
+  swapForId?: string;        // swap: asset the buyer would give
+  swapForShares?: number;
+  note: string;
+  createdAt: number;
+  read: boolean;
+};
+
+const INTEREST_BUYERS = ["0x6Ad2…91Cf", "0xE4b8…2207", "0x1c97…aB3e", "0x9F50…6d14", "0x83Ce…77Da"];
+
+const INT_KEY = (addr: string) => `opas:interest:${addr.toLowerCase()}`;
+const INT_SEEDED = (addr: string) => `opas:interest:seeded:${addr.toLowerCase()}`;
+
+function intId() {
+  return `int_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function readInterest(address: string): InterestMessage[] {
+  if (typeof window === "undefined" || !address) return [];
+  try {
+    const raw = window.localStorage.getItem(INT_KEY(address));
+    if (raw) return JSON.parse(raw) as InterestMessage[];
+  } catch {}
+  return [];
+}
+
+function writeInterest(address: string, m: InterestMessage[]) {
+  window.localStorage.setItem(INT_KEY(address), JSON.stringify(m.slice(0, 50)));
+}
+
+// Builds one simulated interest message for a given listing.
+function buildInterest(listing: Listing): InterestMessage {
+  const from = INTEREST_BUYERS[Math.floor(Math.random() * INTEREST_BUYERS.length)];
+  const roll = Math.random();
+  const kind: InterestKind = roll < 0.45 ? "bid" : roll < 0.75 ? "interest" : "swap";
+  const token = lookupProperty(listing.propertyId)?.prop.token ?? listing.propertyId;
+  const base = {
+    id: intId(),
+    propertyId: listing.propertyId,
+    listingId: listing.id,
+    from,
+    createdAt: Date.now(),
+    read: false,
+  };
+  if (kind === "bid") {
+    const shares = Math.max(1, Math.round(listing.shares * (0.3 + Math.random() * 0.6)));
+    const { min, max } = bidBounds(listing.propertyId);
+    const perShare = Math.round((min + Math.random() * (max - min)) * 100) / 100;
+    return { ...base, kind, shares, perShare, note: `Bid ${shares} × ${fmtUsdCompact(perShare)}/sh on your ${token} listing` };
+  }
+  if (kind === "swap") {
+    const ids = Array.from(ASSET_INDEX.keys()).filter((id) => id !== listing.propertyId);
+    const swapForId = ids[Math.floor(Math.random() * ids.length)];
+    const swapForShares = Math.max(1, Math.round(listing.shares * (0.4 + Math.random() * 0.6)));
+    const swapToken = lookupProperty(swapForId)?.prop.token ?? swapForId;
+    const shares = Math.max(1, Math.round(listing.shares * (0.3 + Math.random() * 0.5)));
+    return { ...base, kind, shares, swapForId, swapForShares, note: `Wants to swap ${swapForShares} × ${swapToken} for ${shares} × your ${token}` };
+  }
+  return { ...base, kind, note: `Expressed interest in your ${token} listing` };
+}
+
+// Reads the inbox, seeding one message per own listing the first time so a
+// holder with active listings immediately sees who is interested.
+export function getInterest(address: string): InterestMessage[] {
+  if (typeof window === "undefined" || !address) return [];
+  const existing = readInterest(address);
+  if (window.localStorage.getItem(INT_SEEDED(address))) return existing;
+
+  const own = getListings().filter((l) => l.seller === address.toLowerCase());
+  const seeds = own.slice(0, 3).map((l, i) => {
+    const m = buildInterest(l);
+    return { ...m, createdAt: Date.now() - (i + 1) * 47 * 60 * 1000 };
+  });
+  const merged = [...seeds, ...existing];
+  writeInterest(address, merged);
+  window.localStorage.setItem(INT_SEEDED(address), "1");
+  return merged;
+}
+
+// Simulated arrival: a buyer signals interest in one of the wallet's own
+// listings. Returns the updated inbox, or null when there are no own listings.
+export function simulateIncomingInterest(address: string): InterestMessage[] | null {
+  if (!address) return null;
+  const own = getListings().filter((l) => l.seller === address.toLowerCase());
+  if (own.length === 0) return null;
+  const listing = own[Math.floor(Math.random() * own.length)];
+  const next = [buildInterest(listing), ...readInterest(address)];
+  writeInterest(address, next);
+  return next;
+}
+
+export function markInterestRead(address: string, id: string): InterestMessage[] {
+  const next = readInterest(address).map((m) => m.id === id ? { ...m, read: true } : m);
+  writeInterest(address, next);
+  return next;
+}
+
+export function markAllInterestRead(address: string): InterestMessage[] {
+  const next = readInterest(address).map((m) => ({ ...m, read: true }));
+  writeInterest(address, next);
+  return next;
+}
+
+export function dismissInterest(address: string, id: string): InterestMessage[] {
+  const next = readInterest(address).filter((m) => m.id !== id);
+  writeInterest(address, next);
+  return next;
+}
+
+export function unreadInterestCount(messages: InterestMessage[]): number {
+  return messages.reduce((n, m) => n + (m.read ? 0 : 1), 0);
+}
+
+// Buyer-side: signal interest in someone else's listing. There is no price and
+// nothing is escrowed — it just pings the listing owner. Records a buyer-side
+// activity entry so the action shows in the user's own ledger.
+export function expressInterest(
+  buyer: string,
+  listing: Listing,
+): { ok: boolean; reason?: string } {
+  if (!buyer) return { ok: false, reason: "Connect a wallet first." };
+  if (listing.seller === buyer.toLowerCase()) return { ok: false, reason: "This is your own listing." };
+  const token = lookupProperty(listing.propertyId)?.prop.token ?? listing.propertyId;
+  logActivity(buyer, {
+    kind: "bid", propertyId: listing.propertyId, shares: listing.shares,
+    note: `Expressed interest in ${token} · owner notified`,
+  });
+  return { ok: true };
+}
