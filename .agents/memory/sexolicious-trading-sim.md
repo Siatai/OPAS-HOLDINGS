@@ -64,6 +64,25 @@ cashes out accumulated USDT proceeds; available = sum(rent+sell usd) − sum(wit
 usd), clamped ≥0, single-sourced via `proceedsFromActivity(activity)` (and
 `proceedsBalance(address)` wrapper) so Dashboard + Withdraw never drift.
 
+## Bids — buy-side offers bounded to ±2% of fair value
+A user places a bid to buy shares at a chosen price/share, **constrained to
+fairValuePerShare ± 2%** (`BID_VARIANCE`). Single-wallet sim: a simulated seller
+fills it via a timer (mirrors the swap settle timer). A filled bid is a purchase
+→ charges the 7% buy fee and logs `kind:"buy"` (placement logs `kind:"bid"`).
+**Why:** keeps quotes anchored to the real valuation; bids aren't proceeds so
+they must not feed `proceedsBalance`.
+**How to apply:**
+- `validateBid(propertyId, shares, bidPerShare)` is the **single source of truth**
+  for validity (finite, positive, within band). It MUST be called in BOTH
+  `createBid` AND `settleBid` — re-validate at settlement so a tampered
+  localStorage bid (out-of-band price / NaN) can never fill.
+- Any new `ActivityKind` (e.g. `"bid"`) must be added to Dashboard `ACT_META`
+  or the ledger hits an undefined lookup. Classify in/out in Dashboard's
+  isOut/isIn; bid *placement* is neutral (no cash moves until fill).
+- Sim fill timers: track handles in a ref Map, dedupe by id, capture a local
+  `acct = address`, and clear all on unmount/wallet switch to avoid stale-wallet
+  settlement (same pattern as the Portfolio swap timer).
+
 ## Known non-blocking warning
 Console: "Cannot update a component (WalletProvider) while rendering Hydrate" —
 expected/benign, do not chase it. Screenshots always catch the 4s intro loader.

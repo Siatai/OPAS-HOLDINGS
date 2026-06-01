@@ -5,7 +5,7 @@ import { useAccount, useChainId } from "wagmi";
 import {
   Wallet, Building2, Store, Vote, Coins, TrendingUp, TrendingDown,
   Tag, ShoppingCart, ShieldCheck, Receipt, ArrowUpRight, ArrowDownRight,
-  Activity as ActivityIcon, ChevronRight, BadgePercent, ArrowLeftRight, Banknote,
+  Activity as ActivityIcon, ChevronRight, BadgePercent, ArrowLeftRight, Banknote, Gavel,
 } from "lucide-react";
 import {
   getHoldings, getProposals, getListings, getActivity,
@@ -41,6 +41,7 @@ const ACT_META: Record<ActivityKind, { icon: any; tone: string; label: string }>
   vote:   { icon: Vote,         tone: "text-secondary border-secondary/40 bg-secondary/10",       label: "Vote" },
   swap:   { icon: ArrowLeftRight, tone: "text-secondary border-secondary/40 bg-secondary/10",     label: "Swap" },
   withdraw: { icon: Banknote,    tone: "text-secondary border-secondary/40 bg-secondary/10",     label: "Withdraw" },
+  bid:    { icon: Gavel,        tone: "text-primary border-primary/40 bg-primary/10",             label: "Bid" },
 };
 
 export default function Dashboard() {

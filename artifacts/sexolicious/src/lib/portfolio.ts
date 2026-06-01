@@ -420,7 +420,7 @@ export function fmtUsdCompact(n: number): string {
 // Activity ledger (per-wallet)
 // ─────────────────────────────────────────────────────────────
 
-export type ActivityKind = "buy" | "sell" | "list" | "cancel" | "rent" | "vote" | "swap" | "withdraw";
+export type ActivityKind = "buy" | "sell" | "list" | "cancel" | "rent" | "vote" | "swap" | "withdraw" | "bid";
 
 export type Activity = {
   id: string;
@@ -792,4 +792,153 @@ export function settleOutgoingSwap(
     note: `Swap filled by ${taker} · ${lookupProperty(offer.giveId)?.prop.token ?? offer.giveId} → ${lookupProperty(offer.receiveId)?.prop.token ?? offer.receiveId} · no swap fee`,
   });
   return { ok: true, offers: next };
+}
+
+// ─────────────────────────────────────────────────────────────
+// Bids — buy-side offers priced within ±2% of an asset's fair value
+//   A holder/investor names a price per share they're willing to pay; the
+//   platform only accepts bids inside a tight ±2% band around fair value so
+//   quotes stay anchored to the real valuation. A simulated seller from the
+//   open order book fills the bid, charging the standard 7% buy fee.
+// ─────────────────────────────────────────────────────────────
+
+export const BID_VARIANCE = 0.02; // ±2% around fair value per share
+
+export type BidStatus = "pending" | "filled" | "cancelled";
+
+export type Bid = {
+  id: string;
+  propertyId: string;
+  bidder: string;        // wallet address (lowercased)
+  shares: number;
+  bidPerShare: number;   // USD — constrained to fairValue ± 2%
+  status: BidStatus;
+  counterparty?: string; // simulated seller, set on fill
+  createdAt: number;
+};
+
+// Allowed bid band: fair value per share ± BID_VARIANCE.
+export function bidBounds(propertyId: string) {
+  const fair = fairValuePerShare(propertyId);
+  return {
+    fair,
+    min: fair * (1 - BID_VARIANCE),
+    max: fair * (1 + BID_VARIANCE),
+  };
+}
+
+// Single source of truth for what a valid bid is. Used at creation AND at
+// settlement so a tampered localStorage bid (out-of-band price, NaN/Infinity,
+// non-positive) can never be filled. Returns null when valid, else a reason.
+const BID_EPS = 0.005;
+function validateBid(
+  propertyId: string,
+  shares: number,
+  bidPerShare: number,
+): string | null {
+  if (!lookupProperty(propertyId)) return "Unknown asset.";
+  if (!Number.isFinite(shares) || shares <= 0) return "Shares must be greater than zero.";
+  if (!Number.isFinite(bidPerShare) || bidPerShare <= 0) return "Bid price must be positive.";
+  const { min, max } = bidBounds(propertyId);
+  if (bidPerShare < min - BID_EPS || bidPerShare > max + BID_EPS) {
+    return `Bid must be within ±2% of fair value (${fmtUsdCompact(min)}–${fmtUsdCompact(max)}/share).`;
+  }
+  return null;
+}
+
+const BID_KEY = (addr: string) => `opas:bids:${addr.toLowerCase()}`;
+
+function bidId() {
+  return `bid_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function readBids(address: string): Bid[] {
+  if (typeof window === "undefined" || !address) return [];
+  try {
+    const raw = window.localStorage.getItem(BID_KEY(address));
+    if (raw) return JSON.parse(raw) as Bid[];
+  } catch {}
+  return [];
+}
+
+function writeBids(address: string, b: Bid[]) {
+  window.localStorage.setItem(BID_KEY(address), JSON.stringify(b));
+}
+
+export function getBids(address: string): Bid[] {
+  return readBids(address);
+}
+
+export function createBid(
+  address: string,
+  propertyId: string,
+  shares: number,
+  bidPerShare: number,
+): { ok: boolean; reason?: string; bids?: Bid[] } {
+  if (!address) return { ok: false, reason: "Connect a wallet first." };
+  const invalid = validateBid(propertyId, shares, bidPerShare);
+  if (invalid) return { ok: false, reason: invalid };
+
+  const bid: Bid = {
+    id: bidId(),
+    propertyId,
+    bidder: address.toLowerCase(),
+    shares,
+    bidPerShare,
+    status: "pending",
+    createdAt: Date.now(),
+  };
+  const next = [bid, ...readBids(address)];
+  writeBids(address, next);
+  logActivity(address, {
+    kind: "bid", propertyId, shares, usd: shares * bidPerShare,
+    note: `Bid placed @ ${fmtUsdCompact(bidPerShare)}/share · within ±2% of fair`,
+  });
+  return { ok: true, bids: next };
+}
+
+export function cancelBid(address: string, id: string): Bid[] {
+  const all = readBids(address);
+  const target = all.find((b) => b.id === id);
+  // No cash/shares are escrowed for a bid, so cancelling is a pure status flip.
+  const next = all.map((b) => b.id === id ? { ...b, status: "cancelled" as BidStatus } : b);
+  writeBids(address, next);
+  if (target && target.status === "pending") {
+    logActivity(address, {
+      kind: "cancel", propertyId: target.propertyId, shares: target.shares,
+      note: "Bid withdrawn",
+    });
+  }
+  return next;
+}
+
+// Simulated order-book fill: a seller accepts the user's bid. The buyer is
+// credited the shares at the bid price plus the standard 7% buy fee (cost basis
+// = bid total incl. fee, mirroring buyListing).
+export function settleBid(
+  address: string,
+  id: string,
+): { ok: boolean; reason?: string; bids?: Bid[] } {
+  const all = readBids(address);
+  const bid = all.find((b) => b.id === id);
+  if (!bid || bid.status !== "pending") return { ok: false, reason: "Bid not fillable." };
+  // Re-validate against the live ±2% band before crediting shares — a tampered
+  // localStorage bid (out-of-band price, NaN) must never settle.
+  if (validateBid(bid.propertyId, bid.shares, bid.bidPerShare)) {
+    return { ok: false, reason: "Bid is no longer within the ±2% band." };
+  }
+
+  const cost = bid.shares * bid.bidPerShare;
+  const fee = cost * FEES.buySell;
+  const total = cost + fee;
+  addShares(address, bid.propertyId, bid.shares, total);
+
+  const seller = SIM_TAKERS[Math.floor(Math.random() * SIM_TAKERS.length)];
+  const next = all.map((b) => b.id === id ? { ...b, status: "filled" as BidStatus, counterparty: seller } : b);
+  writeBids(address, next);
+  logActivity(address, {
+    kind: "buy", propertyId: bid.propertyId, shares: bid.shares, usd: total,
+    note: `Bid filled by ${seller} @ ${fmtUsdCompact(bid.bidPerShare)}/share · incl. 7% fee ${fmtUsdCompact(fee)}`,
+  });
+  return { ok: true, bids: next };
 }

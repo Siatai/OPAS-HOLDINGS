@@ -1,15 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useAccount } from "wagmi";
 import { Link } from "wouter";
 import {
   Store, TrendingUp, TrendingDown, Tag, ShoppingCart, X as XIcon,
-  Wallet, Search, ArrowUpDown, ChevronRight,
+  Wallet, Search, ArrowUpDown, ChevronRight, Gavel, Minus, Plus, Loader2,
 } from "lucide-react";
 import {
   getListings, buyListing, cancelListing, lookupProperty, fairValuePerShare,
   fmtUsdCompact, FEES,
-  type Listing,
+  getBids, createBid, cancelBid, settleBid, bidBounds, BID_VARIANCE,
+  type Listing, type Bid,
 } from "@/lib/portfolio";
 import { useWallet } from "@/components/WalletContext";
 import MarqueeText from "@/components/MarqueeText";
@@ -32,9 +33,12 @@ export default function Marketplace() {
   const [sort, setSort] = useState<SortKey>("available");
   const [search, setSearch] = useState("");
   const [buyState, setBuyState] = useState<{ listing: Listing; qty: number } | null>(null);
+  const [bidState, setBidState] = useState<{ propertyId: string; qty: number; perShare: number } | null>(null);
+  const [bids, setBids] = useState<Bid[]>([]);
   const [toast, setToast] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
 
   useEffect(() => { setListings(getListings()); }, []);
+  useEffect(() => { setBids(address ? getBids(address) : []); }, [address]);
 
   useEffect(() => {
     if (!toast) return;
@@ -112,6 +116,63 @@ export default function Marketplace() {
     setListings(next);
     setToast({ kind: "ok", msg: "Listing cancelled. Shares returned to vault." });
   };
+
+  const openBid = (propertyId: string) => {
+    if (!isConnected) { openWallet(); return; }
+    setBidState({ propertyId, qty: 1, perShare: Math.round(fairValuePerShare(propertyId)) });
+  };
+
+  const handleBid = () => {
+    if (!bidState || !address) return;
+    const res = createBid(address, bidState.propertyId, bidState.qty, bidState.perShare);
+    if (!res.ok) { setToast({ kind: "err", msg: res.reason ?? "Bid failed." }); return; }
+    setBids(res.bids!);
+    setToast({ kind: "ok", msg: `Bid placed for ${bidState.qty} share${bidState.qty === 1 ? "" : "s"}.` });
+    setBidState(null);
+  };
+
+  const handleCancelBid = (id: string) => {
+    if (!address) return;
+    setBids(cancelBid(address, id));
+    setToast({ kind: "ok", msg: "Bid withdrawn." });
+  };
+
+  // Simulated order book: a seller fills the user's pending bids after a moment.
+  const bidTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  useEffect(() => {
+    if (!address) return;
+    const acct = address;
+    bids
+      .filter((b) => b.status === "pending")
+      .forEach((b) => {
+        if (bidTimers.current.has(b.id)) return;
+        const delay = Math.max(2500, 6000 - (Date.now() - b.createdAt));
+        const t = setTimeout(() => {
+          bidTimers.current.delete(b.id);
+          const res = settleBid(acct, b.id);
+          if (res.ok) {
+            setBids(res.bids ?? getBids(acct));
+            setToast({ kind: "ok", msg: "Seller accepted — bid filled." });
+          }
+        }, delay);
+        bidTimers.current.set(b.id, t);
+      });
+  }, [bids, address]);
+
+  // Cancel any in-flight fill timers on unmount or wallet switch so a stale
+  // callback can't settle against the previous wallet's bids.
+  useEffect(() => {
+    const timers = bidTimers.current;
+    return () => {
+      timers.forEach((t) => clearTimeout(t));
+      timers.clear();
+    };
+  }, [address]);
+
+  const myBids = useMemo(
+    () => bids.filter((b) => b.status === "pending" || b.status === "filled").slice(0, 6),
+    [bids],
+  );
 
   return (
     <div className="min-h-screen pt-28 md:pt-32 pb-24">
@@ -255,6 +316,54 @@ export default function Marketplace() {
           </div>
         </div>
 
+        {/* My bids */}
+        {myBids.length > 0 && (
+          <div className="rounded-lg p-4 space-y-3"
+            style={{ background: "rgba(20,28,48,0.4)", border: "1px solid rgba(234,141,14,0.18)" }}
+            data-testid="my-bids"
+          >
+            <div className="flex items-center gap-2">
+              <Gavel className="w-3.5 h-3.5 text-primary" />
+              <span className="text-[9.5px] tracking-[0.3em] uppercase text-white/55" style={NEVERA}>Your bids</span>
+            </div>
+            <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-2.5">
+              {myBids.map((b) => {
+                const m = lookupProperty(b.propertyId);
+                const pending = b.status === "pending";
+                return (
+                  <div key={b.id} className="flex items-center justify-between gap-3 rounded-md px-3 py-2.5"
+                    style={{ background: "rgba(8,12,24,0.6)", border: "1px solid rgba(220,225,235,0.06)" }}
+                  >
+                    <div className="min-w-0">
+                      <div className="text-[12px] text-white truncate" style={SHARKON}>{m?.prop.token ?? b.propertyId}</div>
+                      <div className="text-[9.5px] text-white/45 font-mono truncate">
+                        {b.shares} × {fmtUsd(b.bidPerShare)}/sh
+                      </div>
+                    </div>
+                    {pending ? (
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="flex items-center gap-1 text-[9px] tracking-[0.18em] uppercase text-primary font-mono">
+                          <Loader2 className="w-3 h-3 animate-spin" /> Live
+                        </span>
+                        <button
+                          onClick={() => handleCancelBid(b.id)}
+                          data-testid={`cancel-bid-${b.id}`}
+                          className="text-white/40 hover:text-rose-300"
+                          aria-label="Withdraw bid"
+                        >
+                          <XIcon className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="shrink-0 text-[9px] tracking-[0.18em] uppercase text-emerald-300 font-mono">Filled</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Listings grid */}
         {filtered.length === 0 ? (
           <div className="rounded-lg p-12 text-center"
@@ -369,15 +478,26 @@ export default function Marketplace() {
                           Cancel listing
                         </button>
                       ) : (
-                        <button
-                          onClick={() => isConnected ? setBuyState({ listing, qty: Math.min(1, listing.shares) }) : openWallet()}
-                          data-testid={`buy-${listing.id}`}
-                          className="btn-metal flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-[10.5px] tracking-[0.22em] uppercase text-[#050810] rounded-sm font-bold"
-                          style={{ fontFamily: "BankGothic, sans-serif" }}
-                        >
-                          <ShoppingCart className="w-3.5 h-3.5" />
-                          Buy
-                        </button>
+                        <>
+                          <button
+                            onClick={() => isConnected ? setBuyState({ listing, qty: Math.min(1, listing.shares) }) : openWallet()}
+                            data-testid={`buy-${listing.id}`}
+                            className="btn-metal flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-[10.5px] tracking-[0.22em] uppercase text-[#050810] rounded-sm font-bold"
+                            style={{ fontFamily: "BankGothic, sans-serif" }}
+                          >
+                            <ShoppingCart className="w-3.5 h-3.5" />
+                            Buy
+                          </button>
+                          <button
+                            onClick={() => openBid(listing.propertyId)}
+                            data-testid={`bid-${listing.id}`}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-[10.5px] tracking-[0.22em] uppercase text-primary border border-primary/40 hover:bg-primary/10 rounded-sm transition-colors"
+                            style={NEVERA}
+                          >
+                            <Gavel className="w-3.5 h-3.5" />
+                            Bid
+                          </button>
+                        </>
                       )}
                       {city && (
                         <Link
@@ -489,6 +609,142 @@ export default function Marketplace() {
           </motion.div>
         </div>
       )}
+
+      {/* Bid modal */}
+      {bidState && (() => {
+        const meta = lookupProperty(bidState.propertyId);
+        if (!meta) return null;
+        const { fair, min, max } = bidBounds(bidState.propertyId);
+        const subtotal = bidState.qty * bidState.perShare;
+        const bidFee = subtotal * FEES.buySell;
+        const total = subtotal + bidFee;
+        const deltaPct = fair ? ((bidState.perShare - fair) / fair) * 100 : 0;
+        const clampPrice = (v: number) => Math.min(max, Math.max(min, v));
+        const setPrice = (v: number) => setBidState({ ...bidState, perShare: Math.round(clampPrice(v)) });
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4"
+            onClick={() => setBidState(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0, y: 12 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="metallic-border relative w-full max-w-md rounded-xl p-7 space-y-5"
+              style={{ background: "linear-gradient(160deg, rgba(12,18,32,0.96) 0%, rgba(8,12,24,0.96) 100%)" }}
+              data-testid="bid-modal"
+            >
+              <button
+                onClick={() => setBidState(null)}
+                className="absolute top-4 right-4 text-white/40 hover:text-primary"
+              >
+                <XIcon className="w-5 h-5" />
+              </button>
+
+              <div>
+                <div className="text-[8.5px] tracking-[0.32em] uppercase text-primary mb-1 font-mono">
+                  {meta.prop.token} · Place bid
+                </div>
+                <h3 className="text-2xl text-white" style={SHARKON}>{meta.prop.title}</h3>
+              </div>
+
+              <div className="space-y-3">
+                <label className="block">
+                  <span className="text-[8.5px] tracking-[0.32em] uppercase text-white/45" style={NEVERA}>Quantity</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={bidState.qty}
+                    onChange={(e) => setBidState({ ...bidState, qty: Math.max(1, parseInt(e.target.value || "1", 10)) })}
+                    data-testid="bid-qty"
+                    className="mt-1 w-full px-3 py-2.5 text-lg bg-[rgba(20,28,48,0.6)] border border-white/10 focus:border-primary/40 outline-none rounded-md text-white"
+                    style={SHARKON}
+                  />
+                </label>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[8.5px] tracking-[0.32em] uppercase text-white/45" style={NEVERA}>Bid / share</span>
+                    <span className={`text-[10px] font-mono ${deltaPct >= 0 ? "text-rose-300" : "text-emerald-300"}`}>
+                      {deltaPct >= 0 ? "+" : ""}{deltaPct.toFixed(1)}% vs fair
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setPrice(bidState.perShare - 1)}
+                      className="shrink-0 w-9 h-9 flex items-center justify-center border border-white/10 hover:border-primary/40 rounded-md text-white/70"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <input
+                      type="number"
+                      value={bidState.perShare}
+                      onChange={(e) => setPrice(parseFloat(e.target.value || "0"))}
+                      data-testid="bid-price"
+                      className="flex-1 min-w-0 px-3 py-2 text-lg text-center bg-[rgba(20,28,48,0.6)] border border-white/10 focus:border-primary/40 outline-none rounded-md text-white"
+                      style={SHARKON}
+                    />
+                    <button
+                      onClick={() => setPrice(bidState.perShare + 1)}
+                      className="shrink-0 w-9 h-9 flex items-center justify-center border border-white/10 hover:border-primary/40 rounded-md text-white/70"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <input
+                    type="range"
+                    min={Math.floor(min)}
+                    max={Math.ceil(max)}
+                    value={bidState.perShare}
+                    onChange={(e) => setPrice(parseFloat(e.target.value))}
+                    data-testid="bid-slider"
+                    className="mt-3 w-full accent-[#EA8D0E]"
+                  />
+                  <div className="flex items-center justify-between text-[9px] text-white/40 font-mono mt-1">
+                    <span>{fmtUsd(min)}</span>
+                    <span className="text-white/55">Fair {fmtUsd(fair)}</span>
+                    <span>{fmtUsd(max)}</span>
+                  </div>
+                </div>
+
+                <div className="rounded-md p-3 space-y-1.5"
+                  style={{ background: "rgba(20,28,48,0.6)", border: "1px solid rgba(220,225,235,0.08)" }}
+                >
+                  <Row label="Bid / share" value={fmtUsd(bidState.perShare)} />
+                  <Row label="Quantity"    value={`${bidState.qty} × shares`} />
+                  <Row label="Subtotal"    value={fmtUsd(subtotal)} />
+                  <Row label="Platform fee · 7%" value={fmtUsd(bidFee)} />
+                  <div className="h-px bg-white/10 my-1" />
+                  <Row label="Max total"   value={fmtUsd(total)} accent />
+                </div>
+                <p className="text-[10px] text-white/40 leading-relaxed" style={NEVERA}>
+                  Bids are capped to <span className="text-primary">±{(BID_VARIANCE * 100).toFixed(0)}%</span> of fair
+                  value. Settled in <span className="text-primary">$OPAS</span>; yield distributions paid in{" "}
+                  <span className="text-secondary">USDT</span>.
+                </p>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setBidState(null)}
+                  className="flex-1 px-5 py-3 text-[10.5px] tracking-[0.22em] uppercase text-white/60 border border-white/10 hover:border-white/25 rounded-sm"
+                  style={NEVERA}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBid}
+                  data-testid="confirm-bid"
+                  className="btn-metal flex-1 px-5 py-3 text-[11px] font-bold tracking-[0.22em] uppercase text-[#050810] rounded-sm"
+                  style={{ fontFamily: "BankGothic, sans-serif" }}
+                >
+                  Place bid
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        );
+      })()}
 
       {/* Toast */}
       {toast && (
