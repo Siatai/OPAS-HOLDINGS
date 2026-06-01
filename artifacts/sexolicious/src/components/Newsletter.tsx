@@ -15,7 +15,7 @@ export default function Newsletter() {
   };
 
   return (
-    <section className="py-20 md:py-32 bg-background relative overflow-hidden">
+    <section id="waitlist" className="py-20 md:py-32 bg-background relative overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 md:px-12 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 40 }}

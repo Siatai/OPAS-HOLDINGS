@@ -3,6 +3,9 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { useWallet } from "./WalletContext";
 import worldSkyline from "@/assets/images/world_skyline.png";
+import heroCar from "@/assets/images/assets/car_ferrari.png";
+import heroYacht from "@/assets/images/assets/yacht_riva.png";
+import heroJet from "@/assets/images/assets/jet_gulfstream.png";
 
 const TICKER_ITEMS = [
   "120 assets", "4 asset classes", "$480M aum", "18,000 investors",
@@ -13,6 +16,12 @@ const TICKER_ITEMS = [
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
 const SERIF   = { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" as const };
+
+const HERO_ASSETS = [
+  { img: heroCar,   label: "Supercars",    yld: "12.6%", accent: "#EA8D0E", pos: "bottom-[16%] left-[3%]",  delay: 0.9,  dur: 5.0 },
+  { img: heroYacht, label: "Yachts",       yld: "11.0%", accent: "#0BB5BE", pos: "bottom-[10%] left-[22%]", delay: 1.1,  dur: 6.0 },
+  { img: heroJet,   label: "Private Jets", yld: "10.8%", accent: "#22D3EE", pos: "bottom-[24%] left-[40%]", delay: 1.3,  dur: 5.5 },
+];
 
 export default function Hero() {
   const { scrollY } = useScroll();
@@ -73,6 +82,43 @@ export default function Hero() {
               "radial-gradient(ellipse 60% 100% at 50% 100%, rgba(234,141,14,0.35), transparent 70%)",
           }}
         />
+      </div>
+
+      {/* Floating tokenized-asset cards over the skyline (desktop) */}
+      <div className="hidden lg:block absolute inset-0 z-[5] pointer-events-none">
+        {HERO_ASSETS.map((a) => (
+          <motion.div
+            key={a.label}
+            className={`absolute ${a.pos} w-[160px] rounded-lg overflow-hidden`}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: [0, -10, 0] }}
+            transition={{
+              opacity: { duration: 0.8, delay: a.delay },
+              y: { duration: a.dur, repeat: Infinity, ease: "easeInOut", delay: a.delay },
+            }}
+            style={{
+              border: `1px solid ${a.accent}59`,
+              boxShadow: `0 20px 50px -20px rgba(0,0,0,0.7), 0 0 42px -16px ${a.accent}80`,
+            }}
+          >
+            <div className="relative aspect-[16/10]">
+              <img src={a.img} alt={a.label} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+              <span
+                className="absolute top-2 left-2 text-[7px] tracking-[0.28em] uppercase px-1.5 py-0.5 rounded backdrop-blur-sm"
+                style={{ ...NEVERA, background: `${a.accent}33`, color: "#fff" }}
+              >
+                Tokenized
+              </span>
+              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
+                <span className="text-[8px] tracking-[0.26em] uppercase text-white/85" style={NEVERA}>{a.label}</span>
+                <span className="inline-flex items-center gap-1 text-[9px]" style={{ ...NEVERA, color: a.accent }}>
+                  <TrendingUp className="w-2.5 h-2.5" /> {a.yld}
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        ))}
       </div>
 
       {/* Refined HUD grid — even more subtle */}

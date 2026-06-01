@@ -1,117 +1,48 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { motion, type PanInfo } from "framer-motion";
+import React, { useRef } from "react";
+import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import {
-  ChevronLeft, ChevronRight, TrendingUp, MapPin, ArrowUpRight,
-  Building2, Car, Ship, Plane,
+  ChevronLeft, ChevronRight, TrendingUp, ArrowUpRight,
+  Building2, Car, Ship, Plane, Lock, Palette, Watch, Grape, Gem,
 } from "lucide-react";
 import { useWallet } from "./WalletContext";
 import { CITIES } from "@/data/cities";
 import {
   CATEGORIES, assetsByCategory, getCategory,
-  type Asset, type AssetCategory,
+  type Asset, type AssetCategory, type CategoryMeta,
 } from "@/data/assets";
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
 const SERIF   = { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" as const };
 
-const TAB_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+const TAB_ICONS: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
   Building2, Car, Ship, Plane,
 };
 
-// Structural card type satisfied by both Property and Asset.
-type CardAsset = {
-  id: string; title: string; token: string; tier: string; available: number;
-  rentalYield: string; capitalGrowth: string; totalRoi: string; price: number; image: string;
-  spec?: string;
-};
+const COMING_SOON = [
+  { icon: Palette, label: "Fine Art",       blurb: "Blue-chip canvases & sculpture from auction houses.",  accent: "#C084FC" },
+  { icon: Watch,   label: "Rare Watches",   blurb: "Independent horology & vintage grail references.",      accent: "#EA8D0E" },
+  { icon: Grape,   label: "Vineyards",      blurb: "Grand cru estates with annual en-primeur yield.",       accent: "#0BB5BE" },
+  { icon: Gem,     label: "Collectibles",   blurb: "Coloured stones, hypercars memorabilia & more.",        accent: "#22D3EE" },
+];
 
 export default function Properties() {
   const { openWallet } = useWallet();
   const [, navigate] = useLocation();
 
-  const [activeCat, setActiveCat] = useState<AssetCategory>("real-estate");
-  const [activeCityId, setActiveCityId] = useState<string>(CITIES[0].id);
-  const [activeCardIdx, setActiveCardIdx] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  // One flagship residence per city for the real-estate row.
+  const seenCity = new Set<string>();
+  const featuredRE = assetsByCategory("real-estate").filter((a) => {
+    if (!a.cityId || seenCity.has(a.cityId)) return false;
+    seenCity.add(a.cityId);
+    return true;
+  });
 
-  const isRealEstate = activeCat === "real-estate";
-  const catMeta = getCategory(activeCat);
-  const accent = catMeta.accent;
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 639px)");
-    const update = () => setIsMobile(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-
-  const activeCity = CITIES.find((c) => c.id === activeCityId)!;
-
-  // Coverflow source: RE → active city's properties; else → all assets of the class.
-  const cards: CardAsset[] = useMemo(
-    () => (isRealEstate ? activeCity.properties : assetsByCategory(activeCat)),
-    [isRealEstate, activeCity, activeCat],
-  );
-  const n = cards.length;
-  // Render-safe index — guards the one frame before the reset effect runs when
-  // switching to a class with fewer items (prevents an out-of-range counter flicker).
-  const safeIdx = n ? activeCardIdx % n : 0;
-
-  // Reset focus when class or city changes.
-  useEffect(() => { setActiveCardIdx(0); }, [activeCat, activeCityId]);
-
-  const next = useCallback(() => setActiveCardIdx((i) => (i + 1) % n), [n]);
-  const prev = useCallback(() => setActiveCardIdx((i) => (i - 1 + n) % n), [n]);
-
-  // Autoplay — pauses on hover / drag / manual nav.
-  const [isHovering, setIsHovering] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [manualPause, setManualPause] = useState(false);
-  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const clearResumeTimer = () => {
-    if (resumeTimer.current) { clearTimeout(resumeTimer.current); resumeTimer.current = null; }
-  };
-  const pauseFor = useCallback((ms = 6000) => {
-    setManualPause(true);
-    clearResumeTimer();
-    resumeTimer.current = setTimeout(() => setManualPause(false), ms);
-  }, []);
-  const isPaused = isHovering || isDragging || manualPause;
-  useEffect(() => {
-    if (isPaused) return;
-    const id = setInterval(() => setActiveCardIdx((i) => (i + 1) % n), 4500);
-    return () => clearInterval(id);
-  }, [isPaused, n]);
-  useEffect(() => () => clearResumeTimer(), []);
-
-  const goNext = () => { next(); pauseFor(); };
-  const goPrev = () => { prev(); pauseFor(); };
-  const goTo = (i: number) => { setActiveCardIdx(i); pauseFor(); };
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") goNext();
-      if (e.key === "ArrowLeft") goPrev();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [n]);
-
-  const handleDragEnd = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const swipe = info.offset.x + info.velocity.x * 0.25;
-    if (swipe < -60) goNext();
-    else if (swipe > 60) goPrev();
-  };
-
-  const wrappedOffset = (idx: number) => {
-    let o = idx - safeIdx;
-    if (o > n / 2) o -= n;
-    else if (o < -n / 2) o += n;
-    return o;
-  };
+  const rows: { meta: CategoryMeta; assets: Asset[] }[] = CATEGORIES.map((meta) => ({
+    meta,
+    assets: meta.id === "real-estate" ? featuredRE : assetsByCategory(meta.id),
+  }));
 
   return (
     <section id="properties" className="relative py-20 md:py-28 bg-background overflow-hidden">
@@ -120,406 +51,268 @@ export default function Properties() {
         bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)]
         bg-[size:4rem_4rem]
         [mask-image:radial-gradient(ellipse_70%_60%_at_50%_50%,#000_15%,transparent_100%)]" />
-      <div
-        className="absolute inset-0 pointer-events-none transition-opacity duration-700"
-        style={{ background: `radial-gradient(ellipse 50% 60% at 50% 40%, ${accent}0d 0%, transparent 70%)` }}
-      />
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_50%_60%_at_50%_30%,rgba(234,141,14,0.05)_0%,transparent_70%)]" />
 
       <div className="container mx-auto px-4 sm:px-6 md:px-12 relative z-10">
 
         {/* ── Section header ── */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-10 gap-6">
-          <div>
-            <motion.div
-              initial={{ opacity: 0, x: -16 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="flex items-center gap-3 mb-4"
-            >
-              <div className="w-10 h-px" style={{ background: accent }} />
-              <span className="tracking-[0.32em] uppercase text-[10px]" style={{ ...NEVERA, color: accent }}>
-                Tokenized · 4 asset classes
-              </span>
-            </motion.div>
-            <motion.h2
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-2xl sm:text-3xl md:text-5xl leading-[1.05] tracking-wide mb-2"
-              style={SHARKON}
-            >
-              <span className="metallic-text">Own a piece of</span>{" "}
-              <span className="metallic-warm-text">everything</span>
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-white/55 text-base sm:text-xl md:text-2xl"
-              style={SERIF}
-            >
-              Real estate, supercars, yachts, jets — curated masterpieces, tokenized.
-            </motion.p>
-          </div>
+        <div className="mb-12 md:mb-16">
+          <motion.div
+            initial={{ opacity: 0, x: -16 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="flex items-center gap-3 mb-4"
+          >
+            <div className="w-10 h-px bg-primary" />
+            <span className="text-primary tracking-[0.32em] uppercase text-[10px]" style={NEVERA}>
+              The Opas collection · 4 asset classes
+            </span>
+          </motion.div>
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-2xl sm:text-3xl md:text-5xl leading-[1.05] tracking-wide mb-2"
+            style={SHARKON}
+          >
+            <span className="metallic-text">Own a piece of</span>{" "}
+            <span className="metallic-warm-text">everything</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-white/55 text-base sm:text-xl md:text-2xl"
+            style={SERIF}
+          >
+            Real estate, supercars, yachts &amp; jets — curated masterpieces, tokenized from $100.
+          </motion.p>
         </div>
 
-        {/* ── ASSET-CLASS TABS ── */}
-        <div className="flex flex-wrap gap-2 sm:gap-3 mb-10">
-          {CATEGORIES.map((c) => {
-            const Icon = TAB_ICONS[c.icon];
-            const active = c.id === activeCat;
-            const count = c.id === "real-estate" ? CITIES.length : assetsByCategory(c.id).length;
-            return (
-              <button
-                key={c.id}
-                onClick={() => setActiveCat(c.id)}
-                className="group relative flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-lg transition-all duration-300"
+        {/* ── GATEWAY CITIES RIBBON ── */}
+        <div className="mb-16 md:mb-20">
+          <div className="flex items-center gap-2.5 mb-5">
+            <Building2 className="w-3.5 h-3.5 text-primary" />
+            <span className="text-[10px] tracking-[0.32em] uppercase text-primary/85" style={NEVERA}>
+              Gateway cities · Prime real estate
+            </span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4">
+            {CITIES.map((city, idx) => (
+              <motion.button
+                key={city.id}
+                onClick={() => navigate(`/city/${city.id}`)}
+                aria-label={`View ${city.name} listings`}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: idx * 0.04 }}
+                whileHover={{ y: -4 }}
+                className="group relative aspect-[3/4] rounded-lg overflow-hidden cursor-pointer"
                 style={{
-                  background: active ? `${c.accent}1a` : "rgba(20,28,48,0.5)",
-                  border: `1px solid ${active ? `${c.accent}66` : "rgba(220,225,235,0.1)"}`,
-                  boxShadow: active ? `0 12px 34px -16px ${c.accent}aa, inset 0 1px 0 rgba(255,255,255,0.08)` : "none",
+                  border: "1px solid rgba(220,225,235,0.12)",
+                  boxShadow: "0 10px 30px -15px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)",
                 }}
               >
-                <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-colors`} />
-                <span
-                  className="text-[10px] sm:text-[12px] tracking-[0.18em] sm:tracking-[0.22em] uppercase whitespace-nowrap"
-                  style={{ ...NEVERA, color: active ? "#fff" : "rgba(255,255,255,0.6)" }}
-                >
-                  {c.label}
-                </span>
-                <span
-                  className="text-[8.5px] sm:text-[9px] tracking-[0.1em] font-mono px-1.5 py-0.5 rounded-full"
-                  style={{
-                    color: active ? c.accent : "rgba(255,255,255,0.4)",
-                    background: active ? `${c.accent}1a` : "rgba(255,255,255,0.05)",
-                  }}
-                >
-                  {count}
-                </span>
-                {active && (
-                  <motion.span
-                    layoutId="class-tab-underline"
-                    className="absolute -bottom-px left-3 right-3 h-px"
-                    style={{ background: c.accent }}
+                <div className="absolute inset-0">
+                  <img
+                    src={city.image}
+                    alt={city.name}
+                    className="w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-110"
+                    style={{ filter: "saturate(0.9) brightness(0.9)" }}
                   />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* ── COLLECTION GRID ── */}
-        {isRealEstate ? (
-          // Cities (RE only): hover to preview, click to open city page.
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4 mb-2">
-            {CITIES.map((city, idx) => {
-              const isActive = city.id === activeCityId;
-              return (
-                <motion.button
-                  key={city.id}
-                  onClick={() => navigate(`/city/${city.id}`)}
-                  onMouseEnter={() => setActiveCityId(city.id)}
-                  onFocus={() => setActiveCityId(city.id)}
-                  aria-label={`View ${city.name} listings`}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.5, delay: idx * 0.04 }}
-                  whileHover={{ y: -3 }}
-                  className="group relative aspect-[3/4] rounded-lg overflow-hidden cursor-pointer"
-                  style={{
-                    border: isActive ? "1px solid rgba(234,141,14,0.6)" : "1px solid rgba(220,225,235,0.12)",
-                    boxShadow: isActive
-                      ? "0 0 0 1px rgba(234,141,14,0.35), 0 20px 50px -20px rgba(234,141,14,0.45), inset 0 1px 0 rgba(255,255,255,0.1)"
-                      : "0 10px 30px -15px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)",
-                    transition: "border 0.4s, box-shadow 0.4s",
-                  }}
-                >
-                  <div className="absolute inset-0">
-                    <img
-                      src={city.image}
-                      alt={city.name}
-                      className="w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-110"
-                      style={{ filter: isActive ? "saturate(1.1) brightness(1.05)" : "saturate(0.85) brightness(0.85)" }}
-                    />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/20" />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{ background: "radial-gradient(ellipse 100% 60% at 50% 100%, rgba(234,141,14,0.35) 0%, transparent 70%)" }}
+                />
+                <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
+                  <span
+                    className="text-[8px] tracking-[0.28em] uppercase px-1.5 py-0.5 rounded backdrop-blur-sm"
+                    style={{ ...NEVERA, background: "rgba(0,0,0,0.45)", color: "rgba(255,255,255,0.6)" }}
+                  >
+                    {city.code}
+                  </span>
+                  <span className="text-[8px] tracking-[0.25em] uppercase text-white/55" style={NEVERA}>
+                    {city.properties.length} · listings
+                  </span>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3">
+                  <div className="text-[9px] sm:text-[10px] tracking-[0.24em] sm:tracking-[0.28em] uppercase mb-0.5 text-white/45 group-hover:text-primary transition-colors" style={NEVERA}>
+                    {city.country}
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/20" />
-                  {isActive && (
-                    <motion.div
-                      layoutId="city-glow"
-                      className="absolute inset-0 pointer-events-none"
-                      style={{ background: "radial-gradient(ellipse 100% 60% at 50% 100%, rgba(234,141,14,0.35) 0%, transparent 70%)" }}
-                    />
-                  )}
-                  <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
-                    <span
-                      className="text-[8px] tracking-[0.28em] uppercase px-1.5 py-0.5 rounded backdrop-blur-sm"
-                      style={{
-                        ...NEVERA,
-                        background: isActive ? "rgba(234,141,14,0.18)" : "rgba(0,0,0,0.45)",
-                        color: isActive ? "#f5d98e" : "rgba(255,255,255,0.55)",
-                      }}
-                    >
-                      {city.code}
-                    </span>
-                    <span className="text-[8px] tracking-[0.25em] uppercase text-white/60" style={NEVERA}>
-                      {city.properties.length} · listings
-                    </span>
+                  <div className="leading-tight mb-1.5 sm:mb-2 truncate" style={{ ...SHARKON, fontSize: "clamp(0.78rem, 3.4vw, 1.125rem)" }} title={city.name}>
+                    <span className="metallic-text group-hover:hidden">{city.name}</span>
+                    <span className="metallic-warm-text hidden group-hover:inline">{city.name}</span>
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3">
-                    <div className={`text-[9px] sm:text-[10px] tracking-[0.24em] sm:tracking-[0.28em] uppercase mb-0.5 ${isActive ? "text-primary" : "text-white/40"}`} style={NEVERA}>
-                      {city.country}
-                    </div>
-                    <div className="leading-tight mb-1.5 sm:mb-2 truncate" style={{ ...SHARKON, fontSize: "clamp(0.78rem, 3.4vw, 1.125rem)" }} title={city.name}>
-                      <span className={isActive ? "metallic-warm-text" : "metallic-text"}>{city.name}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-1.5">
-                      <div className="flex items-center gap-1 min-w-0">
-                        <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-secondary/80 shrink-0" />
-                        <span className="text-[9px] sm:text-[10px] text-secondary/90 tracking-wider truncate" style={NEVERA}>
-                          avg {city.avgYield}
-                        </span>
-                      </div>
-                      <ArrowUpRight className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 transition-all duration-300 ${isActive ? "text-primary opacity-100 translate-x-0" : "text-white/40 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"}`} />
-                    </div>
-                  </div>
-                  {isActive && (
-                    <>
-                      <span className="absolute top-1.5 left-1.5 w-2 h-2 border-t border-l border-primary" />
-                      <span className="absolute top-1.5 right-1.5 w-2 h-2 border-t border-r border-primary" />
-                      <span className="absolute bottom-1.5 left-1.5 w-2 h-2 border-b border-l border-primary" />
-                      <span className="absolute bottom-1.5 right-1.5 w-2 h-2 border-b border-r border-primary" />
-                    </>
-                  )}
-                </motion.button>
-              );
-            })}
-          </div>
-        ) : (
-          // Non-RE classes: each tile focuses the coverflow below.
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-2">
-            {cards.map((asset, idx) => {
-              const isActive = idx === safeIdx;
-              return (
-                <motion.button
-                  key={asset.id}
-                  onClick={() => goTo(idx)}
-                  onMouseEnter={() => goTo(idx)}
-                  aria-label={`Focus ${asset.title}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.5, delay: idx * 0.04 }}
-                  whileHover={{ y: -3 }}
-                  className="group relative aspect-[3/4] rounded-lg overflow-hidden cursor-pointer"
-                  style={{
-                    border: isActive ? `1px solid ${accent}99` : "1px solid rgba(220,225,235,0.12)",
-                    boxShadow: isActive
-                      ? `0 0 0 1px ${accent}59, 0 20px 50px -20px ${accent}73, inset 0 1px 0 rgba(255,255,255,0.1)`
-                      : "0 10px 30px -15px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)",
-                    transition: "border 0.4s, box-shadow 0.4s",
-                  }}
-                >
-                  <div className="absolute inset-0">
-                    <img
-                      src={asset.image}
-                      alt={asset.title}
-                      className="w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-110"
-                      style={{ filter: isActive ? "saturate(1.1) brightness(1.05)" : "saturate(0.85) brightness(0.85)" }}
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/20" />
-                  {isActive && (
-                    <div
-                      className="absolute inset-0 pointer-events-none"
-                      style={{ background: `radial-gradient(ellipse 100% 60% at 50% 100%, ${accent}59 0%, transparent 70%)` }}
-                    />
-                  )}
-                  <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
-                    <span
-                      className="text-[8px] tracking-[0.22em] uppercase px-1.5 py-0.5 rounded backdrop-blur-sm"
-                      style={{
-                        ...NEVERA,
-                        background: isActive ? `${accent}2e` : "rgba(0,0,0,0.45)",
-                        color: isActive ? "#fff" : "rgba(255,255,255,0.55)",
-                      }}
-                    >
-                      {asset.tier}
-                    </span>
-                    <span className="text-[8px] tracking-[0.18em] uppercase text-white/55 font-mono truncate" style={NEVERA}>
-                      {asset.token}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3">
-                    <div className="leading-tight mb-1 truncate" style={{ ...SHARKON, fontSize: "clamp(0.78rem, 3vw, 1rem)" }} title={asset.title}>
-                      <span className={isActive ? "metallic-warm-text" : "metallic-text"}>{asset.title}</span>
-                    </div>
-                    {asset.spec && (
-                      <div className="text-[8.5px] sm:text-[9px] text-white/45 font-mono truncate mb-1">{asset.spec}</div>
-                    )}
+                  <div className="flex items-center justify-between gap-1.5">
                     <div className="flex items-center gap-1 min-w-0">
                       <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-secondary/80 shrink-0" />
                       <span className="text-[9px] sm:text-[10px] text-secondary/90 tracking-wider truncate" style={NEVERA}>
-                        {asset.rentalYield} {catMeta.rentalNoun.toLowerCase()}
+                        avg {city.avgYield}
                       </span>
                     </div>
+                    <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 text-white/40 opacity-0 -translate-x-1 group-hover:text-primary group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                   </div>
-                </motion.button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* ── COVERFLOW CAROUSEL ── */}
-        <div className="mt-16">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-2">
-            <div>
-              <div className="flex items-center gap-2.5 mb-2">
-                <MapPin className="w-3.5 h-3.5" style={{ color: accent }} />
-                <span className="text-[10px] tracking-[0.32em] uppercase" style={{ ...NEVERA, color: `${accent}cc` }}>
-                  {isRealEstate ? `Hot in ${activeCity.name} · ${activeCity.country}` : `${catMeta.label} · tokenized`}
-                </span>
-              </div>
-              <h3 className="text-xl sm:text-2xl md:text-3xl tracking-wide" style={SHARKON}>
-                <span className="metallic-text">Trending</span>{" "}
-                <span className="metallic-warm-text">{isRealEstate ? "listings" : catMeta.label.toLowerCase()}</span>
-              </h3>
-              <button
-                onClick={() => navigate(isRealEstate ? `/city/${activeCity.id}` : "/marketplace")}
-                className="mt-2 inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] tracking-[0.3em] uppercase transition-colors"
-                style={{ ...NEVERA, color: `${accent}d9` }}
-              >
-                {isRealEstate ? `View all ${activeCity.name} listings` : `Explore all ${catMeta.label.toLowerCase()} on marketplace`}
-                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-              </button>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={goPrev}
-                aria-label="Previous"
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-primary transition-all hover:scale-105"
-                style={{ background: "rgba(20,28,48,0.85)", border: "1px solid rgba(220,225,235,0.18)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="text-[10px] tracking-[0.3em] uppercase text-white/40 min-w-[42px] text-center" style={NEVERA}>
-                {String(safeIdx + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}
-              </span>
-              <button
-                onClick={goNext}
-                aria-label="Next"
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-primary transition-all hover:scale-105"
-                style={{ background: "rgba(20,28,48,0.85)", border: "1px solid rgba(220,225,235,0.18)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          <motion.div
-            className="relative h-[440px] sm:h-[460px] md:h-[520px] mt-6 overflow-hidden touch-pan-y select-none"
-            style={{ perspective: "1600px" }}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.18}
-            onDragStart={() => { setIsDragging(true); clearResumeTimer(); }}
-            onDragEnd={(e, info) => { setIsDragging(false); handleDragEnd(e, info); }}
-            onMouseEnter={() => { setIsHovering(true); clearResumeTimer(); }}
-            onMouseLeave={() => setIsHovering(false)}
-          >
-            <div className="absolute inset-x-0 bottom-0 h-24 pointer-events-none"
-              style={{ background: `radial-gradient(ellipse 60% 100% at 50% 100%, ${accent}1f 0%, transparent 70%)` }}
-            />
-
-            {cards.map((card, idx) => {
-              const offset = wrappedOffset(idx);
-              const abs = Math.abs(offset);
-              const isCenter = offset === 0;
-              const x = offset * (isMobile ? 150 : 220);
-              const rotateY = offset * -28;
-              const scale = isCenter ? 1 : 0.78 - (abs - 1) * 0.08;
-              const z = isCenter ? 0 : -120 * abs;
-              const opacity = abs > 2 ? 0 : abs === 0 ? 1 : abs === 1 ? 0.75 : 0.35;
-              const zIndex = 30 - abs;
-              const pointerEvents = abs > 2 ? "none" : "auto";
-
-              return (
-                <motion.div
-                  key={card.id}
-                  onClick={() => !isCenter && goTo(idx)}
-                  className="absolute top-1/2 left-1/2 cursor-pointer"
-                  style={{ transformStyle: "preserve-3d", zIndex, pointerEvents }}
-                  animate={{ opacity, x: `calc(-50% + ${x}px)`, y: "-50%", rotateY, scale, z }}
-                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <AssetCard
-                    card={card}
-                    label={isRealEstate ? activeCity.name : ((card as Asset).subtitle ?? "")}
-                    accent={accent}
-                    rentalNoun={catMeta.rentalNoun}
-                    isCenter={isCenter}
-                    onAcquire={openWallet}
-                  />
-                </motion.div>
-              );
-            })}
-          </motion.div>
-
-          {isMobile && !isPaused && (
-            <div className="text-center mt-3 text-[9px] tracking-[0.32em] uppercase text-white/35" style={NEVERA}>
-              Swipe →
-            </div>
-          )}
-
-          <div className="flex items-center justify-center gap-2 mt-4">
-            {cards.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => goTo(idx)}
-                aria-label={`Go to card ${idx + 1}`}
-                className="h-1 rounded-full transition-all duration-500"
-                style={{
-                  width: idx === safeIdx ? 28 : 8,
-                  background: idx === safeIdx ? `linear-gradient(90deg, #fff6, ${accent})` : "rgba(255,255,255,0.18)",
-                }}
-              />
+                </div>
+              </motion.button>
             ))}
           </div>
         </div>
+
+        {/* ── FOUR ASSET-CLASS SHOWCASE ROWS ── */}
+        <div className="space-y-16 md:space-y-20">
+          {rows.map((row) => (
+            <AssetRow
+              key={row.meta.id}
+              meta={row.meta}
+              assets={row.assets}
+              onAcquire={openWallet}
+              onViewAll={() => navigate("/marketplace")}
+            />
+          ))}
+        </div>
+
+        {/* ── COMING SOON ── */}
+        <ComingSoon />
       </div>
     </section>
   );
 }
 
-/* ─────────────────────── Card subcomponent ─────────────────────── */
-function AssetCard({
-  card, label, accent, rentalNoun, isCenter, onAcquire,
+/* ─────────────────────── Showcase row ─────────────────────── */
+function AssetRow({
+  meta, assets, onAcquire, onViewAll,
 }: {
-  card: CardAsset;
-  label: string;
+  meta: CategoryMeta;
+  assets: Asset[];
+  onAcquire: () => void;
+  onViewAll: () => void;
+}) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const Icon = TAB_ICONS[meta.icon];
+  const accent = meta.accent;
+
+  const scrollByDir = (dir: 1 | -1) => {
+    const el = railRef.current;
+    if (!el) return;
+    el.scrollBy({ left: el.clientWidth * 0.82 * dir, behavior: "smooth" });
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* Row header */}
+      <div className="flex items-end justify-between gap-4 mb-5">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2.5 mb-2">
+            <span
+              className="flex items-center justify-center w-7 h-7 rounded-lg shrink-0"
+              style={{ background: `${accent}1a`, border: `1px solid ${accent}59` }}
+            >
+              <Icon className="w-3.5 h-3.5" style={{ color: accent }} />
+            </span>
+            <span className="text-[10px] tracking-[0.32em] uppercase truncate" style={{ ...NEVERA, color: `${accent}d9` }}>
+              {meta.blurb}
+            </span>
+          </div>
+          <h3 className="text-xl sm:text-2xl md:text-3xl tracking-wide" style={SHARKON}>
+            <span className="metallic-text">{meta.label}</span>
+          </h3>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => scrollByDir(-1)}
+            aria-label={`Scroll ${meta.label} left`}
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all hover:scale-105"
+            style={{ background: "rgba(20,28,48,0.85)", border: "1px solid rgba(220,225,235,0.18)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => scrollByDir(1)}
+            aria-label={`Scroll ${meta.label} right`}
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all hover:scale-105"
+            style={{ background: "rgba(20,28,48,0.85)", border: "1px solid rgba(220,225,235,0.18)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Rail */}
+      <div className="relative -mx-4 sm:-mx-6 md:-mx-12">
+        {/* edge fades */}
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-12 z-10 bg-gradient-to-r from-background to-transparent" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-12 z-10 bg-gradient-to-l from-background to-transparent" />
+        <div
+          ref={railRef}
+          className="flex gap-4 md:gap-5 overflow-x-auto snap-x snap-mandatory px-4 sm:px-6 md:px-12 pb-5 pt-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
+        >
+          {assets.map((a) => (
+            <div key={a.id} className="snap-start shrink-0">
+              <AssetCard card={a} accent={accent} rentalNoun={meta.rentalNoun} onAcquire={onAcquire} />
+            </div>
+          ))}
+          {/* tail "view all" tile */}
+          <button
+            onClick={onViewAll}
+            className="snap-start shrink-0 w-[150px] sm:w-[170px] self-stretch rounded-xl flex flex-col items-center justify-center gap-3 group transition-all"
+            style={{ background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(220,225,235,0.2)" }}
+          >
+            <span
+              className="w-12 h-12 rounded-full flex items-center justify-center transition-transform group-hover:scale-110"
+              style={{ background: `${accent}1a`, border: `1px solid ${accent}66` }}
+            >
+              <ArrowUpRight className="w-5 h-5" style={{ color: accent }} />
+            </span>
+            <span className="text-[10px] tracking-[0.28em] uppercase text-white/70 text-center px-3" style={NEVERA}>
+              View all<br />{meta.label.toLowerCase()}
+            </span>
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ─────────────────────── Asset card ─────────────────────── */
+function AssetCard({
+  card, accent, rentalNoun, onAcquire,
+}: {
+  card: Asset;
   accent: string;
   rentalNoun: string;
-  isCenter: boolean;
   onAcquire: () => void;
 }) {
   return (
     <div
-      className="relative w-[260px] sm:w-[300px] md:w-[360px] rounded-xl overflow-hidden"
+      className="group relative w-[260px] sm:w-[300px] md:w-[320px] rounded-xl overflow-hidden transition-transform duration-300 hover:-translate-y-1"
       style={{
         background: "linear-gradient(160deg, rgba(20,28,48,0.96) 0%, rgba(14,20,36,0.96) 60%, rgba(28,20,12,0.96) 100%)",
-        border: isCenter ? `1px solid ${accent}66` : "1px solid rgba(220,225,235,0.16)",
-        boxShadow: isCenter
-          ? `0 40px 90px -20px rgba(0,0,0,0.85), 0 0 60px -10px ${accent}4d, inset 0 1px 0 rgba(255,255,255,0.12)`
-          : "0 25px 60px -15px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)",
+        border: "1px solid rgba(220,225,235,0.16)",
+        boxShadow: "0 25px 60px -18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)",
       }}
     >
+      {/* accent glow on hover */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{ boxShadow: `inset 0 0 0 1px ${accent}59, 0 0 60px -10px ${accent}4d` }}
+      />
+
       <div className="relative aspect-[4/3] overflow-hidden">
-        <img src={card.image} alt={card.title} className="w-full h-full object-cover" draggable={false} />
+        <img
+          src={card.image}
+          alt={card.title}
+          className="w-full h-full object-cover transition-transform duration-[1400ms] group-hover:scale-110"
+          draggable={false}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-        {isCenter && (
-          <div className="absolute inset-0 opacity-30 pointer-events-none bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:100%_3px]" />
-        )}
 
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
           <span
@@ -538,7 +331,7 @@ function AssetCard({
 
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="text-[9px] tracking-[0.32em] uppercase mb-1 truncate" style={{ ...NEVERA, color: `${accent}cc` }}>
-            {label} · {card.tier}
+            {card.subtitle} · {card.tier}
           </div>
           <h4 className="text-lg leading-tight" style={SHARKON}>
             <span className="metallic-text">{card.title}</span>
@@ -549,7 +342,7 @@ function AssetCard({
         </div>
       </div>
 
-      <div className="p-4 space-y-3">
+      <div className="relative p-4 space-y-3">
         <div>
           <div className="flex justify-between text-[9px] tracking-[0.28em] uppercase text-white/45 mb-1.5" style={NEVERA}>
             <span>Ownership available</span>
@@ -558,7 +351,8 @@ function AssetCard({
           <div className="w-full h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${card.available}%` }}
+              whileInView={{ width: `${card.available}%` }}
+              viewport={{ once: true }}
               transition={{ duration: 1, ease: "easeOut" }}
               className="h-full rounded-full"
               style={{ background: `linear-gradient(90deg, #fff6, ${accent})` }}
@@ -584,19 +378,110 @@ function AssetCard({
         </div>
 
         <button
-          onClick={(e) => { e.stopPropagation(); onAcquire(); }}
+          onClick={onAcquire}
           className="w-full py-2.5 rounded-sm text-[10px] tracking-[0.28em] uppercase transition-all duration-300 hover:translate-y-[-1px]"
           style={{
             ...NEVERA,
-            background: isCenter ? `linear-gradient(180deg, #f5b955 0%, ${accent} 50%, #b87d1e 100%)` : "rgba(255,255,255,0.04)",
-            color: isCenter ? "#1a0e02" : "rgba(255,255,255,0.75)",
-            border: isCenter ? "none" : "1px solid rgba(220,225,235,0.18)",
+            background: `linear-gradient(180deg, #f5b955 0%, ${accent} 50%, #b87d1e 100%)`,
+            color: "#1a0e02",
             fontWeight: 700,
-            boxShadow: isCenter ? `0 8px 24px -10px ${accent}80, inset 0 1px 0 rgba(255,255,255,0.25)` : "none",
+            boxShadow: `0 8px 24px -10px ${accent}80, inset 0 1px 0 rgba(255,255,255,0.25)`,
           }}
         >
-          {isCenter ? "Acquire equity interest" : "from $" + card.price}
+          Acquire equity interest · from ${card.price}
         </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────── Coming soon ─────────────────────── */
+function ComingSoon() {
+  return (
+    <div className="mt-24 md:mt-28">
+      <div className="relative rounded-2xl overflow-hidden p-6 sm:p-10 md:p-14"
+        style={{
+          background: "linear-gradient(160deg, rgba(20,28,48,0.8) 0%, rgba(12,18,32,0.8) 100%)",
+          border: "1px solid rgba(220,225,235,0.12)",
+        }}
+      >
+        {/* grid texture */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.04]
+          bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)]
+          bg-[size:3rem_3rem]" />
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_60%_80%_at_50%_0%,rgba(11,181,190,0.08)_0%,transparent_70%)]" />
+
+        <div className="relative text-center mb-10 md:mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full"
+            style={{ background: "rgba(11,181,190,0.1)", border: "1px solid rgba(11,181,190,0.35)" }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+            <span className="text-[9px] tracking-[0.32em] uppercase text-secondary/90" style={NEVERA}>
+              On the roadmap
+            </span>
+          </div>
+          <h3 className="text-2xl sm:text-3xl md:text-4xl tracking-wide mb-3" style={SHARKON}>
+            <span className="metallic-text">More to</span>{" "}
+            <span className="metallic-warm-text">own</span>
+          </h3>
+          <p className="text-white/55 text-base sm:text-lg md:text-xl max-w-xl mx-auto" style={SERIF}>
+            New asset classes are entering the vault. Reserve your seat before the drop.
+          </p>
+        </div>
+
+        <div className="relative grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-10">
+          {COMING_SOON.map((c, idx) => {
+            const Icon = c.icon;
+            return (
+              <motion.div
+                key={c.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.5, delay: idx * 0.06 }}
+                className="group relative rounded-xl p-5 sm:p-6 overflow-hidden"
+                style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(220,225,235,0.1)" }}
+              >
+                <div className="pointer-events-none absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl opacity-50 transition-opacity group-hover:opacity-80"
+                  style={{ background: `${c.accent}26` }}
+                />
+                <div className="relative flex items-center justify-between mb-4">
+                  <span className="flex items-center justify-center w-10 h-10 rounded-lg"
+                    style={{ background: `${c.accent}1a`, border: `1px solid ${c.accent}59` }}
+                  >
+                    <Icon className="w-4 h-4" style={{ color: c.accent }} />
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[8px] tracking-[0.28em] uppercase px-2 py-1 rounded-full text-white/55"
+                    style={{ ...NEVERA, background: "rgba(0,0,0,0.4)", border: "1px solid rgba(220,225,235,0.14)" }}
+                  >
+                    <Lock className="w-2.5 h-2.5" /> Soon
+                  </span>
+                </div>
+                <h4 className="relative text-base sm:text-lg leading-tight mb-1.5" style={SHARKON}>
+                  <span className="metallic-text">{c.label}</span>
+                </h4>
+                <p className="relative text-white/45 text-xs sm:text-[13px] leading-relaxed">{c.blurb}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <div className="relative text-center">
+          <a
+            href="#waitlist"
+            className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-sm transition-all duration-300 hover:translate-y-[-1px]"
+            style={{
+              ...NEVERA,
+              background: "linear-gradient(180deg, #f5b955 0%, #ea8d0e 50%, #b87d1e 100%)",
+              boxShadow: "0 8px 28px -10px rgba(234,141,14,0.55), inset 0 1px 0 rgba(255,255,255,0.25)",
+            }}
+          >
+            <span className="text-[10.5px] font-bold tracking-[0.28em] uppercase text-[#1a0e02]">
+              Join the waitlist
+            </span>
+            <ArrowUpRight className="w-3.5 h-3.5 text-[#1a0e02]" />
+          </a>
+        </div>
       </div>
     </div>
   );
