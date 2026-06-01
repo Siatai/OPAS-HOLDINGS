@@ -14,9 +14,17 @@ export default function Title() {
       <div className="absolute top-0 left-0 right-0 h-[0.4vh] bg-gold" />
 
       <div className="relative h-full w-full flex flex-col justify-center px-[8vw]">
-        <p className="font-body uppercase tracking-[0.45em] text-[1.05vw] text-teal mb-[3vh]">
-          Opas Holdings
-        </p>
+        <div className="flex items-center gap-[1.1vw] mb-[3vh]">
+          <img
+            src={`${base}img/opas-logo.png`}
+            crossOrigin="anonymous"
+            alt="Opas Holdings logo"
+            className="h-[7vh] w-[7vh] object-contain"
+          />
+          <span className="font-body uppercase tracking-[0.45em] text-[1.05vw] text-teal">
+            Opas Holdings
+          </span>
+        </div>
         <h1 className="font-wordmark text-fg text-[9vw] leading-[0.9] tracking-tight">
           OPAS
         </h1>

@@ -15,8 +15,13 @@ export default function Title() {
 
       <div className="relative h-full w-full flex flex-col justify-between px-[8vw] py-[7vh]">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-[1vw]">
-            <div className="h-[1.6vh] w-[1.6vh] bg-gold rotate-45" />
+          <div className="flex items-center gap-[1.1vw]">
+            <img
+              src={`${base}img/opas-logo.png`}
+              crossOrigin="anonymous"
+              alt="Opas Holdings logo"
+              className="h-[6vh] w-[6vh] object-contain"
+            />
             <span className="font-body uppercase tracking-[0.45em] text-[1.15vw] text-fg/80">
               Opas Holdings
             </span>
