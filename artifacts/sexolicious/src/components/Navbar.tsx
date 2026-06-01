@@ -44,7 +44,7 @@ export default function Navbar() {
             alt="Opas"
             className="w-9 h-9 object-contain drop-shadow-[0_0_12px_rgba(234,141,14,0.6)] group-hover:drop-shadow-[0_0_20px_rgba(234,141,14,0.9)] transition-all duration-300"
           />
-          <div className="flex flex-col leading-none">
+          <div className="flex items-baseline gap-2 leading-none">
             <span
               className="text-[17px] tracking-[0.22em] text-white font-bold uppercase"
               style={{ fontFamily: "BankGothic, sans-serif" }}
