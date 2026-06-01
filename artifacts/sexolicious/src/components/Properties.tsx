@@ -30,6 +30,7 @@ const COMING_SOON = [
 export default function Properties() {
   const { openWallet } = useWallet();
   const [, navigate] = useLocation();
+  const cityRail = useAutoRail(2800);
 
   // One flagship residence per city for the real-estate row.
   const seenCity = new Set<string>();
@@ -90,26 +91,54 @@ export default function Properties() {
           </motion.p>
         </div>
 
-        {/* ── GATEWAY CITIES RIBBON ── */}
+        {/* ── GATEWAY CITIES CAROUSEL ── */}
         <div className="mb-16 md:mb-20">
-          <div className="flex items-center gap-2.5 mb-5">
-            <Globe className="w-3.5 h-3.5 text-primary" />
-            <span className="text-[10px] tracking-[0.32em] uppercase text-primary/85" style={NEVERA}>
-              Where Opas operates · {CITIES.length} prime cities worldwide
-            </span>
+          <div className="flex items-end justify-between gap-4 mb-5">
+            <div className="flex items-center gap-2.5">
+              <Globe className="w-3.5 h-3.5 text-primary" />
+              <span className="text-[10px] tracking-[0.32em] uppercase text-primary/85" style={NEVERA}>
+                Where Opas operates · {CITIES.length} prime cities worldwide
+              </span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => cityRail.scrollByDir(-1)}
+                aria-label="Scroll cities left"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all hover:scale-105"
+                style={{ background: "rgba(20,28,48,0.85)", border: "1px solid rgba(220,225,235,0.18)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => cityRail.scrollByDir(1)}
+                aria-label="Scroll cities right"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all hover:scale-105"
+                style={{ background: "rgba(20,28,48,0.85)", border: "1px solid rgba(220,225,235,0.18)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4">
-            {CITIES.map((city, idx) => (
-              <motion.button
-                key={city.id}
-                onClick={() => navigate(`/city/${city.id}`)}
-                aria-label={`View ${city.name} listings`}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: idx * 0.04 }}
-                whileHover={{ y: -4 }}
-                className="group relative aspect-[3/4] rounded-lg overflow-hidden cursor-pointer"
+          <div className="relative -mx-4 sm:-mx-6 md:-mx-12">
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-12 z-10 bg-gradient-to-r from-background to-transparent" />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-12 z-10 bg-gradient-to-l from-background to-transparent" />
+            <div
+              ref={cityRail.railRef}
+              {...cityRail.pauseHandlers}
+              className="flex gap-3 md:gap-4 overflow-x-auto snap-x snap-mandatory px-4 sm:px-6 md:px-12 pb-5 pt-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
+            >
+              {CITIES.map((city, idx) => (
+                <motion.button
+                  key={city.id}
+                  onClick={() => navigate(`/city/${city.id}`)}
+                  aria-label={`View ${city.name} listings`}
+                  data-card
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5, delay: idx * 0.04 }}
+                  whileHover={{ y: -4 }}
+                  className="group relative snap-start shrink-0 w-[150px] sm:w-[170px] aspect-[3/4] rounded-lg overflow-hidden cursor-pointer"
                 style={{
                   border: "1px solid rgba(220,225,235,0.12)",
                   boxShadow: "0 10px 30px -15px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)",
@@ -156,8 +185,9 @@ export default function Properties() {
                     <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 text-white/40 opacity-0 -translate-x-1 group-hover:text-primary group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                   </div>
                 </div>
-              </motion.button>
-            ))}
+                </motion.button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -182,6 +212,46 @@ export default function Properties() {
   );
 }
 
+/* ─────────────────────── Auto-scrolling rail hook ─────────────────────── */
+function useAutoRail(autoMs: number) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const [paused, setPaused] = useState(false);
+
+  const scrollByDir = (dir: 1 | -1) => {
+    const el = railRef.current;
+    if (!el) return;
+    el.scrollBy({ left: el.clientWidth * 0.82 * dir, behavior: "smooth" });
+  };
+
+  // Auto-advance one card at a time; loop back at the end. Pause on hover/touch.
+  // Respect users who prefer reduced motion — skip autoplay entirely for them.
+  useEffect(() => {
+    if (paused) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const el = railRef.current;
+    if (!el) return;
+    const id = window.setInterval(() => {
+      const first = el.querySelector<HTMLElement>("[data-card]");
+      const step = first ? first.offsetWidth + 16 : el.clientWidth * 0.8;
+      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 12) {
+        el.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        el.scrollBy({ left: step, behavior: "smooth" });
+      }
+    }, autoMs);
+    return () => clearInterval(id);
+  }, [paused, autoMs]);
+
+  const pauseHandlers = {
+    onMouseEnter: () => setPaused(true),
+    onMouseLeave: () => setPaused(false),
+    onTouchStart: () => setPaused(true),
+    onTouchEnd: () => setPaused(false),
+  };
+
+  return { railRef, scrollByDir, pauseHandlers };
+}
+
 /* ─────────────────────── Showcase row ─────────────────────── */
 function AssetRow({
   index, meta, assets, onAcquire, onViewAll,
@@ -192,34 +262,9 @@ function AssetRow({
   onAcquire: () => void;
   onViewAll: () => void;
 }) {
-  const railRef = useRef<HTMLDivElement>(null);
-  const [paused, setPaused] = useState(false);
+  const { railRef, scrollByDir, pauseHandlers } = useAutoRail(3200 + index * 500);
   const Icon = TAB_ICONS[meta.icon];
   const accent = meta.accent;
-  const autoMs = 3200 + index * 500;
-
-  const scrollByDir = (dir: 1 | -1) => {
-    const el = railRef.current;
-    if (!el) return;
-    el.scrollBy({ left: el.clientWidth * 0.82 * dir, behavior: "smooth" });
-  };
-
-  // Auto-advance the rail one card at a time; loop back at the end. Pause on hover/touch.
-  useEffect(() => {
-    if (paused) return;
-    const el = railRef.current;
-    if (!el) return;
-    const id = window.setInterval(() => {
-      const first = el.querySelector<HTMLElement>("[data-card]");
-      const step = first ? first.offsetWidth + 20 : el.clientWidth * 0.8;
-      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 12) {
-        el.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        el.scrollBy({ left: step, behavior: "smooth" });
-      }
-    }, autoMs);
-    return () => clearInterval(id);
-  }, [paused, autoMs]);
 
   return (
     <motion.div
@@ -273,10 +318,7 @@ function AssetRow({
         <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-12 z-10 bg-gradient-to-l from-background to-transparent" />
         <div
           ref={railRef}
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-          onTouchStart={() => setPaused(true)}
-          onTouchEnd={() => setPaused(false)}
+          {...pauseHandlers}
           className="flex gap-4 md:gap-5 overflow-x-auto snap-x snap-mandatory px-4 sm:px-6 md:px-12 pb-5 pt-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
         >
           {assets.map((a) => (

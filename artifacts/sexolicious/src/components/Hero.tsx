@@ -158,10 +158,9 @@ export default function Hero() {
               className="text-[clamp(1.4rem,2.4vw,2.1rem)] leading-[1.18] tracking-[0.01em] mb-6 font-normal"
               style={SHARKON}
             >
-              <span className="metallic-text">Where technology</span>
+              <span className="metallic-text">Own anything,</span>
               <br />
-              <span className="metallic-warm-text">meets</span>{" "}
-              <span className="text-white/90">prime assets</span>
+              <span className="metallic-warm-text">anywhere.</span>
             </motion.h1>
 
             {/* Subhead — Cormorant italic, restrained */}
@@ -172,8 +171,8 @@ export default function Hero() {
               className="text-[15px] md:text-base text-white/45 max-w-md mb-10 leading-relaxed"
               style={SERIF}
             >
-              AI-driven valuation. Blockchain co-ownership. Real-time market intelligence.
-              An equity interest in the world's finest real estate, supercars, yachts &amp; jets — from&nbsp;$100.
+              The planet's rarest real estate, supercars, yachts &amp; jets — acquired in minutes,
+              owned on-chain, liquid on demand. AI valuation, blockchain title, sovereign-grade discretion.
             </motion.p>
 
             {/* CTAs — silver metallic outline + warm primary */}
