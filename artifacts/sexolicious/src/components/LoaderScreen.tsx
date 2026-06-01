@@ -87,9 +87,9 @@ export default function LoaderScreen({ onComplete }: { onComplete: () => void })
           style={{ background: "linear-gradient(90deg, transparent, #EA8D0E 40%, #EA8D0E 60%, transparent)" }}
         />
 
-        {/* PROPERTIES */}
+        {/* HOLDINGS */}
         <div className="relative z-10 flex items-start gap-[0.02em] overflow-hidden">
-          {"PROPERTIES".split("").map((letter, i) => (
+          {"HOLDINGS".split("").map((letter, i) => (
             <motion.span
               key={i}
               initial={{ y: -50, opacity: 0 }}
