@@ -5,7 +5,7 @@ import { useAccount, useChainId } from "wagmi";
 import {
   Wallet, Building2, Store, Vote, Coins, TrendingUp, TrendingDown,
   Tag, ShoppingCart, ShieldCheck, Receipt, ArrowUpRight, ArrowDownRight,
-  Activity as ActivityIcon, ChevronRight, BadgePercent,
+  Activity as ActivityIcon, ChevronRight, BadgePercent, ArrowLeftRight,
 } from "lucide-react";
 import {
   getHoldings, getProposals, getListings, getActivity,
@@ -39,6 +39,7 @@ const ACT_META: Record<ActivityKind, { icon: any; tone: string; label: string }>
   cancel: { icon: Tag,          tone: "text-white/55 border-white/15 bg-white/5",                 label: "Cancel" },
   rent:   { icon: Receipt,      tone: "text-amber-300 border-amber-400/40 bg-amber-400/10",       label: "Rent" },
   vote:   { icon: Vote,         tone: "text-secondary border-secondary/40 bg-secondary/10",       label: "Vote" },
+  swap:   { icon: ArrowLeftRight, tone: "text-secondary border-secondary/40 bg-secondary/10",     label: "Swap" },
 };
 
 export default function Dashboard() {
@@ -292,7 +293,7 @@ export default function Dashboard() {
                 </MarqueeText>
               </h2>
               <span className="text-[9px] sm:text-[10px] tracking-[0.22em] sm:tracking-[0.32em] uppercase text-white/30 shrink-0 font-mono" style={NEVERA}>
-                {fmtUsdCompact(rentals.annual)}/yr
+                {fmtUsdCompact(rentals.netAnnual)}/yr net
               </span>
             </div>
 
@@ -320,15 +321,25 @@ export default function Dashboard() {
                           </div>
                         </div>
                         <div className="text-right shrink-0">
-                          <div className="text-[13px] sm:text-sm text-amber-300" style={SHARKON}>{fmtUsd(r.monthly)}</div>
-                          <div className="text-[8.5px] tracking-[0.24em] uppercase text-white/35 font-mono">per month</div>
+                          <div className="text-[13px] sm:text-sm text-amber-300" style={SHARKON}>{fmtUsd(r.net)}</div>
+                          <div className="text-[8.5px] tracking-[0.24em] uppercase text-white/35 font-mono">net / month</div>
                         </div>
                       </div>
                     );
                   })}
-                  <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-amber-400/8 to-transparent">
-                    <span className="text-[10px] tracking-[0.28em] uppercase text-amber-300/80 font-mono">Total monthly</span>
-                    <span className="text-base sm:text-lg text-amber-300" style={SHARKON}>{fmtUsdCompact(rentals.monthly)}</span>
+                  <div className="px-4 py-3 space-y-1.5 bg-gradient-to-r from-amber-400/8 to-transparent">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] tracking-[0.24em] uppercase text-white/40 font-mono">Gross monthly</span>
+                      <span className="text-[12px] text-white/70" style={SHARKON}>{fmtUsdCompact(rentals.monthly)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] tracking-[0.24em] uppercase text-white/40 font-mono">Maintenance · 5%</span>
+                      <span className="text-[12px] text-rose-300/80" style={SHARKON}>−{fmtUsdCompact(rentals.maintenance)}</span>
+                    </div>
+                    <div className="flex items-center justify-between pt-1 border-t border-white/5">
+                      <span className="text-[10px] tracking-[0.28em] uppercase text-amber-300/80 font-mono">Net monthly</span>
+                      <span className="text-base sm:text-lg text-amber-300" style={SHARKON}>{fmtUsdCompact(rentals.net)}</span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -339,8 +350,8 @@ export default function Dashboard() {
             >
               <BadgePercent className="w-3.5 h-3.5 mt-px text-amber-300 shrink-0" />
               <span style={NEVERA}>
-                Distributions stream automatically to your wallet in USDC on the 1st of every month.
-                On-chain payouts ship with mainnet — current cycle is recorded locally.
+                Net distributions stream automatically to your wallet in USDC on the 1st of every month,
+                after the 5% operator maintenance fee. On-chain payouts ship with mainnet — current cycle is recorded locally.
               </span>
             </div>
           </section>

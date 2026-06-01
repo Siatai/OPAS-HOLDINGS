@@ -1,1 +1,1 @@
-- [Sharkon font text clipping & marquee](sharkon-text-clipping.md) — wide display font overflows; titles use MarqueeText (span-rooted, scroll-on-overflow), descriptions line-clamp-2, numeric stats keep truncate.
+- [Opas trading sim design & accounting](sexolicious-trading-sim.md) — single-wallet localStorage sim (no multi-user settlement by design); escrow must move cost basis proportionally; fees must change state, not just display.

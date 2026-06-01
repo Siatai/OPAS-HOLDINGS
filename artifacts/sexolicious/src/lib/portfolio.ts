@@ -175,6 +175,24 @@ export function portfolioStats(holdings: Holding[]) {
 export const TOTAL_SUPPLY_CONST = TOTAL_SUPPLY;
 
 // ─────────────────────────────────────────────────────────────
+// Platform fees
+//   buySell      — 7% charged on every primary/secondary buy & sell
+//   trade        — 5% charged on equity-for-equity swaps
+//   maintenance  — 5% monthly fee the operator takes from gross income
+// ─────────────────────────────────────────────────────────────
+export const FEES = {
+  buySell: 0.07,
+  trade: 0.05,
+  maintenanceMonthly: 0.05,
+} as const;
+
+export const FEE_LABEL = {
+  buySell: "7%",
+  trade: "5%",
+  maintenance: "5%",
+} as const;
+
+// ─────────────────────────────────────────────────────────────
 // Secondary market
 // ─────────────────────────────────────────────────────────────
 
@@ -184,6 +202,7 @@ export type Listing = {
   seller: string;          // wallet address (lowercased) — "vault" for synthetic liquidity
   shares: number;
   askPerShare: number;     // USD
+  escrowBasisUsd?: number; // original cost basis of escrowed shares (user listings)
   createdAt: number;
 };
 
@@ -253,9 +272,10 @@ export function createListing(
   if (shares > h.shares) return { ok: false, reason: `You only hold ${h.shares} shares.` };
   if (askPerShare <= 0) return { ok: false, reason: "Ask price must be positive." };
 
-  // Escrow: remove from holdings
+  // Escrow: remove shares and their proportional cost basis from holdings.
+  const escrowBasisUsd = h.shares > 0 ? h.costBasisUsd * (shares / h.shares) : 0;
   const next = holdings
-    .map((x) => x.propertyId === propertyId ? { ...x, shares: x.shares - shares } : x)
+    .map((x) => x.propertyId === propertyId ? { ...x, shares: x.shares - shares, costBasisUsd: x.costBasisUsd - escrowBasisUsd } : x)
     .filter((x) => x.shares > 0);
   setHoldings(seller, next);
 
@@ -266,6 +286,7 @@ export function createListing(
     seller: seller.toLowerCase(),
     shares,
     askPerShare,
+    escrowBasisUsd,
     createdAt: Date.now(),
   };
   const updated = [created, ...all];
@@ -287,14 +308,16 @@ export function cancelListing(listingId: string, caller: string): Listing[] {
   if (target.seller !== "vault") {
     const holdings = getHoldings(target.seller);
     const existing = holdings.find((h) => h.propertyId === target.propertyId);
+    // Restore the escrowed shares at their original cost basis.
+    const restoreBasis = target.escrowBasisUsd ?? target.shares * target.askPerShare;
     const next = existing
-      ? holdings.map((h) => h.propertyId === target.propertyId ? { ...h, shares: h.shares + target.shares } : h)
+      ? holdings.map((h) => h.propertyId === target.propertyId ? { ...h, shares: h.shares + target.shares, costBasisUsd: h.costBasisUsd + restoreBasis } : h)
       : [...holdings, {
           propertyId: target.propertyId,
           cityId: lookupProperty(target.propertyId)?.city ?? "",
           shares: target.shares,
           acquiredAt: Date.now(),
-          costBasisUsd: target.shares * target.askPerShare,
+          costBasisUsd: restoreBasis,
         } as Holding];
     setHoldings(target.seller, next);
   }
@@ -322,14 +345,16 @@ export function buyListing(
   if (listing.seller === buyer.toLowerCase()) return { ok: false, reason: "You can't buy your own listing." };
   if (buyShares > listing.shares) return { ok: false, reason: `Only ${listing.shares} shares available.` };
 
-  // Credit buyer
+  // Credit buyer — buyer pays the ask plus a 7% platform fee
   const buyerHoldings = getHoldings(buyer);
   const cost = buyShares * listing.askPerShare;
+  const fee = cost * FEES.buySell;
+  const total = cost + fee;
   const existing = buyerHoldings.find((h) => h.propertyId === listing.propertyId);
   const nextBuyer: Holding[] = existing
     ? buyerHoldings.map((h) =>
         h.propertyId === listing.propertyId
-          ? { ...h, shares: h.shares + buyShares, costBasisUsd: h.costBasisUsd + cost }
+          ? { ...h, shares: h.shares + buyShares, costBasisUsd: h.costBasisUsd + total }
           : h,
       )
     : [
@@ -339,26 +364,31 @@ export function buyListing(
           cityId: lookupProperty(listing.propertyId)?.city ?? "",
           shares: buyShares,
           acquiredAt: Date.now(),
-          costBasisUsd: cost,
+          costBasisUsd: total,
         },
       ];
   setHoldings(buyer, nextBuyer);
 
-  // Decrement / remove listing
+  // Decrement / remove listing. On a partial fill, scale the escrowed basis to
+  // the unsold portion so a later cancel only restores the unsold slice's basis.
   const remaining = listing.shares - buyShares;
+  const remainingBasis = listing.escrowBasisUsd != null && listing.shares > 0
+    ? listing.escrowBasisUsd * (remaining / listing.shares)
+    : listing.escrowBasisUsd;
   const nextListings = remaining > 0
-    ? all.map((l, i) => i === idx ? { ...l, shares: remaining } : l)
+    ? all.map((l, i) => i === idx ? { ...l, shares: remaining, escrowBasisUsd: remainingBasis } : l)
     : all.filter((_, i) => i !== idx);
   saveListings(nextListings);
 
   logActivity(buyer, {
-    kind: "buy", propertyId: listing.propertyId, shares: buyShares, usd: cost,
-    note: listing.seller === "vault" ? "Filled from vault liquidity" : `Filled from ${listing.seller.slice(0, 6)}…`,
+    kind: "buy", propertyId: listing.propertyId, shares: buyShares, usd: total,
+    note: `Incl. 7% fee ${fmtUsdCompact(fee)} · ${listing.seller === "vault" ? "vault liquidity" : `from ${listing.seller.slice(0, 6)}…`}`,
   });
   if (listing.seller !== "vault") {
+    const sellFee = cost * FEES.buySell;
     logActivity(listing.seller, {
-      kind: "sell", propertyId: listing.propertyId, shares: buyShares, usd: cost,
-      note: `Settled to ${buyer.slice(0, 6)}…`,
+      kind: "sell", propertyId: listing.propertyId, shares: buyShares, usd: cost - sellFee,
+      note: `Net of 7% fee ${fmtUsdCompact(sellFee)} · to ${buyer.slice(0, 6)}…`,
     });
   }
   return { ok: true, listings: nextListings, holdings: nextBuyer };
@@ -390,7 +420,7 @@ export function fmtUsdCompact(n: number): string {
 // Activity ledger (per-wallet)
 // ─────────────────────────────────────────────────────────────
 
-export type ActivityKind = "buy" | "sell" | "list" | "cancel" | "rent" | "vote";
+export type ActivityKind = "buy" | "sell" | "list" | "cancel" | "rent" | "vote" | "swap";
 
 export type Activity = {
   id: string;
@@ -443,7 +473,9 @@ export function getActivity(address: string): Activity[] {
       const meta = lookupProperty(h.propertyId);
       if (!meta) return;
       const fair = fairValuePerShare(h.propertyId);
-      const monthly = (h.shares * fair * (parseFloat(meta.prop.rentalYield) || 0) / 100) / 12;
+      const grossMonthly = (h.shares * fair * (parseFloat(meta.prop.rentalYield) || 0) / 100) / 12;
+      // Distributions are net of the 5% monthly maintenance fee.
+      const netMonthly = grossMonthly * (1 - FEES.maintenanceMonthly);
       // initial buy receipt
       seeded.push({
         id: aid(),
@@ -454,15 +486,15 @@ export function getActivity(address: string): Activity[] {
         usd: h.costBasisUsd,
         note: "Initial position",
       });
-      // 3 monthly rent collections
+      // 3 monthly rent collections (net of maintenance)
       for (let m = 1; m <= 3; m++) {
         seeded.push({
           id: aid(),
           kind: "rent",
           propertyId: h.propertyId,
           at: now - m * 30 * day + i * day,
-          usd: Math.round(monthly),
-          note: `Month ${4 - m} distribution`,
+          usd: Math.round(netMonthly),
+          note: `Month ${4 - m} distribution · net of 5% maintenance`,
         });
       }
     });
@@ -477,7 +509,7 @@ export function getActivity(address: string): Activity[] {
 export function rentalSummary(holdings: Holding[]) {
   let monthly = 0;
   let annual = 0;
-  const perProperty: { propertyId: string; monthly: number; yield: number }[] = [];
+  const perProperty: { propertyId: string; monthly: number; net: number; yield: number }[] = [];
   for (const h of holdings) {
     const meta = lookupProperty(h.propertyId);
     if (!meta) continue;
@@ -486,7 +518,239 @@ export function rentalSummary(holdings: Holding[]) {
     const m = (h.shares * fair * (yld / 100)) / 12;
     monthly += m;
     annual += m * 12;
-    perProperty.push({ propertyId: h.propertyId, monthly: m, yield: yld });
+    perProperty.push({ propertyId: h.propertyId, monthly: m, net: m * (1 - FEES.maintenanceMonthly), yield: yld });
   }
-  return { monthly, annual, perProperty };
+  const maintenance = monthly * FEES.maintenanceMonthly;
+  const net = monthly - maintenance;
+  return { monthly, annual, maintenance, net, netAnnual: net * 12, perProperty };
+}
+
+// ─────────────────────────────────────────────────────────────
+// Equity-for-equity swap protocol
+//   A holder can list a position to exchange for another asset's equity.
+//   The counterparty is notified and can accept (assets switch hands) or
+//   decline. A 5% trade fee applies on settlement.
+// ─────────────────────────────────────────────────────────────
+
+export type SwapStatus = "pending" | "accepted" | "declined" | "cancelled";
+
+export type SwapOffer = {
+  id: string;
+  direction: "incoming" | "outgoing"; // relative to the current wallet
+  counterparty: string;               // short display label
+  giveId: string;                     // asset the current wallet gives up
+  giveShares: number;
+  receiveId: string;                  // asset the current wallet receives
+  receiveShares: number;
+  feeUsd: number;                     // 5% trade fee on notional
+  escrowBasisUsd?: number;            // original cost basis of escrowed (given) shares
+  status: SwapStatus;
+  createdAt: number;
+};
+
+// Simulated counterparties that fill outgoing offers from the open order book.
+const SIM_TAKERS = ["0x9a4C…71Bd", "0x3Df0…E29a", "0xB7c1…05Fe", "0x52aE…cc83"];
+
+const SWAP_KEY = (addr: string) => `opas:swaps:${addr.toLowerCase()}`;
+const SWAP_SEEDED = (addr: string) => `opas:swaps:seeded:${addr.toLowerCase()}`;
+
+function sid() {
+  return `swp_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+export function swapNotional(propertyId: string, shares: number) {
+  return shares * fairValuePerShare(propertyId);
+}
+
+export function swapFee(propertyId: string, shares: number) {
+  return swapNotional(propertyId, shares) * FEES.trade;
+}
+
+function readSwaps(address: string): SwapOffer[] {
+  if (typeof window === "undefined" || !address) return [];
+  try {
+    const raw = window.localStorage.getItem(SWAP_KEY(address));
+    if (raw) return JSON.parse(raw) as SwapOffer[];
+  } catch {}
+  return [];
+}
+
+function writeSwaps(address: string, s: SwapOffer[]) {
+  window.localStorage.setItem(SWAP_KEY(address), JSON.stringify(s));
+}
+
+export function getSwapOffers(address: string): SwapOffer[] {
+  if (typeof window === "undefined" || !address) return [];
+  const existing = readSwaps(address);
+  if (window.localStorage.getItem(SWAP_SEEDED(address))) return existing;
+
+  // Seed a few incoming requests so the holder is notified to switch assets.
+  const holdings = getHoldings(address);
+  const now = Date.now();
+  const find = (id: string) => holdings.find((h) => h.propertyId === id);
+  const seeds: SwapOffer[] = [];
+  const mk = (cp: string, giveId: string, receiveId: string, receiveShares: number, ageH: number) => {
+    const give = find(giveId);
+    if (!give) return;
+    const giveShares = Math.max(1, Math.round(give.shares / 2));
+    seeds.push({
+      id: sid(),
+      direction: "incoming",
+      counterparty: cp,
+      giveId,
+      giveShares,
+      receiveId,
+      receiveShares,
+      feeUsd: swapFee(giveId, giveShares),
+      status: "pending",
+      createdAt: now - ageH * 3_600_000,
+    });
+  };
+  mk("0x7F3a…b2E1", "car-2", "yacht-1", 6, 5);
+  mk("0xC19d…84Aa", "ldn-1", "par-3", 14, 20);
+  mk("0x2bE7…F0c4", "jet-4", "nyc-1", 12, 41);
+
+  const merged = [...seeds, ...existing];
+  writeSwaps(address, merged);
+  window.localStorage.setItem(SWAP_SEEDED(address), "1");
+  return merged;
+}
+
+function addShares(address: string, propertyId: string, shares: number, costUsd: number) {
+  const h = getHoldings(address);
+  const existing = h.find((x) => x.propertyId === propertyId);
+  const next: Holding[] = existing
+    ? h.map((x) => x.propertyId === propertyId ? { ...x, shares: x.shares + shares, costBasisUsd: x.costBasisUsd + costUsd } : x)
+    : [...h, {
+        propertyId,
+        cityId: lookupProperty(propertyId)?.city ?? "",
+        shares,
+        acquiredAt: Date.now(),
+        costBasisUsd: costUsd,
+      }];
+  setHoldings(address, next);
+}
+
+// Removes shares and the proportional slice of cost basis. Returns the basis
+// removed (so callers can carry it forward), or null if the holding is short.
+function removeShares(address: string, propertyId: string, shares: number): number | null {
+  const h = getHoldings(address);
+  const existing = h.find((x) => x.propertyId === propertyId);
+  if (!existing || existing.shares < shares) return null;
+  const basisRemoved = existing.shares > 0 ? existing.costBasisUsd * (shares / existing.shares) : 0;
+  const next = h
+    .map((x) => x.propertyId === propertyId ? { ...x, shares: x.shares - shares, costBasisUsd: x.costBasisUsd - basisRemoved } : x)
+    .filter((x) => x.shares > 0);
+  setHoldings(address, next);
+  return basisRemoved;
+}
+
+export function createSwapOffer(
+  address: string,
+  giveId: string,
+  giveShares: number,
+  receiveId: string,
+  receiveShares: number,
+): { ok: boolean; reason?: string; offers?: SwapOffer[] } {
+  if (!address) return { ok: false, reason: "Connect a wallet first." };
+  if (giveId === receiveId) return { ok: false, reason: "Choose a different asset to receive." };
+  if (giveShares <= 0 || receiveShares <= 0) return { ok: false, reason: "Share amounts must be positive." };
+  const held = getHoldings(address).find((h) => h.propertyId === giveId);
+  if (!held) return { ok: false, reason: "You don't hold that asset." };
+  if (giveShares > held.shares) return { ok: false, reason: `You only hold ${held.shares} shares.` };
+
+  const basis = removeShares(address, giveId, giveShares); // escrow offered shares
+  if (basis === null) return { ok: false, reason: "You no longer hold enough shares." };
+
+  const offer: SwapOffer = {
+    id: sid(),
+    direction: "outgoing",
+    counterparty: "Awaiting counterparty…",
+    giveId, giveShares, receiveId, receiveShares,
+    feeUsd: swapFee(giveId, giveShares),
+    escrowBasisUsd: basis,
+    status: "pending",
+    createdAt: Date.now(),
+  };
+  const next = [offer, ...readSwaps(address)];
+  writeSwaps(address, next);
+  logActivity(address, {
+    kind: "swap", propertyId: giveId, shares: giveShares, usd: swapNotional(giveId, giveShares),
+    note: `Swap offered for ${lookupProperty(receiveId)?.prop.token ?? receiveId}`,
+  });
+  return { ok: true, offers: next };
+}
+
+export function respondSwapOffer(
+  address: string,
+  id: string,
+  action: "accept" | "decline",
+): { ok: boolean; reason?: string; offers?: SwapOffer[] } {
+  const all = readSwaps(address);
+  const offer = all.find((o) => o.id === id);
+  if (!offer) return { ok: false, reason: "Offer no longer exists." };
+  if (offer.status !== "pending") return { ok: false, reason: "Offer already settled." };
+
+  if (action === "decline") {
+    const next = all.map((o) => o.id === id ? { ...o, status: "declined" as SwapStatus } : o);
+    writeSwaps(address, next);
+    return { ok: true, offers: next };
+  }
+
+  // accept (incoming): give up giveId, receive receiveId, pay 5% trade fee.
+  const basisRemoved = removeShares(address, offer.giveId, offer.giveShares);
+  if (basisRemoved === null) return { ok: false, reason: "You no longer hold the shares for this swap." };
+  // Like-kind exchange: carry the given position's basis into the received
+  // asset, plus the 5% trade fee paid — so the fee is reflected in P&L.
+  addShares(address, offer.receiveId, offer.receiveShares, basisRemoved + offer.feeUsd);
+  const next = all.map((o) => o.id === id ? { ...o, status: "accepted" as SwapStatus } : o);
+  writeSwaps(address, next);
+  logActivity(address, {
+    kind: "swap", propertyId: offer.receiveId, shares: offer.receiveShares, usd: swapNotional(offer.receiveId, offer.receiveShares),
+    note: `Swapped ${lookupProperty(offer.giveId)?.prop.token ?? offer.giveId} → ${lookupProperty(offer.receiveId)?.prop.token ?? offer.receiveId} · 5% fee ${fmtUsdCompact(offer.feeUsd)}`,
+  });
+  return { ok: true, offers: next };
+}
+
+export function cancelSwapOffer(
+  address: string,
+  id: string,
+): { ok: boolean; reason?: string; offers?: SwapOffer[] } {
+  const all = readSwaps(address);
+  const offer = all.find((o) => o.id === id);
+  if (!offer) return { ok: false, reason: "Offer no longer exists." };
+  if (offer.direction !== "outgoing" || offer.status !== "pending")
+    return { ok: false, reason: "Only your own pending offers can be cancelled." };
+  // Return escrowed shares at their original cost basis.
+  addShares(address, offer.giveId, offer.giveShares, offer.escrowBasisUsd ?? swapNotional(offer.giveId, offer.giveShares));
+  const next = all.map((o) => o.id === id ? { ...o, status: "cancelled" as SwapStatus } : o);
+  writeSwaps(address, next);
+  logActivity(address, {
+    kind: "swap", propertyId: offer.giveId, shares: offer.giveShares,
+    note: "Swap offer cancelled · shares returned",
+  });
+  return { ok: true, offers: next };
+}
+
+// Simulated order-book fill: a counterparty accepts the user's outgoing offer.
+// The escrowed asset is gone; the requested asset is credited, carrying the
+// escrowed basis plus the 5% trade fee.
+export function settleOutgoingSwap(
+  address: string,
+  id: string,
+): { ok: boolean; reason?: string; offers?: SwapOffer[] } {
+  const all = readSwaps(address);
+  const offer = all.find((o) => o.id === id);
+  if (!offer || offer.direction !== "outgoing" || offer.status !== "pending")
+    return { ok: false, reason: "Offer not settleable." };
+  const carriedBasis = (offer.escrowBasisUsd ?? swapNotional(offer.giveId, offer.giveShares)) + offer.feeUsd;
+  addShares(address, offer.receiveId, offer.receiveShares, carriedBasis);
+  const taker = SIM_TAKERS[Math.floor(Math.random() * SIM_TAKERS.length)];
+  const next = all.map((o) => o.id === id ? { ...o, status: "accepted" as SwapStatus, counterparty: taker } : o);
+  writeSwaps(address, next);
+  logActivity(address, {
+    kind: "swap", propertyId: offer.receiveId, shares: offer.receiveShares, usd: swapNotional(offer.receiveId, offer.receiveShares),
+    note: `Swap filled by ${taker} · ${lookupProperty(offer.giveId)?.prop.token ?? offer.giveId} → ${lookupProperty(offer.receiveId)?.prop.token ?? offer.receiveId} · 5% fee ${fmtUsdCompact(offer.feeUsd)}`,
+  });
+  return { ok: true, offers: next };
 }

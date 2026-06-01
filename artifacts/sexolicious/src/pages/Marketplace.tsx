@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import {
   getListings, buyListing, cancelListing, lookupProperty, fairValuePerShare,
-  fmtUsdCompact,
+  fmtUsdCompact, FEES,
   type Listing,
 } from "@/lib/portfolio";
 import { useWallet } from "@/components/WalletContext";
@@ -423,7 +423,9 @@ export default function Marketplace() {
             {(() => {
               const meta = lookupProperty(buyState.listing.propertyId);
               if (!meta) return null;
-              const total = buyState.qty * buyState.listing.askPerShare;
+              const subtotal = buyState.qty * buyState.listing.askPerShare;
+              const buyFee = subtotal * FEES.buySell;
+              const total = subtotal + buyFee;
               return (
                 <>
                   <div>
@@ -453,6 +455,8 @@ export default function Marketplace() {
                     >
                       <Row label="Ask / share" value={fmtUsd(buyState.listing.askPerShare)} />
                       <Row label="Quantity"    value={`${buyState.qty} × shares`} />
+                      <Row label="Subtotal"    value={fmtUsd(subtotal)} />
+                      <Row label="Platform fee · 7%" value={fmtUsd(buyFee)} />
                       <div className="h-px bg-white/10 my-1" />
                       <Row label="Total"       value={fmtUsd(total)} accent />
                     </div>

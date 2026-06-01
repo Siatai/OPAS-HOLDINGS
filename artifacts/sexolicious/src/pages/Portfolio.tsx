@@ -1,19 +1,21 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useAccount, useChainId } from "wagmi";
 import { Link } from "wouter";
 import {
   TrendingUp, Wallet, Building2, Car, Ship, Plane, Coins, Vote, AlertTriangle,
-  ChevronRight, ShieldCheck, Clock, Layers, Tag, Plus,
+  ChevronRight, ShieldCheck, Clock, Layers, Tag, Plus, ArrowLeftRight, Check, X,
 } from "lucide-react";
 import {
   getHoldings, getProposals, castVote, lookupProperty,
   ownershipPct, portfolioStats, tally,
   createListing, fairValuePerShare, fmtUsdCompact,
-  type Holding, type Proposal,
+  getSwapOffers, createSwapOffer, respondSwapOffer, cancelSwapOffer, settleOutgoingSwap,
+  swapNotional, swapFee,
+  type Holding, type Proposal, type SwapOffer,
 } from "@/lib/portfolio";
 import {
-  CATEGORIES, getCategory, type AssetCategory,
+  CATEGORIES, getCategory, ASSETS, type AssetCategory,
 } from "@/data/assets";
 import { useWallet } from "@/components/WalletContext";
 import MarqueeText from "@/components/MarqueeText";
@@ -62,6 +64,8 @@ export default function Portfolio() {
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [listFor, setListFor] = useState<{ propertyId: string; qty: number; ask: number } | null>(null);
+  const [swaps, setSwaps] = useState<SwapOffer[]>([]);
+  const [swapFor, setSwapFor] = useState<{ giveId: string; giveShares: number; receiveId: string; receiveShares: number } | null>(null);
   const [toast, setToast] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
 
   useEffect(() => {
@@ -91,6 +95,7 @@ export default function Portfolio() {
     if (address) {
       setHoldings(getHoldings(address));
       setProposals(getProposals());
+      setSwaps(getSwapOffers(address));
     }
   }, [address]);
 
@@ -139,6 +144,168 @@ export default function Portfolio() {
     const weight = sharesByProp.get(p.propertyId) ?? 0;
     if (weight === 0) return;
     setProposals(castVote(proposalId, address, choice, weight));
+  };
+
+  // ── Swaps ──
+  const openSwapModal = (giveId: string) => {
+    const held = holdings.find((h) => h.propertyId === giveId);
+    const firstOther = ASSETS.find((a) => a.id !== giveId);
+    setSwapFor({
+      giveId,
+      giveShares: Math.min(1, held?.shares ?? 1) || 1,
+      receiveId: firstOther?.id ?? giveId,
+      receiveShares: 1,
+    });
+  };
+
+  const submitSwap = () => {
+    if (!swapFor || !address) return;
+    const res = createSwapOffer(address, swapFor.giveId, swapFor.giveShares, swapFor.receiveId, swapFor.receiveShares);
+    if (!res.ok) { setToast({ kind: "err", msg: res.reason ?? "Swap failed." }); return; }
+    setHoldings(getHoldings(address));
+    setSwaps(res.offers ?? getSwapOffers(address));
+    setSwapFor(null);
+    setToast({ kind: "ok", msg: "Swap offer published — counterparty notified." });
+  };
+
+  const onRespondSwap = (id: string, action: "accept" | "decline") => {
+    if (!address) return;
+    const res = respondSwapOffer(address, id, action);
+    if (!res.ok) { setToast({ kind: "err", msg: res.reason ?? "Action failed." }); return; }
+    setHoldings(getHoldings(address));
+    setSwaps(res.offers ?? getSwapOffers(address));
+    setToast({ kind: "ok", msg: action === "accept" ? "Swap accepted — assets switched." : "Swap declined." });
+  };
+
+  const onCancelSwap = (id: string) => {
+    if (!address) return;
+    const res = cancelSwapOffer(address, id);
+    if (!res.ok) { setToast({ kind: "err", msg: res.reason ?? "Cancel failed." }); return; }
+    setHoldings(getHoldings(address));
+    setSwaps(res.offers ?? getSwapOffers(address));
+    setToast({ kind: "ok", msg: "Offer cancelled — shares returned." });
+  };
+
+  // Simulated order book: a counterparty fills the user's outgoing offers.
+  const settleTimers = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!address) return;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    swaps
+      .filter((s) => s.direction === "outgoing" && s.status === "pending")
+      .forEach((s) => {
+        if (settleTimers.current.has(s.id)) return;
+        settleTimers.current.add(s.id);
+        const delay = Math.max(2500, 6000 - (Date.now() - s.createdAt));
+        const t = setTimeout(() => {
+          const res = settleOutgoingSwap(address, s.id);
+          settleTimers.current.delete(s.id);
+          if (res.ok) {
+            setHoldings(getHoldings(address));
+            setSwaps(res.offers ?? getSwapOffers(address));
+            setToast({ kind: "ok", msg: "Counterparty accepted — swap settled." });
+          }
+        }, delay);
+        timers.push(t);
+      });
+    return () => timers.forEach(clearTimeout);
+  }, [swaps, address]);
+
+  const pendingIncoming = useMemo(
+    () => swaps.filter((s) => s.direction === "incoming" && s.status === "pending"),
+    [swaps],
+  );
+  const sortedSwaps = useMemo(() => {
+    const rank = (s: SwapOffer) =>
+      (s.status === "pending" ? 0 : 1) * 10 + (s.direction === "incoming" ? 0 : 1);
+    return [...swaps].sort((a, b) => rank(a) - rank(b) || b.createdAt - a.createdAt);
+  }, [swaps]);
+
+  const renderSwapRow = (s: SwapOffer) => {
+    const give = lookupProperty(s.giveId);
+    const recv = lookupProperty(s.receiveId);
+    const incoming = s.direction === "incoming";
+    const statusTone =
+      s.status === "pending"  ? "text-amber-300 border-amber-400/40 bg-amber-400/10"
+    : s.status === "accepted" ? "text-emerald-300 border-emerald-400/40 bg-emerald-400/10"
+    : s.status === "declined" ? "text-rose-300 border-rose-400/40 bg-rose-400/10"
+    :                           "text-white/50 border-white/15 bg-white/5";
+    return (
+      <div key={s.id}
+        className="rounded-lg p-4 md:p-5 space-y-3"
+        style={{ background: "rgba(20,28,48,0.55)", border: "1px solid rgba(220,225,235,0.08)" }}
+        data-testid={`swap-${s.id}`}
+      >
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className={`px-2 py-0.5 rounded-sm text-[8.5px] tracking-[0.28em] uppercase border font-mono ${incoming ? "text-secondary border-secondary/40 bg-secondary/5" : "text-primary border-primary/40 bg-primary/5"}`}>
+              {incoming ? "Incoming" : "Outgoing"}
+            </span>
+            <span className="text-[9.5px] tracking-[0.24em] uppercase text-white/40 font-mono truncate">{s.counterparty}</span>
+          </div>
+          <span className={`px-2 py-0.5 rounded-sm text-[8.5px] tracking-[0.28em] uppercase border font-mono ${statusTone}`}>{s.status}</span>
+        </div>
+
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            {give && <img src={give.prop.image} alt="" className="w-10 h-10 rounded-md object-cover shrink-0" />}
+            <div className="min-w-0">
+              <div className="text-[8px] tracking-[0.24em] uppercase text-white/35 font-mono">You give</div>
+              <div className="text-[12px] text-white truncate" style={SHARKON}>{give?.prop.title ?? s.giveId}</div>
+              <div className="text-[9px] tracking-[0.2em] uppercase text-rose-300/80 font-mono">{s.giveShares} shares</div>
+            </div>
+          </div>
+          <ArrowLeftRight className="w-4 h-4 text-white/40 shrink-0" />
+          <div className="flex items-center gap-2 min-w-0 justify-end text-right">
+            <div className="min-w-0">
+              <div className="text-[8px] tracking-[0.24em] uppercase text-white/35 font-mono">You receive</div>
+              <div className="text-[12px] text-white truncate" style={SHARKON}>{recv?.prop.title ?? s.receiveId}</div>
+              <div className="text-[9px] tracking-[0.2em] uppercase text-emerald-300/80 font-mono">{s.receiveShares} shares</div>
+            </div>
+            {recv && <img src={recv.prop.image} alt="" className="w-10 h-10 rounded-md object-cover shrink-0" />}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-2 border-t border-white/5">
+          <span className="text-[9.5px] tracking-[0.22em] uppercase text-white/40 font-mono">Trade fee · 5%</span>
+          <span className="text-[12px] text-secondary" style={SHARKON}>{fmtUsd(s.feeUsd)}</span>
+        </div>
+
+        {s.status === "pending" && (
+          <div className="flex gap-2">
+            {incoming ? (
+              <>
+                <button
+                  onClick={() => onRespondSwap(s.id, "decline")}
+                  data-testid={`swap-decline-${s.id}`}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-[10px] tracking-[0.2em] uppercase border border-rose-400/40 text-rose-300 hover:bg-rose-400/10 rounded-sm transition-colors"
+                  style={NEVERA}
+                >
+                  <X className="w-3 h-3" /> Decline
+                </button>
+                <button
+                  onClick={() => onRespondSwap(s.id, "accept")}
+                  data-testid={`swap-accept-${s.id}`}
+                  className="btn-metal flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-[10px] font-bold tracking-[0.2em] uppercase text-[#050810] rounded-sm"
+                  style={{ fontFamily: "BankGothic, sans-serif" }}
+                >
+                  <Check className="w-3 h-3" /> Accept
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => onCancelSwap(s.id)}
+                data-testid={`swap-cancel-${s.id}`}
+                className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-[10px] tracking-[0.2em] uppercase border border-white/15 text-white/60 hover:border-white/35 rounded-sm transition-colors"
+                style={NEVERA}
+              >
+                <X className="w-3 h-3" /> Cancel offer
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    );
   };
 
   if (!isConnected) {
@@ -400,21 +567,31 @@ export default function Portfolio() {
                                 <span style={{ color: cat.accent }}>{fmtUsd(monthly)}/mo</span>
                               </div>
 
-                              <div className="mt-auto pt-1 flex gap-2">
-                                <button
-                                  onClick={() => openListModal(h.propertyId)}
-                                  data-testid={`list-${h.propertyId}`}
-                                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-[10px] tracking-[0.2em] uppercase border border-secondary/40 text-secondary hover:bg-secondary/10 rounded-sm transition-colors"
-                                  style={NEVERA}
-                                >
-                                  <Tag className="w-3 h-3" /> Sell
-                                </button>
+                              <div className="mt-auto pt-1 space-y-2">
+                                <div className="grid grid-cols-2 gap-2">
+                                  <button
+                                    onClick={() => openListModal(h.propertyId)}
+                                    data-testid={`list-${h.propertyId}`}
+                                    className="flex items-center justify-center gap-2 px-3 py-2 text-[10px] tracking-[0.2em] uppercase border border-secondary/40 text-secondary hover:bg-secondary/10 rounded-sm transition-colors"
+                                    style={NEVERA}
+                                  >
+                                    <Tag className="w-3 h-3" /> Sell
+                                  </button>
+                                  <button
+                                    onClick={() => openSwapModal(h.propertyId)}
+                                    data-testid={`swap-open-${h.propertyId}`}
+                                    className="flex items-center justify-center gap-2 px-3 py-2 text-[10px] tracking-[0.2em] uppercase border border-white/15 text-white/70 hover:border-white/35 rounded-sm transition-colors"
+                                    style={NEVERA}
+                                  >
+                                    <ArrowLeftRight className="w-3 h-3" /> Swap
+                                  </button>
+                                </div>
                                 <Link
                                   href="/marketplace"
-                                  className="btn-metal-silver flex-1 flex items-center justify-center gap-2 px-3 py-2 text-[10px] tracking-[0.2em] uppercase rounded-sm"
+                                  className="btn-metal-silver w-full flex items-center justify-center gap-2 px-3 py-2 text-[10px] tracking-[0.2em] uppercase rounded-sm"
                                   style={NEVERA}
                                 >
-                                  <Plus className="w-3 h-3" /> Buy
+                                  <Plus className="w-3 h-3" /> Buy more
                                 </Link>
                               </div>
                             </div>
@@ -428,6 +605,44 @@ export default function Portfolio() {
             })}
           </div>
         )}
+
+        {/* Equity swaps */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-xl md:text-2xl flex items-center gap-3 min-w-0" style={SHARKON}>
+              <ArrowLeftRight className="w-5 h-5 text-secondary shrink-0" />
+              <MarqueeText className="min-w-0 flex-1">
+                <span className="metallic-text">Equity swaps</span>
+              </MarqueeText>
+            </h2>
+            <span className="shrink-0 text-[10px] tracking-[0.32em] uppercase text-white/30" style={NEVERA}>
+              {pendingIncoming.length} pending
+            </span>
+          </div>
+
+          <div className="rounded-md p-3 flex items-start gap-2 text-[11px] text-white/55"
+            style={{ background: "rgba(11,181,190,0.05)", border: "1px solid rgba(11,181,190,0.18)" }}
+          >
+            <ArrowLeftRight className="w-3.5 h-3.5 mt-px text-secondary shrink-0" />
+            <span style={NEVERA}>
+              Exchange equity in one asset for equity in another. The counterparty is notified and must accept before
+              assets switch hands. A 5% trade fee applies on settlement.
+            </span>
+          </div>
+
+          {sortedSwaps.length === 0 ? (
+            <div className="rounded-lg p-8 text-center text-white/40 text-sm"
+              style={{ background: "rgba(20,28,48,0.4)", border: "1px solid rgba(220,225,235,0.06)" }}
+              data-testid="empty-swaps"
+            >
+              No swap offers yet — use “Swap” on any holding to propose an exchange.
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-3">
+              {sortedSwaps.map((s) => renderSwapRow(s))}
+            </div>
+          )}
+        </section>
 
         {/* DAO governance */}
         <section className="space-y-4">
@@ -643,6 +858,124 @@ export default function Portfolio() {
                   style={{ fontFamily: "BankGothic, sans-serif" }}
                 >
                   List for sale
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        );
+      })()}
+
+      {/* Swap modal */}
+      {swapFor && (() => {
+        const giveMeta = lookupProperty(swapFor.giveId);
+        const held = holdings.find((h) => h.propertyId === swapFor.giveId);
+        if (!giveMeta || !held) return null;
+        const recvMeta = lookupProperty(swapFor.receiveId);
+        const giveValue = swapNotional(swapFor.giveId, swapFor.giveShares);
+        const recvValue = swapNotional(swapFor.receiveId, swapFor.receiveShares);
+        const fee = swapFee(swapFor.giveId, swapFor.giveShares);
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4"
+            onClick={() => setSwapFor(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0, y: 12 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="metallic-border relative w-full max-w-md rounded-xl p-7 space-y-5"
+              style={{ background: "linear-gradient(160deg, rgba(12,18,32,0.96) 0%, rgba(8,12,24,0.96) 100%)" }}
+              data-testid="swap-modal"
+            >
+              <div>
+                <div className="text-[8.5px] tracking-[0.32em] uppercase text-secondary mb-1 font-mono">
+                  {giveMeta.prop.token} · Propose swap
+                </div>
+                <h3 className="text-2xl text-white" style={SHARKON}>{giveMeta.prop.title}</h3>
+                <div className="text-[11px] text-white/45 mt-1" style={NEVERA}>
+                  You hold {held.shares} shares · Fair value {fmtUsd(fairValuePerShare(swapFor.giveId))} / share
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="block">
+                  <span className="text-[8.5px] tracking-[0.32em] uppercase text-white/45" style={NEVERA}>Shares to give (max {held.shares})</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={held.shares}
+                    value={swapFor.giveShares}
+                    onChange={(e) => setSwapFor({ ...swapFor, giveShares: Math.max(1, Math.min(held.shares, parseInt(e.target.value || "1", 10))) })}
+                    data-testid="swap-give-qty"
+                    className="mt-1 w-full px-3 py-2.5 text-lg bg-[rgba(20,28,48,0.6)] border border-white/10 focus:border-secondary/40 outline-none rounded-md text-white"
+                    style={SHARKON}
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-[8.5px] tracking-[0.32em] uppercase text-white/45" style={NEVERA}>Asset to receive</span>
+                  <select
+                    value={swapFor.receiveId}
+                    onChange={(e) => setSwapFor({ ...swapFor, receiveId: e.target.value })}
+                    data-testid="swap-receive-asset"
+                    className="mt-1 w-full px-3 py-2.5 text-sm bg-[rgba(20,28,48,0.6)] border border-white/10 focus:border-secondary/40 outline-none rounded-md text-white"
+                    style={NEVERA}
+                  >
+                    {ASSETS.filter((a) => a.id !== swapFor.giveId).map((a) => (
+                      <option key={a.id} value={a.id} className="bg-[#0b1220] text-white">
+                        {a.token} · {a.title}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="text-[8.5px] tracking-[0.32em] uppercase text-white/45" style={NEVERA}>Shares to receive</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={swapFor.receiveShares}
+                    onChange={(e) => setSwapFor({ ...swapFor, receiveShares: Math.max(1, parseInt(e.target.value || "1", 10)) })}
+                    data-testid="swap-receive-qty"
+                    className="mt-1 w-full px-3 py-2.5 text-lg bg-[rgba(20,28,48,0.6)] border border-white/10 focus:border-secondary/40 outline-none rounded-md text-white"
+                    style={SHARKON}
+                  />
+                </label>
+
+                <div className="rounded-md p-3 space-y-1.5"
+                  style={{ background: "rgba(20,28,48,0.6)", border: "1px solid rgba(220,225,235,0.08)" }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9.5px] tracking-[0.28em] uppercase text-white/45" style={NEVERA}>You give · value</span>
+                    <span className="text-[13px] text-white/90" style={SHARKON}>{fmtUsd(giveValue)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9.5px] tracking-[0.28em] uppercase text-white/45" style={NEVERA}>
+                      You receive{recvMeta ? ` · ${recvMeta.prop.token}` : ""}
+                    </span>
+                    <span className="text-[13px] text-white/90" style={SHARKON}>{fmtUsd(recvValue)}</span>
+                  </div>
+                  <div className="h-px bg-white/10 my-1" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9.5px] tracking-[0.28em] uppercase text-white/45" style={NEVERA}>Trade fee · 5%</span>
+                    <span className="text-[13px] text-secondary" style={SHARKON}>{fmtUsd(fee)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setSwapFor(null)}
+                  className="flex-1 px-5 py-3 text-[10.5px] tracking-[0.22em] uppercase text-white/60 border border-white/10 hover:border-white/25 rounded-sm"
+                  style={NEVERA}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitSwap}
+                  data-testid="confirm-swap"
+                  className="btn-metal flex-1 px-5 py-3 text-[11px] font-bold tracking-[0.22em] uppercase text-[#050810] rounded-sm"
+                  style={{ fontFamily: "BankGothic, sans-serif" }}
+                >
+                  Publish swap
                 </button>
               </div>
             </motion.div>
