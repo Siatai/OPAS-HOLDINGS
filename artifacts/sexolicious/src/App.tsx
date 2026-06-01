@@ -22,6 +22,11 @@ const queryClient = new QueryClient();
 function ScrollToTop() {
   const [location] = useLocation();
   useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+  useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [location]);
   return null;
@@ -42,6 +47,10 @@ function Router() {
 
 function App() {
   const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (loaded) window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [loaded]);
 
   return (
     <WagmiProvider config={wagmiConfig}>
