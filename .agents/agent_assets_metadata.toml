@@ -54,6 +54,78 @@ uri = "file://attached_assets/generated_images/ultra_wide_panoramic_silhouette_2
 type = "image"
 title = "generated_image"
 
+[[generated]]
+id = "czaI92O_fxsm0vqoFR9CK"
+uri = "file://artifacts/sexolicious/src/assets/images/assets/car_hyper.png"
+type = "image"
+title = "luxury hypercar"
+
+[[generated]]
+id = "JHOPXuzkAbHwjolZCUWhA"
+uri = "file://artifacts/sexolicious/src/assets/images/assets/yacht_super.png"
+type = "image"
+title = "superyacht ocean"
+
+[[generated]]
+id = "jdgFe9K18s6QvMvSDj886"
+uri = "file://artifacts/sexolicious/src/assets/images/assets/car_ferrari.png"
+type = "image"
+title = "red supercar"
+
+[[generated]]
+id = "p-TOkNqRC9TcODmYeD1i9"
+uri = "file://artifacts/sexolicious/src/assets/images/assets/yacht_riva.png"
+type = "image"
+title = "classic speedboat"
+
+[[generated]]
+id = "RSQDZL8BW8-sENxKkWilO"
+uri = "file://artifacts/sexolicious/src/assets/images/assets/car_lambo.png"
+type = "image"
+title = "gold supercar"
+
+[[generated]]
+id = "XzTC44y91RS9HHREt4L-2"
+uri = "file://artifacts/sexolicious/src/assets/images/assets/yacht_marina.png"
+type = "image"
+title = "yacht marina night"
+
+[[generated]]
+id = "OcGSLRFYREMyHhJWy7Wve"
+uri = "file://artifacts/sexolicious/src/assets/images/assets/car_rolls.png"
+type = "image"
+title = "luxury coupe"
+
+[[generated]]
+id = "tMqdxEEjD1SrfKmokNwnW"
+uri = "file://artifacts/sexolicious/src/assets/images/assets/yacht_mega.png"
+type = "image"
+title = "mega yacht aerial"
+
+[[generated]]
+id = "UWKPRBo72NGpLJ4iRFlMw"
+uri = "file://artifacts/sexolicious/src/assets/images/assets/jet_gulfstream.png"
+type = "image"
+title = "private jet tarmac"
+
+[[generated]]
+id = "KUIKc9OmiA8kYys2G7ana"
+uri = "file://artifacts/sexolicious/src/assets/images/assets/jet_sky.png"
+type = "image"
+title = "business jet sky"
+
+[[generated]]
+id = "PMPb7XBAq8KO3Dq1zO9oX"
+uri = "file://artifacts/sexolicious/src/assets/images/assets/jet_hangar.png"
+type = "image"
+title = "private jet hangar"
+
+[[generated]]
+id = "2DNNYfnBKoJ--G0DVJQx-"
+uri = "file://artifacts/sexolicious/src/assets/images/assets/jet_cabin.png"
+type = "image"
+title = "jet cabin interior"
+
 [[outputs]]
 id = "n-I6a-D2zKc5TGM7Equgj"
 uri = "file://attached_assets/stock_images/lux_skyscraper.jpg"

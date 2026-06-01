@@ -66,7 +66,11 @@ CSS utility classes: `.font-hero`, `.font-display`, `.font-sans`, `.font-serif`,
 
 ## Product
 
-Opas Properties is a luxury fractional real estate investment platform. Users can browse 8 curated global properties (Dubai, London, NYC, Hong Kong, Paris, Singapore, Tokyo, Miami) with real yield and ROI data, and connect a Web3 wallet to acquire equity interests starting from $100. The site showcases the AI valuation engine, blockchain co-ownership, and 24/7 secondary market capabilities.
+Opas Properties is a luxury tokenized-asset investment platform spanning four asset classes: **real estate, supercars, yachts, and private jets**. Users browse curated assets with real yield/ROI data and connect a Web3 wallet to acquire equity interests starting from $100. The site showcases the AI valuation engine, blockchain co-ownership, and 24/7 secondary market capabilities.
+
+- `src/data/assets.ts` is the single source of truth for ALL tokenized assets (real estate flattened from `cities.ts` + curated cars/yachts/jets). `src/lib/portfolio.ts` indexes via `ASSET_INDEX` from there.
+- Non-real-estate assets have `city = ""` — any `/city/:id` link must be conditional on a truthy city (see Portfolio + Marketplace).
+- Portfolio is a multi-segment view grouped by asset class; Marketplace filters by asset class.
 
 ## User preferences
 

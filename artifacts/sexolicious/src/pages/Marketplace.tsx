@@ -12,7 +12,7 @@ import {
   type Listing,
 } from "@/lib/portfolio";
 import { useWallet } from "@/components/WalletContext";
-import { CITIES } from "@/data/cities";
+import { CATEGORIES, getCategory, categoryOf, type AssetCategory } from "@/data/assets";
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
@@ -27,7 +27,7 @@ export default function Marketplace() {
   const { openWallet } = useWallet();
   const [listings, setListings] = useState<Listing[]>([]);
   const [tab, setTab] = useState<"all" | "mine">("all");
-  const [cityFilter, setCityFilter] = useState<string>("all");
+  const [catFilter, setCatFilter] = useState<AssetCategory | "all">("all");
   const [sort, setSort] = useState<SortKey>("newest");
   const [search, setSearch] = useState("");
   const [buyState, setBuyState] = useState<{ listing: Listing; qty: number } | null>(null);
@@ -44,7 +44,7 @@ export default function Marketplace() {
   const filtered = useMemo(() => {
     let l = [...listings];
     if (tab === "mine" && address) l = l.filter((x) => x.seller === address.toLowerCase());
-    if (cityFilter !== "all") l = l.filter((x) => lookupProperty(x.propertyId)?.city === cityFilter);
+    if (catFilter !== "all") l = l.filter((x) => categoryOf(x.propertyId) === catFilter);
     if (search.trim()) {
       const q = search.toLowerCase();
       l = l.filter((x) => {
@@ -67,7 +67,7 @@ export default function Marketplace() {
       default:           enriched.sort((a, b) => b.listing.createdAt - a.listing.createdAt);
     }
     return enriched;
-  }, [listings, tab, cityFilter, sort, search, address]);
+  }, [listings, tab, catFilter, sort, search, address]);
 
   const totals = useMemo(() => {
     const tvl = listings.reduce((a, l) => a + l.shares * l.askPerShare, 0);
@@ -184,16 +184,16 @@ export default function Marketplace() {
           </div>
 
           <div className="flex gap-2 min-w-0">
-            {/* City filter */}
+            {/* Asset-class filter */}
             <select
-              value={cityFilter}
-              onChange={(e) => setCityFilter(e.target.value)}
+              value={catFilter}
+              onChange={(e) => setCatFilter(e.target.value as AssetCategory | "all")}
               className="flex-1 min-w-0 px-3 py-2.5 text-[11px] tracking-[0.18em] uppercase bg-[rgba(20,28,48,0.4)] border border-white/10 hover:border-white/25 rounded-md text-white/75 outline-none cursor-pointer"
               style={NEVERA}
             >
-              <option value="all">All cities</option>
-              {CITIES.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+              <option value="all">All classes</option>
+              {CATEGORIES.map((c) => (
+                <option key={c.id} value={c.id}>{c.label}</option>
               ))}
             </select>
 
@@ -237,6 +237,9 @@ export default function Marketplace() {
               const meta = lookupProperty(listing.propertyId);
               if (!meta) return null;
               const { prop, city } = meta;
+              const catMeta = getCategory(prop.category);
+              const TitleTag: any = city ? Link : "span";
+              const titleProps = city ? { href: `/city/${city}` } : {};
               const mine = address && listing.seller === address.toLowerCase();
               const isPremium = discount < 0;
               return (
@@ -270,13 +273,23 @@ export default function Marketplace() {
                       )}
                     </div>
                     <div className="absolute bottom-3 left-3 right-3">
-                      <Link href={`/city/${city}`} className="text-[15px] text-white font-medium hover:text-primary transition-colors" style={SHARKON}>
+                      <TitleTag {...titleProps} className={`text-[15px] text-white font-medium transition-colors block truncate ${city ? "hover:text-primary" : ""}`} style={SHARKON}>
                         {prop.title}
-                      </Link>
+                      </TitleTag>
+                      <div className="text-[9.5px] text-white/55 truncate font-mono">{prop.spec ?? prop.subtitle}</div>
                     </div>
                   </div>
 
                   <div className="p-4 space-y-3 flex-1 flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="px-2 py-0.5 rounded-full text-[8px] tracking-[0.22em] uppercase font-mono"
+                        style={{ color: catMeta.accent, border: `1px solid ${catMeta.accent}55`, background: `${catMeta.accent}14` }}
+                      >
+                        {catMeta.label}
+                      </span>
+                      <span className="text-[8px] tracking-[0.22em] uppercase text-white/35 font-mono truncate">{prop.tier}</span>
+                    </div>
                     <div className="grid grid-cols-2 gap-3 min-w-0">
                       <div className="min-w-0">
                         <div className="text-[8.5px] tracking-[0.28em] uppercase text-white/35" style={NEVERA}>Ask / share</div>
@@ -327,13 +340,15 @@ export default function Marketplace() {
                           Buy
                         </button>
                       )}
-                      <Link
-                        href={`/city/${city}`}
-                        className="px-3 py-2.5 text-[10.5px] tracking-[0.22em] uppercase text-white/55 hover:text-white border border-white/10 hover:border-white/25 rounded-sm transition-colors flex items-center"
-                        style={NEVERA}
-                      >
-                        <ChevronRight className="w-3 h-3" />
-                      </Link>
+                      {city && (
+                        <Link
+                          href={`/city/${city}`}
+                          className="px-3 py-2.5 text-[10.5px] tracking-[0.22em] uppercase text-white/55 hover:text-white border border-white/10 hover:border-white/25 rounded-sm transition-colors flex items-center"
+                          style={NEVERA}
+                        >
+                          <ChevronRight className="w-3 h-3" />
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </motion.div>

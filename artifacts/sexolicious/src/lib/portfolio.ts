@@ -1,4 +1,4 @@
-import { CITIES, type Property } from "@/data/cities";
+import { ASSET_INDEX } from "@/data/assets";
 
 export type Holding = {
   propertyId: string;
@@ -19,18 +19,18 @@ export type Proposal = {
   votes: Record<string, { choice: "for" | "against" | "abstain"; weight: number }>;
 };
 
-const PROP_INDEX = new Map<string, { city: string; prop: Property }>();
-CITIES.forEach((c) => c.properties.forEach((p) => PROP_INDEX.set(p.id, { city: c.id, prop: p })));
-
-export const lookupProperty = (id: string) => PROP_INDEX.get(id);
+export const lookupProperty = (id: string) => ASSET_INDEX.get(id);
 
 const KEY = (addr: string) => `opas:portfolio:${addr.toLowerCase()}`;
 const PROP_KEY = "opas:proposals";
 
 const SEED_HOLDINGS: Omit<Holding, "acquiredAt">[] = [
-  { propertyId: "dxb-1", cityId: "dubai",   shares: 24, costBasisUsd: 3_600 },
-  { propertyId: "ldn-1", cityId: "london",  shares: 12, costBasisUsd: 2_400 },
-  { propertyId: "nyc-3", cityId: "new-york", shares: 18, costBasisUsd: 2_700 },
+  { propertyId: "dxb-1",   cityId: "dubai",    shares: 24, costBasisUsd: 3_600 },
+  { propertyId: "ldn-1",   cityId: "london",   shares: 12, costBasisUsd: 2_400 },
+  { propertyId: "nyc-3",   cityId: "newyork",  shares: 18, costBasisUsd: 2_700 },
+  { propertyId: "car-2",   cityId: "",         shares: 30, costBasisUsd: 3_600 },
+  { propertyId: "yacht-2", cityId: "",         shares: 16, costBasisUsd: 2_880 },
+  { propertyId: "jet-4",   cityId: "",         shares: 20, costBasisUsd: 3_200 },
 ];
 
 const SEED_PROPOSALS: Omit<Proposal, "votes" | "createdAt" | "endsAt">[] = [
@@ -42,11 +42,32 @@ const SEED_PROPOSALS: Omit<Proposal, "votes" | "createdAt" | "endsAt">[] = [
     detail: "Off-market bid received from Knight Frank private client (35% premium to last valuation). Proceeds distributed pro-rata in USDC within 14 days.",
   },
   {
+    id: "prop-car2-sell",
+    propertyId: "car-2",
+    kind: "sell",
+    title: "Accept $4.2M collector bid on LaFerrari Aperta",
+    detail: "RM Sotheby's private treaty offer at a 26% premium to last appraisal. Settlement in USDC, proceeds distributed pro-rata to token holders within 10 days.",
+  },
+  {
+    id: "prop-yht2-rent",
+    propertyId: "yacht-2",
+    kind: "rent_increase",
+    title: "Raise peak-week charter rate €185k → €210k",
+    detail: "Med summer demand study supports a 13.5% uplift on the Sunseeker 90 charter rate. Occupancy modelled at 18 of 22 prime weeks.",
+  },
+  {
     id: "prop-ldn1-rent",
     propertyId: "ldn-1",
     kind: "rent_increase",
     title: "Increase monthly rent from £18,500 → £21,200",
     detail: "Market study by Savills supports a 14.6% uplift on renewal. Vacancy risk modelled at <4% based on Mayfair Q1-26 comps.",
+  },
+  {
+    id: "prop-jet4-refurb",
+    propertyId: "jet-4",
+    kind: "refurbish",
+    title: "Approve $1.1M cabin refit on Praetor 600",
+    detail: "Full interior refresh and Ka-band connectivity upgrade funded from reserves. Projected charter rate uplift +9% and improved utilisation.",
   },
   {
     id: "prop-nyc3-refurb",
@@ -177,6 +198,13 @@ const SEED_LISTINGS: Omit<Listing, "id" | "createdAt">[] = [
   { propertyId: "hkg-2", seller: "vault", shares: 14, askPerShare: 196 },
   { propertyId: "sgp-4", seller: "vault", shares: 10, askPerShare: 174 },
   { propertyId: "mia-1", seller: "vault", shares: 26, askPerShare: 128 },
+  { propertyId: "car-1",   seller: "vault", shares: 12, askPerShare: 102 },
+  { propertyId: "car-3",   seller: "vault", shares: 20, askPerShare: 68 },
+  { propertyId: "car-6",   seller: "vault", shares: 3,  askPerShare: 152 },
+  { propertyId: "yacht-1", seller: "vault", shares: 9,  askPerShare: 246 },
+  { propertyId: "yacht-3", seller: "vault", shares: 18, askPerShare: 148 },
+  { propertyId: "jet-1",   seller: "vault", shares: 7,  askPerShare: 328 },
+  { propertyId: "jet-5",   seller: "vault", shares: 16, askPerShare: 136 },
 ];
 
 function rid() {
