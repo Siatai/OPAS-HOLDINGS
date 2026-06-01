@@ -1,3 +1,5 @@
+import { SlideHeader, SlideFooter } from "@/components/Chrome";
+
 const base = import.meta.env.BASE_URL;
 
 export default function Portfolio() {
@@ -6,13 +8,9 @@ export default function Portfolio() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_85%,rgba(234,141,14,0.10),transparent_45%)]" />
       <div className="absolute top-0 left-0 right-0 h-[0.4vh] bg-line" />
 
+      <SlideHeader section="05" label="The portfolio" />
+
       <div className="relative h-full w-full flex flex-col justify-center px-[8vw] py-[8vh]">
-        <div className="flex items-center gap-[1.2vw] mb-[2vh]">
-          <span className="font-body text-gold text-[1.1vw] tracking-[0.4em]">05</span>
-          <span className="font-body uppercase tracking-[0.4em] text-[1.05vw] text-muted">
-            The portfolio
-          </span>
-        </div>
         <h2 className="font-display text-[3.2vw] leading-[1] tracking-tight mb-[4vh]">
           Four asset classes, real yield
         </h2>
@@ -108,6 +106,8 @@ export default function Portfolio() {
           CBRE.
         </p>
       </div>
+
+      <SlideFooter page="06" note="Strictly private & confidential" />
     </div>
   );
 }

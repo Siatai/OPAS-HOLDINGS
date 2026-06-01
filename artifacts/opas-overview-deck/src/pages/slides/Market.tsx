@@ -1,16 +1,14 @@
+import { SlideHeader, SlideFooter } from "@/components/Chrome";
+
 export default function Market() {
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-bg text-fg">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(234,141,14,0.14),transparent_50%)]" />
       <div className="absolute top-0 left-0 right-0 h-[0.4vh] bg-line" />
 
+      <SlideHeader section="04" label="Market opportunity" />
+
       <div className="relative h-full w-full flex flex-col justify-center px-[8vw] py-[8vh]">
-        <div className="flex items-center gap-[1.2vw] mb-[2vh]">
-          <span className="font-body text-gold text-[1.1vw] tracking-[0.4em]">04</span>
-          <span className="font-body uppercase tracking-[0.4em] text-[1.05vw] text-muted">
-            Market opportunity
-          </span>
-        </div>
         <h2 className="font-display text-[3.4vw] leading-[1] tracking-tight mb-[6vh] max-w-[62vw]">
           A market compounding fast
         </h2>
@@ -46,14 +44,9 @@ export default function Market() {
           base-case projection (2030). Luxury real estate, collectible cars,
           yachts and aviation remain among the largest under-tokenized pools.
         </p>
-
-        <div className="absolute bottom-[6vh] right-[8vw] flex items-center gap-[1vw]">
-          <span className="font-body uppercase tracking-[0.4em] text-[0.9vw] text-muted">
-            Opas Holdings
-          </span>
-          <div className="h-[1.2vh] w-[1.2vh] bg-gold rotate-45" />
-        </div>
       </div>
+
+      <SlideFooter page="05" note="opasholdings.com" />
     </div>
   );
 }

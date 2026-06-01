@@ -209,3 +209,27 @@ id = "GD0wmF7t0Lk_guJB50Tn1"
 uri = "file://.local/outputs/Opas-Holdings---Overview.pptx"
 type = "slides"
 title = "Opas Holdings — Overview (PPTX, fonts fixed)"
+
+[[outputs]]
+id = "yHgjLHuIo4S3sY9MlyO4h"
+uri = "file://.local/outputs/Opas-Holdings-Presentations.zip"
+type = "unspecified"
+title = "Opas Holdings — All 3 Presentations (one folder)"
+
+[[outputs]]
+id = "rqBUvfFuddUSxqheonQrs"
+uri = "file://.local/outputs/Opas-Holdings-Presentations/1 - Opas Holdings - Investor Deck.pptx"
+type = "slides"
+title = "1 — Opas Holdings Investor Deck (PPTX)"
+
+[[outputs]]
+id = "Hq9GHqjU1be_g63lb6nzD"
+uri = "file://.local/outputs/Opas-Holdings-Presentations/2 - Opas Holdings - How It Works.pptx"
+type = "slides"
+title = "2 — Opas Holdings How It Works (PPTX)"
+
+[[outputs]]
+id = "tx5I-Yi_147bO3iUg0kMZ"
+uri = "file://.local/outputs/Opas-Holdings-Presentations/3 - Opas Holdings - Overview.pptx"
+type = "slides"
+title = "3 — Opas Holdings Overview (PPTX)"

@@ -19,7 +19,7 @@ export default function Title() {
             src={`${base}img/opas-logo.png`}
             crossOrigin="anonymous"
             alt="Opas Holdings logo"
-            className="h-[7vh] w-[7vh] object-contain"
+            className="h-[9vh] w-[9vh] object-contain"
           />
           <span className="font-body uppercase tracking-[0.45em] text-[1.05vw] text-teal">
             Opas Holdings

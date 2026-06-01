@@ -1,16 +1,14 @@
+import { SlideHeader, SlideFooter } from "@/components/Chrome";
+
 export default function BusinessModel() {
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-bg text-fg">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_15%,rgba(11,181,190,0.10),transparent_45%)]" />
       <div className="absolute top-0 left-0 right-0 h-[0.4vh] bg-line" />
 
+      <SlideHeader section="06" label="Business model" />
+
       <div className="relative h-full w-full flex flex-col justify-center px-[8vw] py-[8vh]">
-        <div className="flex items-center gap-[1.2vw] mb-[2vh]">
-          <span className="font-body text-gold text-[1.1vw] tracking-[0.4em]">06</span>
-          <span className="font-body uppercase tracking-[0.4em] text-[1.05vw] text-muted">
-            Business model
-          </span>
-        </div>
         <h2 className="font-display text-[3.4vw] leading-[1] tracking-tight mb-[4vh] max-w-[70vw]">
           Three aligned revenue streams
         </h2>
@@ -62,6 +60,8 @@ export default function BusinessModel() {
           </div>
         </div>
       </div>
+
+      <SlideFooter page="07" note="Strictly private & confidential" />
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { SlideHeader } from "@/components/Chrome";
+
 const base = import.meta.env.BASE_URL;
 
 export default function Ask() {
@@ -13,14 +15,9 @@ export default function Ask() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_85%,rgba(234,141,14,0.18),transparent_45%)]" />
       <div className="absolute top-0 left-0 right-0 h-[0.4vh] bg-gold" />
 
-      <div className="relative h-full w-full flex flex-col justify-center px-[8vw] py-[8vh]">
-        <div className="flex items-center gap-[1.2vw] mb-[3vh]">
-          <span className="font-body text-gold text-[1.1vw] tracking-[0.4em]">07</span>
-          <span className="font-body uppercase tracking-[0.4em] text-[1.05vw] text-muted">
-            The ask
-          </span>
-        </div>
+      <SlideHeader section="07" label="The ask" />
 
+      <div className="relative h-full w-full flex flex-col justify-center px-[8vw] py-[8vh]">
         <div className="grid grid-cols-[44%_56%] gap-[5vw] items-center">
           <div>
             <p className="font-serif italic text-teal text-[2vw] mb-[1.5vh]">

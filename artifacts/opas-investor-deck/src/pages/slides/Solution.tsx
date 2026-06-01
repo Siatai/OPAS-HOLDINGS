@@ -1,17 +1,14 @@
+import { SlideHeader, SlideFooter } from "@/components/Chrome";
+
 export default function Solution() {
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-bg text-fg">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(11,181,190,0.12),transparent_45%)]" />
       <div className="absolute top-0 left-0 right-0 h-[0.4vh] bg-line" />
 
-      <div className="relative h-full w-full flex flex-col justify-center px-[8vw] py-[8vh]">
-        <div className="flex items-center gap-[1.2vw] mb-[4vh]">
-          <span className="font-body text-gold text-[1.1vw] tracking-[0.4em]">02</span>
-          <span className="font-body uppercase tracking-[0.4em] text-[1.05vw] text-muted">
-            The solution
-          </span>
-        </div>
+      <SlideHeader section="02" label="The solution" />
 
+      <div className="relative h-full w-full flex flex-col justify-center px-[8vw] py-[8vh]">
         <div className="grid grid-cols-[34%_66%] gap-[4vw] items-center">
           <div>
             <div className="font-display text-gold text-[6vw] leading-[0.85] whitespace-nowrap">
@@ -57,13 +54,9 @@ export default function Solution() {
           </div>
         </div>
 
-        <div className="absolute bottom-[6vh] left-[8vw] flex items-center gap-[1vw]">
-          <div className="h-[1.2vh] w-[1.2vh] bg-gold rotate-45" />
-          <span className="font-body uppercase tracking-[0.4em] text-[0.9vw] text-muted">
-            Opas Holdings
-          </span>
-        </div>
       </div>
+
+      <SlideFooter page="03" note="Strictly private & confidential" />
     </div>
   );
 }

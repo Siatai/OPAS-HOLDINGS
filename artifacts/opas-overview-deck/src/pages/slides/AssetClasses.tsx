@@ -1,3 +1,5 @@
+import { SlideHeader, SlideFooter } from "@/components/Chrome";
+
 const base = import.meta.env.BASE_URL;
 
 export default function AssetClasses() {
@@ -6,13 +8,9 @@ export default function AssetClasses() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(234,141,14,0.10),transparent_45%)]" />
       <div className="absolute top-0 left-0 right-0 h-[0.4vh] bg-line" />
 
+      <SlideHeader section="02" label="What you can own" />
+
       <div className="relative h-full w-full flex flex-col justify-center px-[6vw] py-[7vh]">
-        <div className="flex items-center gap-[1.2vw] mb-[2vh]">
-          <span className="font-body text-gold text-[1.1vw] tracking-[0.4em]">02</span>
-          <span className="font-body uppercase tracking-[0.4em] text-[1.05vw] text-muted">
-            What you can own
-          </span>
-        </div>
         <h2 className="font-display text-[3.2vw] leading-[1] tracking-tight mb-[4vh]">
           Four asset classes, one wallet
         </h2>
@@ -79,14 +77,9 @@ export default function AssetClasses() {
             </div>
           </div>
         </div>
-
-        <div className="absolute bottom-[3vh] left-[6vw] flex items-center gap-[1vw]">
-          <div className="h-[1.2vh] w-[1.2vh] bg-gold rotate-45" />
-          <span className="font-body uppercase tracking-[0.4em] text-[0.9vw] text-muted">
-            Opas Holdings
-          </span>
-        </div>
       </div>
+
+      <SlideFooter page="03" note="opasholdings.com" />
     </div>
   );
 }
