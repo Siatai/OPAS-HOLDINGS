@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, TrendingUp, MapPin, Coins } from "lucide-react";
 import { getCityById, type Property } from "@/data/cities";
 import { useWallet } from "@/components/WalletContext";
+import MarqueeText from "@/components/MarqueeText";
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
@@ -253,8 +254,10 @@ function PropertyCard({
           <div className="text-[10px] tracking-[0.32em] uppercase text-primary/80 mb-1" style={NEVERA}>
             {cityName}
           </div>
-          <h3 className="text-lg sm:text-xl md:text-2xl leading-tight tracking-wide line-clamp-2 break-words" style={SHARKON}>
-            <span className="metallic-text">{p.title}</span>
+          <h3 className="text-lg sm:text-xl md:text-2xl leading-tight tracking-wide" style={SHARKON}>
+            <MarqueeText title={p.title}>
+              <span className="metallic-text">{p.title}</span>
+            </MarqueeText>
           </h3>
         </div>
       </div>

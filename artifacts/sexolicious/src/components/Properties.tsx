@@ -6,6 +6,7 @@ import {
   Building2, Car, Ship, Plane, Lock, Palette, Watch, Grape, Gem, Globe,
 } from "lucide-react";
 import { useWallet } from "./WalletContext";
+import MarqueeText from "./MarqueeText";
 import { CITIES } from "@/data/cities";
 import {
   CATEGORIES, assetsByCategory, getCategory,
@@ -171,10 +172,10 @@ export default function Properties() {
                   <div className="text-[9px] sm:text-[10px] tracking-[0.24em] sm:tracking-[0.28em] uppercase mb-0.5 text-white/45 group-hover:text-primary transition-colors" style={NEVERA}>
                     {city.country}
                   </div>
-                  <div className="leading-tight mb-1.5 sm:mb-2 line-clamp-2" style={{ ...SHARKON, fontSize: "clamp(0.78rem, 3.4vw, 1.125rem)" }} title={city.name}>
+                  <MarqueeText className="leading-tight mb-1.5 sm:mb-2 text-[15px] sm:text-base" style={SHARKON} title={city.name}>
                     <span className="metallic-text group-hover:hidden">{city.name}</span>
                     <span className="metallic-warm-text hidden group-hover:inline">{city.name}</span>
-                  </div>
+                  </MarqueeText>
                   <div className="flex items-center justify-between gap-1.5">
                     <div className="flex items-center gap-1 min-w-0">
                       <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-secondary/80 shrink-0" />
@@ -400,8 +401,10 @@ function AssetCard({
           <div className="text-[9px] tracking-[0.32em] uppercase mb-1 line-clamp-2" style={{ ...NEVERA, color: `${accent}cc` }}>
             {card.subtitle} · {card.tier}
           </div>
-          <h4 className="text-lg leading-tight line-clamp-2 break-words" style={SHARKON}>
-            <span className="metallic-text">{card.title}</span>
+          <h4 className="text-lg leading-tight" style={SHARKON}>
+            <MarqueeText title={card.title}>
+              <span className="metallic-text">{card.title}</span>
+            </MarqueeText>
           </h4>
           {card.spec && (
             <div className="text-[9px] text-white/45 font-mono mt-1 line-clamp-2">{card.spec}</div>

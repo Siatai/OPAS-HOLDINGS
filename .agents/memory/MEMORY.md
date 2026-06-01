@@ -1,1 +1,1 @@
-- [Sharkon font text clipping](sharkon-text-clipping.md) — wide display font; variable text in SHARKON needs clamp()+line-clamp-2, never 1-line truncate/whitespace-nowrap (numeric stats OK).
+- [Sharkon font text clipping & marquee](sharkon-text-clipping.md) — wide display font overflows; titles use MarqueeText (span-rooted, scroll-on-overflow), descriptions line-clamp-2, numeric stats keep truncate.

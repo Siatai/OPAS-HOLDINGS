@@ -16,6 +16,7 @@ import {
   CATEGORIES, getCategory, type AssetCategory,
 } from "@/data/assets";
 import { useWallet } from "@/components/WalletContext";
+import MarqueeText from "@/components/MarqueeText";
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
@@ -347,8 +348,8 @@ export default function Portfolio() {
                                 </div>
                               </div>
                               <div className="absolute bottom-3 left-3 right-3">
-                                <TitleTag {...titleProps} className={`text-[15px] text-white font-medium transition-colors block line-clamp-2 leading-tight ${city ? "hover:text-primary" : ""}`} style={SHARKON}>
-                                  {prop.title}
+                                <TitleTag {...titleProps} className={`text-[15px] text-white font-medium transition-colors block leading-tight ${city ? "hover:text-primary" : ""}`} style={SHARKON}>
+                                  <MarqueeText title={prop.title}>{prop.title}</MarqueeText>
                                 </TitleTag>
                                 <div className="text-[9.5px] text-white/55 line-clamp-2 font-mono">{prop.spec ?? prop.subtitle}</div>
                               </div>
