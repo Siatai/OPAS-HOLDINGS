@@ -140,7 +140,7 @@ export default function Marketplace() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Link href="/portfolio" className="px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] text-primary hover:text-primary uppercase border border-primary/40 hover:bg-primary/10 rounded-sm transition-colors" style={NEVERA}>
+            <Link href="/portfolio" className="btn-metal-silver px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] uppercase rounded-sm" style={NEVERA}>
               List shares for sale →
             </Link>
             <Link href="/" className="px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] text-white/55 hover:text-white uppercase border border-white/10 hover:border-white/25 rounded-sm transition-colors" style={NEVERA}>
@@ -371,7 +371,7 @@ export default function Marketplace() {
                         <button
                           onClick={() => isConnected ? setBuyState({ listing, qty: Math.min(1, listing.shares) }) : openWallet()}
                           data-testid={`buy-${listing.id}`}
-                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-[10.5px] tracking-[0.22em] uppercase text-[#050810] bg-primary hover:bg-primary/90 rounded-sm transition-colors amber-glow font-bold"
+                          className="btn-metal flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-[10.5px] tracking-[0.22em] uppercase text-[#050810] rounded-sm font-bold"
                           style={{ fontFamily: "BankGothic, sans-serif" }}
                         >
                           <ShoppingCart className="w-3.5 h-3.5" />
@@ -468,7 +468,7 @@ export default function Marketplace() {
                     <button
                       onClick={handleBuy}
                       data-testid="confirm-buy"
-                      className="flex-1 px-5 py-3 text-[11px] font-bold tracking-[0.22em] uppercase text-[#050810] bg-primary hover:bg-primary/90 rounded-sm amber-glow"
+                      className="btn-metal flex-1 px-5 py-3 text-[11px] font-bold tracking-[0.22em] uppercase text-[#050810] rounded-sm"
                       style={{ fontFamily: "BankGothic, sans-serif" }}
                     >
                       Confirm trade

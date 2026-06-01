@@ -224,7 +224,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                       <button
                         onClick={() => injected && connect({ connector: injected })}
                         disabled={isPending || !hasInjected}
-                        className="group relative w-full overflow-hidden px-5 py-3.5 text-[11px] font-bold tracking-[0.22em] text-[#050810] bg-primary uppercase rounded-sm disabled:opacity-50 disabled:cursor-not-allowed amber-glow"
+                        className="btn-metal group relative w-full overflow-hidden px-5 py-3.5 text-[11px] font-bold tracking-[0.22em] text-[#050810] uppercase rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         style={{ fontFamily: "BankGothic, sans-serif" }}
                       >
                         {isPending ? (
@@ -301,7 +301,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
                       <div className="w-full flex flex-col gap-2">
                         <Link href="/dashboard" onClick={closeWallet}
-                          className="w-full text-center px-5 py-3 text-[11px] font-bold tracking-[0.22em] text-[#050810] bg-primary uppercase rounded-sm amber-glow"
+                          className="btn-metal w-full text-center px-5 py-3 text-[11px] font-bold tracking-[0.22em] text-[#050810] uppercase rounded-sm"
                           style={{ fontFamily: "BankGothic, sans-serif" }}
                         >
                           Open Dashboard

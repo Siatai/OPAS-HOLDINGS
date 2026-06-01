@@ -89,14 +89,14 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               <Link
                 href="/dashboard"
-                className="px-4 py-2 text-[10.5px] tracking-[0.22em] uppercase text-white/70 hover:text-primary border border-white/10 hover:border-primary/40 rounded-sm transition-colors"
+                className="btn-metal-silver px-4 py-2 text-[10.5px] tracking-[0.22em] uppercase rounded-sm"
                 style={{ fontFamily: "Neuropol, sans-serif" }}
               >
                 Dashboard
               </Link>
               <button
                 onClick={openWallet}
-                className="flex items-center gap-2 px-4 py-2 text-[10.5px] tracking-[0.18em] uppercase text-primary border border-primary/40 hover:bg-primary/10 rounded-sm transition-colors font-mono"
+                className="btn-metal-silver flex items-center gap-2 px-4 py-2 text-[10.5px] tracking-[0.18em] uppercase rounded-sm font-mono"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 {shortAddr}
@@ -105,7 +105,7 @@ export default function Navbar() {
           ) : (
             <button
               onClick={openWallet}
-              className="relative group overflow-hidden px-5 py-2.5 text-[11px] font-bold tracking-[0.2em] text-[#050810] bg-primary uppercase rounded-sm transition-all duration-300 hover:bg-primary/90 amber-glow"
+              className="btn-metal relative group overflow-hidden px-5 py-2.5 text-[11px] font-bold tracking-[0.2em] text-[#050810] uppercase rounded-sm"
               style={{ fontFamily: "BankGothic, sans-serif" }}
             >
               <motion.span
@@ -167,7 +167,7 @@ export default function Navbar() {
           )}
           <button
             onClick={() => { setMobileMenuOpen(false); openWallet(); }}
-            className="w-full py-3.5 text-xs font-bold tracking-[0.2em] text-[#050810] bg-primary uppercase rounded-sm mt-2 flex items-center justify-center gap-2"
+            className="btn-metal w-full py-3.5 text-xs font-bold tracking-[0.2em] text-[#050810] uppercase rounded-sm mt-2 flex items-center justify-center gap-2"
             style={{ fontFamily: "BankGothic, sans-serif" }}
           >
             <Wallet className="w-3.5 h-3.5" />

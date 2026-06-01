@@ -194,12 +194,8 @@ export default function Hero() {
             >
               <button
                 onClick={openWallet}
-                className="group relative inline-flex items-center gap-2.5 px-6 py-3 rounded-sm overflow-hidden transition-all duration-300 hover:translate-y-[-1px]"
-                style={{
-                  ...NEVERA,
-                  background: "linear-gradient(180deg, #f5b955 0%, #ea8d0e 50%, #b87d1e 100%)",
-                  boxShadow: "0 8px 28px -10px rgba(234,141,14,0.55), inset 0 1px 0 rgba(255,255,255,0.25)",
-                }}
+                className="btn-metal group relative inline-flex items-center gap-2.5 px-6 py-3 rounded-sm transition-all duration-300 hover:translate-y-[-1px]"
+                style={NEVERA}
               >
                 <span className="relative z-10 text-[10.5px] font-bold tracking-[0.28em] uppercase text-[#1a0e02]">
                   Connect wallet
@@ -209,7 +205,7 @@ export default function Hero() {
 
               <a
                 href="#properties"
-                className="metallic-border group inline-flex items-center gap-2 px-6 py-3 rounded-sm transition-all duration-300 hover:translate-y-[-1px] hover:bg-white/[0.03]"
+                className="btn-metal-silver group inline-flex items-center gap-2 px-6 py-3 rounded-sm transition-all duration-300 hover:translate-y-[-1px]"
                 style={NEVERA}
               >
                 <span className="text-[10.5px] font-bold tracking-[0.28em] uppercase text-white/85 group-hover:text-white">

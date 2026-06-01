@@ -158,7 +158,7 @@ export default function Portfolio() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <button
               onClick={openWallet}
-              className="px-7 py-3.5 text-[11px] font-bold tracking-[0.22em] text-[#050810] bg-primary uppercase rounded-sm amber-glow"
+              className="btn-metal px-7 py-3.5 text-[11px] font-bold tracking-[0.22em] text-[#050810] uppercase rounded-sm"
               style={{ fontFamily: "BankGothic, sans-serif" }}
             >
               Connect Wallet
@@ -205,7 +205,7 @@ export default function Portfolio() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Link href="/marketplace" className="px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] text-primary hover:text-primary uppercase border border-primary/40 hover:bg-primary/10 rounded-sm transition-colors" style={NEVERA}>
+            <Link href="/marketplace" className="btn-metal-silver px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] uppercase rounded-sm" style={NEVERA}>
               Open marketplace →
             </Link>
             <Link href="/" className="px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] text-white/55 hover:text-white uppercase border border-white/10 hover:border-white/25 rounded-sm transition-colors" style={NEVERA}>
@@ -408,7 +408,7 @@ export default function Portfolio() {
                                 </button>
                                 <Link
                                   href="/marketplace"
-                                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-[10px] tracking-[0.2em] uppercase border border-primary/40 text-primary hover:bg-primary/10 rounded-sm transition-colors"
+                                  className="btn-metal-silver flex-1 flex items-center justify-center gap-2 px-3 py-2 text-[10px] tracking-[0.2em] uppercase rounded-sm"
                                   style={NEVERA}
                                 >
                                   <Plus className="w-3 h-3" /> Buy

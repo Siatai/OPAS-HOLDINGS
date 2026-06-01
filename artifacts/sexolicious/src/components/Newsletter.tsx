@@ -59,7 +59,7 @@ export default function Newsletter() {
               />
               <button
                 type="submit"
-                className="group px-8 py-4 bg-primary text-black font-bold tracking-wider uppercase text-sm flex items-center justify-center gap-3 hover:bg-primary/90 transition-colors whitespace-nowrap rounded"
+                className="btn-metal group px-8 py-4 text-black font-bold tracking-wider uppercase text-sm flex items-center justify-center gap-3 whitespace-nowrap rounded"
               >
                 <span>Initialize</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

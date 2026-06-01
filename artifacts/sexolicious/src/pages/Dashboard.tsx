@@ -88,7 +88,7 @@ export default function Dashboard() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={openWallet}
-              className="px-7 py-3.5 text-[11px] font-bold tracking-[0.22em] text-[#050810] bg-primary uppercase rounded-sm amber-glow"
+              className="btn-metal px-7 py-3.5 text-[11px] font-bold tracking-[0.22em] text-[#050810] uppercase rounded-sm"
               style={{ fontFamily: "BankGothic, sans-serif" }}
               data-testid="dashboard-connect"
             >
