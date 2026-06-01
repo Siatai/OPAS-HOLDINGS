@@ -58,28 +58,38 @@ export default function Hero() {
       {/* Faint amber wash on the left */}
       <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_45%_55%_at_22%_55%,rgba(234,141,14,0.04)_0%,transparent_70%)]" />
 
-      {/* World-landmarks skyline backdrop */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%] z-0 overflow-hidden">
-        <img
-          src={worldSkyline}
-          alt=""
-          className="absolute inset-x-0 bottom-0 w-full h-full object-cover object-bottom"
-          style={{ filter: "saturate(1.05) contrast(1.05)" }}
-        />
-        {/* Top fade — blend image into the dark hero background */}
+      {/* World-landmarks skyline — infinite, dimmed, classy marquee band */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[44%] z-0 overflow-hidden">
+        {/* Mirror-tiled track: [A][A-flipped] repeated → seamless infinite loop */}
+        <div className="skyline-scroll flex h-full w-max items-end will-change-transform">
+          {Array.from({ length: 8 }, (_, i) => i).map((i) => (
+            <img
+              key={i}
+              src={worldSkyline}
+              alt=""
+              draggable={false}
+              className={`h-full w-auto object-cover object-bottom select-none ${i % 2 === 1 ? "-scale-x-100" : ""}`}
+              style={{ filter: "brightness(0.42) saturate(0.62) contrast(1.02)" }}
+            />
+          ))}
+        </div>
+        {/* Top fade — blend strip into the dark hero background */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, hsl(222,47%,5%) 0%, rgba(8,12,24,0.55) 35%, transparent 70%)",
+              "linear-gradient(180deg, hsl(222,47%,5%) 0%, rgba(8,12,24,0.7) 30%, rgba(8,12,24,0.22) 62%, transparent 100%)",
           }}
         />
-        {/* Subtle amber horizon kiss */}
+        {/* Side vignette fades — keep the loop edges soft & refined */}
+        <div className="absolute inset-y-0 left-0 w-24 md:w-44 bg-gradient-to-r from-background to-transparent" />
+        <div className="absolute inset-y-0 right-0 w-24 md:w-44 bg-gradient-to-l from-background to-transparent" />
+        {/* Whisper-soft amber horizon */}
         <div
-          className="absolute inset-x-0 bottom-[28%] h-32 opacity-40"
+          className="absolute inset-x-0 bottom-0 h-20 opacity-[0.16]"
           style={{
             background:
-              "radial-gradient(ellipse 60% 100% at 50% 100%, rgba(234,141,14,0.35), transparent 70%)",
+              "radial-gradient(ellipse 60% 100% at 50% 100%, rgba(234,141,14,0.3), transparent 70%)",
           }}
         />
       </div>
