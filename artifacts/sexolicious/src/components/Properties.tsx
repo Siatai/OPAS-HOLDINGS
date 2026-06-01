@@ -524,7 +524,7 @@ function ComingSoon() {
                     <Lock className="w-2.5 h-2.5" /> Soon
                   </span>
                 </div>
-                <h4 className="relative text-base sm:text-lg leading-tight mb-1.5" style={SHARKON}>
+                <h4 className="relative leading-tight mb-1.5 break-words [overflow-wrap:anywhere] hyphens-auto" style={{ ...SHARKON, fontSize: "clamp(0.72rem, 3vw, 1.125rem)" }}>
                   <span className="metallic-text">{c.label}</span>
                 </h4>
                 <p className="relative text-white/45 text-xs sm:text-[13px] leading-relaxed">{c.blurb}</p>
