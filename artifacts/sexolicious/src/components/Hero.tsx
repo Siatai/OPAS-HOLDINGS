@@ -27,7 +27,7 @@ const HERO_ASSETS = [
 export default function Hero() {
   const { scrollY } = useScroll();
   const y       = useTransform(scrollY, [0, 800], [0, 120]);
-  const opacity = useTransform(scrollY, [0, 380], [1, 0]);
+  const opacity = useTransform(scrollY, [0, 520, 780], [1, 1, 0]);
   const { openWallet } = useWallet();
   const { price: opasPrice, changePct: opasChange } = useOpasPrice();
 
