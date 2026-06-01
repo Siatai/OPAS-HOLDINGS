@@ -14,7 +14,7 @@ const faqs = [
   },
   {
     question: "How do I receive my income?",
-    answer: "Rental and charter income is calculated monthly after deducting management, maintenance, and operating fees. Your net yield is automatically distributed to your connected digital wallet in USDC or your preferred stablecoin. No bank transfers, no delays."
+    answer: "Rental and charter income is calculated monthly after deducting management, maintenance, and operating fees. Your net yield is automatically distributed to your connected digital wallet in USDT. No bank transfers, no delays."
   },
   {
     question: "Can I exit my position anytime?",
@@ -26,7 +26,7 @@ const faqs = [
   },
   {
     question: "What is the minimum investment?",
-    answer: "You can acquire an equity interest in a global prime asset from as little as $100 per stake. Real estate, supercars, yachts and jets that traditionally require $1M+ in capital are now accessible to any accredited investor — or aspiring one — worldwide."
+    answer: "You can acquire an equity interest in a global prime asset from as little as $100 per stake, deployed in the platform's native $OPAS token. Real estate, supercars, yachts and jets that traditionally require $1M+ in capital are now accessible to any accredited investor — or aspiring one — worldwide. Your earnings are then distributed back in USDT."
   },
   {
     question: "How are the assets selected?",

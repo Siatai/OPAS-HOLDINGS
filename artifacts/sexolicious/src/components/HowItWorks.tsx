@@ -19,13 +19,13 @@ const steps = [
     number: "03",
     icon: Coins,
     title: "Acquire Equity Interests",
-    description: "Purchase smart-contract backed co-ownership stakes from $100. Title-deed verified, immutable, and on-chain.",
+    description: "Deploy $OPAS to acquire smart-contract backed co-ownership stakes from $100. Title-deed verified, immutable, and on-chain.",
   },
   {
     number: "04",
     icon: TrendingUp,
     title: "Earn & Trade 24/7",
-    description: "Collect automated rental and charter yield to your wallet and trade your ownership interests on our liquid secondary market.",
+    description: "Collect automated rental and charter yield in USDT straight to your wallet, and trade your ownership interests on our liquid secondary market.",
   }
 ];
 

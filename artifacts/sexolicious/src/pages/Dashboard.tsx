@@ -350,8 +350,8 @@ export default function Dashboard() {
             >
               <BadgePercent className="w-3.5 h-3.5 mt-px text-amber-300 shrink-0" />
               <span style={NEVERA}>
-                Net distributions stream automatically to your wallet in USDC on the 1st of every month,
-                after the 5% operator maintenance fee. On-chain payouts ship with mainnet — current cycle is recorded locally.
+                Capital is deployed in $OPAS; net yield distributions stream automatically to your wallet in USDT on the
+                1st of every month, after the 5% operator maintenance fee. On-chain payouts ship with mainnet — current cycle is recorded locally.
               </span>
             </div>
           </section>

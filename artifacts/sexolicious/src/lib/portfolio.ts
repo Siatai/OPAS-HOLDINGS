@@ -39,14 +39,14 @@ const SEED_PROPOSALS: Omit<Proposal, "votes" | "createdAt" | "endsAt">[] = [
     propertyId: "dxb-1",
     kind: "sell",
     title: "Liquidate Burj Khalifa Penthouse at $4.8M",
-    detail: "Off-market bid received from Knight Frank private client (35% premium to last valuation). Proceeds distributed pro-rata in USDC within 14 days.",
+    detail: "Off-market bid received from Knight Frank private client (35% premium to last valuation). Proceeds distributed pro-rata in USDT within 14 days.",
   },
   {
     id: "prop-car2-sell",
     propertyId: "car-2",
     kind: "sell",
     title: "Accept $4.2M collector bid on LaFerrari Aperta",
-    detail: "RM Sotheby's private treaty offer at a 26% premium to last appraisal. Settlement in USDC, proceeds distributed pro-rata to token holders within 10 days.",
+    detail: "RM Sotheby's private treaty offer at a 26% premium to last appraisal. Settlement in USDT, proceeds distributed pro-rata to token holders within 10 days.",
   },
   {
     id: "prop-yht2-rent",

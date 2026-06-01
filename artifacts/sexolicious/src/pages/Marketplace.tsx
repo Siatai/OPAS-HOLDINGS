@@ -460,6 +460,10 @@ export default function Marketplace() {
                       <div className="h-px bg-white/10 my-1" />
                       <Row label="Total"       value={fmtUsd(total)} accent />
                     </div>
+                    <p className="text-[10px] text-white/40 leading-relaxed" style={NEVERA}>
+                      Settled in <span className="text-primary">$OPAS</span> at the prevailing rate. Yield distributions
+                      are paid in <span className="text-secondary">USDT</span>.
+                    </p>
                   </div>
 
                   <div className="flex gap-2">
