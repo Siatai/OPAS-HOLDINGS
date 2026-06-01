@@ -14,6 +14,7 @@ import {
 } from "@/lib/portfolio";
 import { useWallet } from "@/components/WalletContext";
 import MarqueeText from "@/components/MarqueeText";
+import OpasPriceTag from "@/components/OpasPriceTag";
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
@@ -190,7 +191,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <OpasPriceTag withSparkline />
             <button
               onClick={openWallet}
               className="px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] text-secondary uppercase border border-secondary/40 hover:bg-secondary/10 rounded-sm transition-colors font-mono"

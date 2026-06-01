@@ -14,6 +14,8 @@ import {
 } from "@/lib/portfolio";
 import { useWallet } from "@/components/WalletContext";
 import MarqueeText from "@/components/MarqueeText";
+import OpasPriceTag from "@/components/OpasPriceTag";
+import { useOpasPrice, usdToOpas, fmtOpas, fmtOpasRate } from "@/lib/opasPrice";
 import { CATEGORIES, getCategory, categoryOf, type AssetCategory } from "@/data/assets";
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
@@ -27,6 +29,7 @@ type SortKey = "available" | "newest" | "discount" | "yield" | "price_asc" | "pr
 export default function Marketplace() {
   const { address, isConnected } = useAccount();
   const { openWallet } = useWallet();
+  const { price: opasPrice } = useOpasPrice();
   const [listings, setListings] = useState<Listing[]>([]);
   const [tab, setTab] = useState<"all" | "mine">("all");
   const [catFilter, setCatFilter] = useState<AssetCategory | "all">("all");
@@ -201,7 +204,8 @@ export default function Marketplace() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <OpasPriceTag withSparkline />
             <Link href="/portfolio" className="btn-metal-silver px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] uppercase rounded-sm" style={NEVERA}>
               List shares for sale →
             </Link>
@@ -579,10 +583,12 @@ export default function Marketplace() {
                       <Row label="Platform fee · 7%" value={fmtUsd(buyFee)} />
                       <div className="h-px bg-white/10 my-1" />
                       <Row label="Total"       value={fmtUsd(total)} accent />
+                      <Row label="≈ OPAS required" value={fmtOpas(usdToOpas(total, opasPrice))} accent />
                     </div>
                     <p className="text-[10px] text-white/40 leading-relaxed" style={NEVERA}>
-                      Settled in <span className="text-primary">$OPAS</span> at the prevailing rate. Yield distributions
-                      are paid in <span className="text-secondary">USDT</span>.
+                      Paid in <span className="text-primary">$OPAS</span> at the live rate
+                      ({fmtOpasRate(opasPrice)}/OPAS). Yield distributions
+                      are settled in <span className="text-secondary">USDT</span>.
                     </p>
                   </div>
 
@@ -716,10 +722,12 @@ export default function Marketplace() {
                   <Row label="Platform fee · 7%" value={fmtUsd(bidFee)} />
                   <div className="h-px bg-white/10 my-1" />
                   <Row label="Max total"   value={fmtUsd(total)} accent />
+                  <Row label="≈ OPAS (max)" value={fmtOpas(usdToOpas(total, opasPrice))} accent />
                 </div>
                 <p className="text-[10px] text-white/40 leading-relaxed" style={NEVERA}>
                   Bids are capped to <span className="text-primary">±{(BID_VARIANCE * 100).toFixed(0)}%</span> of fair
-                  value. Settled in <span className="text-primary">$OPAS</span>; yield distributions paid in{" "}
+                  value. Paid in <span className="text-primary">$OPAS</span> at the live rate
+                  ({fmtOpasRate(opasPrice)}/OPAS); yield distributions settled in{" "}
                   <span className="text-secondary">USDT</span>.
                 </p>
               </div>

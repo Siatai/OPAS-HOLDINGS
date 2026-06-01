@@ -83,6 +83,26 @@ they must not feed `proceedsBalance`.
   `acct = address`, and clear all on unmount/wallet switch to avoid stale-wallet
   settlement (same pattern as the Portfolio swap timer).
 
+## Live $OPAS/USDT price engine
+$OPAS is the trading currency: capital in is paid in $OPAS, distributions/proceeds
+settle out in USDT (1 USDT ≈ 1 USD). A client-side **mean-reverting random walk**
+(`src/lib/opasPrice.ts`) produces a real-time rate that ticks up/down, shared as a
+singleton via `useSyncExternalStore` (`useOpasPrice()`), persisted to localStorage
+with a per-day open anchor for the change %.
+**Why:** the user wants a visibly live token price and OPAS-denominated trade
+amounts; no backend/oracle exists, so it's simulated and must be one shared source.
+**How to apply:**
+- All USD→OPAS conversions go through `usdToOpas(usd, price)` + `fmtOpas`; never
+  divide inline. Show "≈ OPAS required/(max)/in $OPAS" on every trade surface
+  (Marketplace buy + bid modals, Portfolio sell modal) using the live `opasPrice`.
+- The price is decorative/UX only — it does NOT change share economics. Asset
+  totals, fees, costBasis, and proceeds stay USD-based; OPAS is just the displayed
+  settlement currency. Do not feed the OPAS rate into portfolio accounting.
+- The live pill is `OpasPriceTag`; subpages (Marketplace/Portfolio/Dashboard) each
+  render their own header copy of it because `Navbar` only mounts on Home.
+- Engine starts its interval on first subscribe and clears it when the last
+  listener unsubscribes — keep that lifecycle if refactoring.
+
 ## Known non-blocking warning
 Console: "Cannot update a component (WalletProvider) while rendering Hydrate" —
 expected/benign, do not chase it. Screenshots always catch the 4s intro loader.

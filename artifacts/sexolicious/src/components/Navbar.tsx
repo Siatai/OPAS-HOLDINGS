@@ -4,6 +4,7 @@ import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { Menu, X, Wallet } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useWallet } from "./WalletContext";
+import OpasPriceTag from "./OpasPriceTag";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -84,6 +85,7 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
+          <OpasPriceTag withSparkline />
           <div className="w-px h-5 bg-white/10" />
           {isConnected ? (
             <div className="flex items-center gap-2">
@@ -134,6 +136,7 @@ export default function Navbar() {
           animate={{ opacity: 1, y: 0 }}
           className="md:hidden absolute top-full left-0 right-0 bg-[#050810]/98 backdrop-blur-2xl border-b border-white/5 px-6 py-8 flex flex-col gap-6"
         >
+          <OpasPriceTag withSparkline className="self-start" />
           {navLinks.map((link) => link.internal ? (
             <Link
               key={link.label}

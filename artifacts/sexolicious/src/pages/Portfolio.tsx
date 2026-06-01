@@ -19,6 +19,8 @@ import {
 } from "@/data/assets";
 import { useWallet } from "@/components/WalletContext";
 import MarqueeText from "@/components/MarqueeText";
+import OpasPriceTag from "@/components/OpasPriceTag";
+import { useOpasPrice, usdToOpas, fmtOpas, fmtOpasRate } from "@/lib/opasPrice";
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
@@ -59,6 +61,7 @@ type Enriched = {
 export default function Portfolio() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
+  const { price: opasPrice } = useOpasPrice();
   const { openWallet } = useWallet();
 
   const [holdings, setHoldings] = useState<Holding[]>([]);
@@ -372,7 +375,8 @@ export default function Portfolio() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <OpasPriceTag withSparkline />
             <Link href="/marketplace" className="btn-metal-silver px-3 sm:px-4 py-2 sm:py-2.5 text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] uppercase rounded-sm" style={NEVERA}>
               Open marketplace →
             </Link>
@@ -840,7 +844,16 @@ export default function Portfolio() {
                     <span className="text-[9.5px] tracking-[0.28em] uppercase text-white/45" style={NEVERA}>Proceeds</span>
                     <span className="text-[15px] text-secondary" style={SHARKON}>{fmtUsd(total)}</span>
                   </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9.5px] tracking-[0.28em] uppercase text-white/45" style={NEVERA}>≈ In $OPAS</span>
+                    <span className="text-[13px] text-primary" style={SHARKON}>{fmtOpas(usdToOpas(total, opasPrice))}</span>
+                  </div>
                 </div>
+                <p className="text-[10px] text-white/40 leading-relaxed" style={NEVERA}>
+                  Sold in <span className="text-primary">$OPAS</span> at the live rate
+                  ({fmtOpasRate(opasPrice)}/OPAS); proceeds settle to{" "}
+                  <span className="text-secondary">USDT</span>.
+                </p>
               </div>
 
               <div className="flex gap-2">
