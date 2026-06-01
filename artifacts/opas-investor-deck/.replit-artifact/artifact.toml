@@ -1,0 +1,31 @@
+kind = "slides"
+previewPath = "/opas-investor-deck/"
+title = "Opas Holdings — Investor Deck"
+version = "1.0.0"
+id = "artifacts/opas-investor-deck"
+router = "path"
+
+[[integratedSkills]]
+name = "slides"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/opas-investor-deck/" ]
+localPort = 21537
+
+[services.development]
+run = "pnpm --filter @workspace/opas-investor-deck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/opas-investor-deck", "run", "build" ]
+publicDir = "artifacts/opas-investor-deck/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21537"
+BASE_PATH = "/opas-investor-deck/"
