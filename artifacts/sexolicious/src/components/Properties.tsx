@@ -140,7 +140,7 @@ export default function Properties() {
                   onClick={() => navigate(`/city/${city.id}`)}
                   aria-label={`View ${city.name} listings`}
                   tabIndex={copy === 1 ? 0 : -1}
-                  className="group relative w-[178px] sm:w-[202px] aspect-[3/4] rounded-lg overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
+                  className="group relative w-[198px] sm:w-[226px] aspect-[3/4] rounded-lg overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
                 style={{
                   border: "1px solid rgba(220,225,235,0.12)",
                   boxShadow: "0 10px 30px -15px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)",
@@ -151,10 +151,10 @@ export default function Properties() {
                     src={city.image}
                     alt={city.name}
                     className="w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-110"
-                    style={{ filter: "saturate(0.9) brightness(0.9)" }}
+                    style={{ filter: "saturate(1) brightness(1.08)" }}
                   />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/5" />
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                   style={{ background: "radial-gradient(ellipse 100% 60% at 50% 100%, rgba(234,141,14,0.35) 0%, transparent 70%)" }}
                 />

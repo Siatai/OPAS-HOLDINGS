@@ -12,7 +12,7 @@ export default function Footer() {
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center space-x-3 group mb-4">
               <img src="/opas-logo.png" alt="Opas Logo" className="w-10 h-10 object-contain" />
-              <span className="text-xl font-sans font-bold tracking-wide text-white"><span className="opas-3d">OPAS</span> HOLDINGS</span>
+              <span className="text-xl tracking-[0.14em] text-white uppercase" style={{ fontFamily: "DuneRise, Sharkon, sans-serif" }}><span className="opas-3d">OPAS</span> HOLDINGS</span>
             </Link>
             <p className="text-primary font-mono text-xs uppercase tracking-widest mb-6">
               Tokenized Assets · Real Estate · Supercars · Yachts · Jets · Web3

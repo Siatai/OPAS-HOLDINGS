@@ -47,14 +47,14 @@ export default function Navbar() {
           />
           <div className="flex items-baseline gap-2 leading-none">
             <span
-              className="opas-3d text-[17px] tracking-[0.22em] font-bold uppercase"
-              style={{ fontFamily: "BankGothic, sans-serif" }}
+              className="opas-3d text-[18px] tracking-[0.14em] uppercase"
+              style={{ fontFamily: "DuneRise, Sharkon, sans-serif" }}
             >
               OPAS
             </span>
             <span
-              className="text-[10px] tracking-[0.35em] text-primary/80 uppercase"
-              style={{ fontFamily: "BankGothic, sans-serif", fontWeight: 300 }}
+              className="text-[11px] tracking-[0.24em] text-primary/80 uppercase"
+              style={{ fontFamily: "DuneRise, Sharkon, sans-serif" }}
             >
               HOLDINGS
             </span>
