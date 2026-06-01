@@ -126,6 +126,12 @@ uri = "file://artifacts/sexolicious/src/assets/images/assets/jet_cabin.png"
 type = "image"
 title = "jet cabin interior"
 
+[[generated]]
+id = "yqz0uo0RXB-aHCWtzEbJA"
+uri = "file://artifacts/sexolicious/src/assets/images/world_skyline.png"
+type = "image"
+title = "multi asset luxury skyline"
+
 [[outputs]]
 id = "n-I6a-D2zKc5TGM7Equgj"
 uri = "file://attached_assets/stock_images/lux_skyscraper.jpg"
