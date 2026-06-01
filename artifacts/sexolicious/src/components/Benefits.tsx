@@ -31,7 +31,7 @@ const benefits = [
   {
     icon: Activity,
     title: "24/7 Markets",
-    description: "Real estate that never sleeps. React to global events instantly and rebalance your portfolio on the fly."
+    description: "Assets that never sleep. React to global events instantly and rebalance your portfolio on the fly."
   }
 ];
 
@@ -64,7 +64,7 @@ export default function Benefits() {
             transition={{ delay: 0.2 }}
             className="text-white/50 text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-sans"
           >
-            We have engineered away the friction of traditional real estate investing, replacing it with speed, transparency, and unprecedented access.
+            We have engineered away the friction of traditional alternative-asset investing, replacing it with speed, transparency, and unprecedented access across real estate, supercars, yachts and jets.
           </motion.p>
         </div>
 

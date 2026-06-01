@@ -15,7 +15,7 @@ export default function Footer() {
               <span className="text-xl font-sans font-bold tracking-wide text-white">OPAS PROPERTIES</span>
             </Link>
             <p className="text-primary font-mono text-xs uppercase tracking-widest mb-6">
-              PropTech · Global Real Estate · Web3
+              Tokenized Assets · Real Estate · Supercars · Yachts · Jets · Web3
             </p>
             <div className="flex space-x-4">
               <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-primary hover:border-primary transition-all">
@@ -145,7 +145,7 @@ export default function Footer() {
                   className="text-[13px] md:text-[14px] leading-[1.7] text-white/65"
                   style={{ fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" }}
                 >
-                  Co-ownership equity interests in real estate carry risk. ROI figures are
+                  Co-ownership equity interests in real estate, supercars, yachts and jets carry risk. ROI figures are
                   indicative estimates based on publicly available market data and do not
                   constitute a guarantee of future returns. Past performance is not
                   indicative of future results.{" "}

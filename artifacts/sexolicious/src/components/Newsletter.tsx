@@ -36,7 +36,7 @@ export default function Newsletter() {
             Secure Your Position
           </p>
           <p className="text-white/50 text-sm sm:text-base md:text-lg mb-8 sm:mb-10 max-w-xl mx-auto font-sans relative z-10">
-            Be first to access exclusive property drops and platform features.
+            Be first to access exclusive asset drops across real estate, supercars, yachts and jets.
           </p>
 
           {submitted ? (

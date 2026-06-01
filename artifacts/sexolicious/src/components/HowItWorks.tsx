@@ -12,8 +12,8 @@ const steps = [
   {
     number: "02",
     icon: Brain,
-    title: "AI Property Match",
-    description: "Our proprietary valuation engine identifies underpriced assets globally and matches them to your risk profile.",
+    title: "AI Asset Match",
+    description: "Our proprietary valuation engine identifies underpriced real estate, supercars, yachts and jets globally and matches them to your risk profile.",
   },
   {
     number: "03",
@@ -25,7 +25,7 @@ const steps = [
     number: "04",
     icon: TrendingUp,
     title: "Earn & Trade 24/7",
-    description: "Collect automated rental yield to your wallet and trade your ownership interests on our liquid secondary market.",
+    description: "Collect automated rental and charter yield to your wallet and trade your ownership interests on our liquid secondary market.",
   }
 ];
 

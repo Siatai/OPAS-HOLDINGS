@@ -5,8 +5,9 @@ import { useWallet } from "./WalletContext";
 import worldSkyline from "@/assets/images/world_skyline.png";
 
 const TICKER_ITEMS = [
-  "48 properties", "$142M aum", "12,500 investors", "16 countries",
-  "avg yield 6.1%", "Dubai +17.2%", "Tokyo +9.6%", "Miami +14.2%",
+  "120 assets", "4 asset classes", "$480M aum", "18,000 investors",
+  "real estate", "supercars", "yachts", "private jets",
+  "avg yield 7.4%", "Dubai +17.2%", "Pagani +22%", "Riva charter +19%",
 ];
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
@@ -114,7 +115,7 @@ export default function Hero() {
               <span className="metallic-text">Where technology</span>
               <br />
               <span className="metallic-warm-text">meets</span>{" "}
-              <span className="text-white/90">prime real estate</span>
+              <span className="text-white/90">prime assets</span>
             </motion.h1>
 
             {/* Subhead — Cormorant italic, restrained */}
@@ -126,7 +127,7 @@ export default function Hero() {
               style={SERIF}
             >
               AI-driven valuation. Blockchain co-ownership. Real-time market intelligence.
-              An equity interest in the world's finest properties — from&nbsp;$100.
+              An equity interest in the world's finest real estate, supercars, yachts &amp; jets — from&nbsp;$100.
             </motion.p>
 
             {/* CTAs — silver metallic outline + warm primary */}
@@ -256,9 +257,9 @@ export default function Hero() {
                 {/* Three-stat row */}
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { l: "AUM",        v: "$142M" },
-                    { l: "Properties", v: "48"    },
-                    { l: "Investors",  v: "12.5k" },
+                    { l: "AUM",       v: "$480M" },
+                    { l: "Assets",    v: "120"   },
+                    { l: "Investors", v: "18k"   },
                   ].map(d => (
                     <div key={d.l} className="text-center">
                       <div className="text-[7.5px] tracking-[0.28em] uppercase text-white/30 mb-1" style={NEVERA}>{d.l}</div>

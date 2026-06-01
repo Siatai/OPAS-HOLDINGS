@@ -10,27 +10,27 @@ import {
 const faqs = [
   {
     question: "What exactly am I buying?",
-    answer: "You are purchasing digital tokens representing a co-ownership equity interest in a Special Purpose Vehicle (SPV) that legally holds title to the physical property. These tokens are legally binding instruments giving you direct, proportionate rights to rental income and capital appreciation — the same rights a traditional owner holds, scaled to your stake."
+    answer: "You are purchasing digital tokens representing a co-ownership equity interest in a Special Purpose Vehicle (SPV) that legally holds title to the underlying asset — whether a prime property, a collectible supercar, a superyacht, or a private jet. These tokens are legally binding instruments giving you direct, proportionate rights to income and capital appreciation — the same rights a traditional owner holds, scaled to your stake."
   },
   {
-    question: "How do I receive my rental income?",
-    answer: "Rental income is calculated monthly after deducting property management and maintenance fees. Your net yield is automatically distributed to your connected digital wallet in USDC or your preferred stablecoin. No bank transfers, no delays."
+    question: "How do I receive my income?",
+    answer: "Rental and charter income is calculated monthly after deducting management, maintenance, and operating fees. Your net yield is automatically distributed to your connected digital wallet in USDC or your preferred stablecoin. No bank transfers, no delays."
   },
   {
     question: "Can I exit my position anytime?",
-    answer: "Yes. Unlike traditional real estate — which can take months to transact — our secondary marketplace lets you list and transfer your equity interests 24/7 to other investors at market-determined prices, providing institutional-grade liquidity on a retail-accessible platform."
+    answer: "Yes. Unlike traditional real estate, cars, yachts or aircraft — which can take months to transact — our secondary marketplace lets you list and transfer your equity interests 24/7 to other investors at market-determined prices, providing institutional-grade liquidity on a retail-accessible platform."
   },
   {
-    question: "Who manages the physical properties?",
-    answer: "We partner exclusively with tier-1 property management firms in each local market. They handle tenant screening, maintenance, legal compliance, insurance, and tax reporting. As an equity interest holder, you receive returns — never responsibilities."
+    question: "Who manages the physical assets?",
+    answer: "We partner exclusively with tier-1 operators in each class — property managers, marque-certified car custodians, yacht charter crews, and aircraft management firms. They handle bookings, maintenance, legal compliance, insurance, and tax reporting. As an equity interest holder, you receive returns — never responsibilities."
   },
   {
     question: "What is the minimum investment?",
-    answer: "You can acquire an equity interest in a global prime property from as little as $100 per stake. Properties that traditionally require $1M+ in capital are now accessible to any accredited investor — or aspiring one — worldwide."
+    answer: "You can acquire an equity interest in a global prime asset from as little as $100 per stake. Real estate, supercars, yachts and jets that traditionally require $1M+ in capital are now accessible to any accredited investor — or aspiring one — worldwide."
   },
   {
-    question: "How are the properties selected?",
-    answer: "Our acquisitions team — backed by proprietary AI valuation models and local market intelligence — screens thousands of assets annually. Only ultra-premium properties in high-conviction global cities with proven rental demand and capital growth trajectories are admitted to the Opas portfolio."
+    question: "How are the assets selected?",
+    answer: "Our acquisitions team — backed by proprietary AI valuation models and local market intelligence — screens thousands of assets annually. Only ultra-premium real estate, supercars, yachts and jets with proven demand and capital growth trajectories are admitted to the Opas portfolio."
   }
 ];
 

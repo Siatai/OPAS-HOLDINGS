@@ -4,10 +4,10 @@ import { useRef } from "react";
 import { Database, Globe2, Users, Layers } from "lucide-react";
 
 const stats = [
-  { label: "Total Value Locked", value: 142, prefix: "$", suffix: "M+", decimal: false, icon: Database },
-  { label: "Global Properties", value: 48, prefix: "", suffix: "", decimal: false, icon: Layers },
-  { label: "Active Investors", value: 12.5, prefix: "", suffix: "k", decimal: true, icon: Users },
-  { label: "Countries Present", value: 16, prefix: "", suffix: "", decimal: false, icon: Globe2 },
+  { label: "Total Value Locked", value: 480, prefix: "$", suffix: "M+", decimal: false, icon: Database },
+  { label: "Tokenized Assets", value: 120, prefix: "", suffix: "+", decimal: false, icon: Layers },
+  { label: "Asset Classes", value: 4, prefix: "", suffix: "", decimal: false, icon: Globe2 },
+  { label: "Active Investors", value: 18, prefix: "", suffix: "k", decimal: false, icon: Users },
 ];
 
 function Counter({ value, prefix, suffix, decimal }: { value: number, prefix: string, suffix: string, decimal: boolean }) {
