@@ -163,7 +163,7 @@ export default function Marketplace() {
               style={{ background: "rgba(20,28,48,0.5)", border: "1px solid rgba(220,225,235,0.08)" }}
             >
               <div className="flex items-center justify-between mb-2 sm:mb-3 gap-2 min-w-0">
-                <span className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 truncate" style={NEVERA}>{s.label}</span>
+                <MarqueeText className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 min-w-0 flex-1" style={NEVERA}>{s.label}</MarqueeText>
                 <s.icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${s.tone}`} />
               </div>
               <div className={`text-base sm:text-xl md:text-2xl truncate ${s.tone}`} style={SHARKON}>{s.value}</div>
@@ -320,14 +320,14 @@ export default function Marketplace() {
                   </div>
 
                   <div className="p-4 space-y-3 flex-1 flex flex-col">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
                       <span
-                        className="px-2 py-0.5 rounded-full text-[8px] tracking-[0.22em] uppercase font-mono"
+                        className="shrink-0 px-2 py-0.5 rounded-full text-[8px] tracking-[0.22em] uppercase font-mono"
                         style={{ color: catMeta.accent, border: `1px solid ${catMeta.accent}55`, background: `${catMeta.accent}14` }}
                       >
                         {catMeta.label}
                       </span>
-                      <span className="text-[8px] tracking-[0.22em] uppercase text-white/35 font-mono truncate">{prop.tier}</span>
+                      <MarqueeText className="text-[8px] tracking-[0.22em] uppercase text-white/35 font-mono min-w-0 flex-1">{prop.tier}</MarqueeText>
                     </div>
                     <div className="grid grid-cols-2 gap-3 min-w-0">
                       <div className="min-w-0">

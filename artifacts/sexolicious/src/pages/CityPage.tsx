@@ -94,14 +94,15 @@ export default function CityPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.7 }}
-              className="leading-[0.95] mb-4 sm:mb-6 sm:whitespace-nowrap break-words"
+              className="leading-[0.95] mb-4 sm:mb-6 text-4xl sm:text-6xl md:text-[5.25rem]"
               style={{
                 ...SHARKON,
                 letterSpacing: "0.01em",
-                fontSize: `clamp(1.75rem, ${Math.min(11, 78 / Math.max(city.name.length, 6))}vw, 5.25rem)`,
               }}
             >
-              <span className="metallic-warm-text">{city.name}</span>
+              <MarqueeText>
+                <span className="metallic-warm-text">{city.name}</span>
+              </MarqueeText>
             </motion.h1>
 
             <motion.p

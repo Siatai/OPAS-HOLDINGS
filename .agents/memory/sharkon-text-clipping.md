@@ -11,6 +11,34 @@ much wider than a normal sans, so any dynamic/variable-length string (city names
 asset/property titles, category labels) overflows narrow or fixed-width containers —
 especially mobile cards (`w-[150px]`, `w-[260px]`, `grid-cols-2`).
 
+## Scope: this is a PROJECT-WIDE rule (user was emphatic)
+EVERY single-line title/name/label that would otherwise clip (`truncate`),
+scale-to-fit (`clamp()` font-size keyed to content length / viewport), or
+break mid-word (`break-words`/`[overflow-wrap:anywhere]`/`hyphens`) inside a
+constrained component MUST use `MarqueeText` instead. The user explicitly does
+NOT want wrap-or-scale; they want scroll-on-overflow. When auditing, sweep ALL
+of: Properties, Hero, Marketplace, Portfolio, Dashboard, CityPage (and any new
+component). Re-run the sweep after edits: `rg -n "truncate|clamp\(|break-words"
+src --glob '*.tsx'`.
+
+## Layout pattern for icon/title/badge rows
+When a heading sits in a flex row next to an icon and/or a badge/count, give
+MarqueeText `className="min-w-0 flex-1"`, the row `min-w-0`, and the icon/badge
+`shrink-0`. This lets MarqueeText measure the correct available width and keeps
+the badge inline (instead of forcing block-full-width that pushes it to a new
+line). Drop any `flex-wrap` on that row.
+
+## Intentionally KEEP `truncate` (do NOT marquee)
+- Numeric stat VALUES (`fmtUsd`/`fmtUsdCompact`/percent/counts/P&L) — never
+  meaningfully overflow.
+- Codes/IDs: wallet address slices, asset token codes (e.g. `prop.token`) —
+  treat like numerics.
+
+## Fluid hero headlines
+A small multi-line marketing hero headline with an explicit `<br>` (e.g. Hero
+"Own anything, / anywhere.") is NOT a clip case — just swap any `clamp()` for
+fixed breakpoint sizes (`text-2xl sm:text-3xl md:text-[..]`); do NOT marquee it.
+
 ## Handling, by text type
 - **Single-line TITLES / NAMES / labels in components** → use the reusable
   `MarqueeText` component (`src/components/MarqueeText.tsx`): it auto-scrolls

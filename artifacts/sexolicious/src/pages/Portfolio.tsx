@@ -228,7 +228,7 @@ export default function Portfolio() {
               style={{ background: "rgba(20,28,48,0.5)", border: "1px solid rgba(220,225,235,0.08)" }}
             >
               <div className="flex items-center justify-between mb-2 sm:mb-3 gap-2 min-w-0">
-                <span className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 truncate" style={NEVERA}>{s.label}</span>
+                <MarqueeText className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 min-w-0 flex-1" style={NEVERA}>{s.label}</MarqueeText>
                 <s.icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${s.tone}`} />
               </div>
               <div className={`text-base sm:text-xl md:text-2xl truncate ${s.tone}`} style={SHARKON}>{s.value}</div>
@@ -276,12 +276,14 @@ export default function Portfolio() {
                           <Icon className="w-5 h-5" />
                         </div>
                         <div className="min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h2 className="text-xl sm:text-2xl" style={SHARKON}>
-                              <span className="metallic-text">{cat.label}</span>
+                          <div className="flex items-center gap-2 min-w-0">
+                            <h2 className="text-xl sm:text-2xl min-w-0 flex-1" style={SHARKON}>
+                              <MarqueeText>
+                                <span className="metallic-text">{cat.label}</span>
+                              </MarqueeText>
                             </h2>
                             <span
-                              className="px-2 py-0.5 rounded-full text-[8.5px] tracking-[0.22em] uppercase font-mono"
+                              className="shrink-0 px-2 py-0.5 rounded-full text-[8.5px] tracking-[0.22em] uppercase font-mono"
                               style={{ color: cat.accent, border: `1px solid ${cat.accent}55`, background: `${cat.accent}14` }}
                             >
                               {items.length} held
@@ -430,11 +432,13 @@ export default function Portfolio() {
         {/* DAO governance */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl md:text-2xl flex items-center gap-3" style={SHARKON}>
-              <Vote className="w-5 h-5 text-primary" />
-              <span className="metallic-text">DAO governance</span>
+            <h2 className="text-xl md:text-2xl flex items-center gap-3 min-w-0" style={SHARKON}>
+              <Vote className="w-5 h-5 text-primary shrink-0" />
+              <MarqueeText className="min-w-0 flex-1">
+                <span className="metallic-text">DAO governance</span>
+              </MarqueeText>
             </h2>
-            <span className="text-[10px] tracking-[0.32em] uppercase text-white/30" style={NEVERA}>
+            <span className="shrink-0 text-[10px] tracking-[0.32em] uppercase text-white/30" style={NEVERA}>
               {proposals.length} active
             </span>
           </div>

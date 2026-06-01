@@ -179,9 +179,9 @@ export default function Properties() {
                   <div className="flex items-center justify-between gap-1.5">
                     <div className="flex items-center gap-1 min-w-0">
                       <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-secondary/80 shrink-0" />
-                      <span className="text-[9px] sm:text-[10px] text-secondary/90 tracking-wider truncate" style={NEVERA}>
+                      <MarqueeText className="text-[9px] sm:text-[10px] text-secondary/90 tracking-wider min-w-0 flex-1" style={NEVERA}>
                         avg {city.avgYield}
-                      </span>
+                      </MarqueeText>
                     </div>
                     <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 text-white/40 opacity-0 -translate-x-1 group-hover:text-primary group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                   </div>
@@ -277,16 +277,16 @@ function AssetRow({
       {/* Row header */}
       <div className="flex items-end justify-between gap-4 mb-5">
         <div className="min-w-0">
-          <div className="flex items-center gap-2.5 mb-2">
+          <div className="flex items-center gap-2.5 mb-2 min-w-0">
             <span
               className="flex items-center justify-center w-7 h-7 rounded-lg shrink-0"
               style={{ background: `${accent}1a`, border: `1px solid ${accent}59` }}
             >
               <Icon className="w-3.5 h-3.5" style={{ color: accent }} />
             </span>
-            <span className="text-[10px] tracking-[0.32em] uppercase truncate" style={{ ...NEVERA, color: `${accent}d9` }}>
+            <MarqueeText className="text-[10px] tracking-[0.32em] uppercase min-w-0 flex-1" style={{ ...NEVERA, color: `${accent}d9` }}>
               {meta.blurb}
-            </span>
+            </MarqueeText>
           </div>
           <h3 className="text-xl sm:text-2xl md:text-3xl tracking-wide" style={SHARKON}>
             <span className="metallic-text">{meta.label}</span>
@@ -441,7 +441,7 @@ function AssetCard({
               className="rounded p-2 text-center"
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(220,225,235,0.06)" }}
             >
-              <div className="text-[8px] tracking-[0.24em] uppercase text-white/35 mb-1 truncate" style={NEVERA}>{d.l}</div>
+              <MarqueeText className="text-[8px] tracking-[0.24em] uppercase text-white/35 mb-1" style={NEVERA}>{d.l}</MarqueeText>
               <div className={`text-[13px] ${d.c}`} style={SHARKON}>{d.v}</div>
             </div>
           ))}
@@ -527,8 +527,10 @@ function ComingSoon() {
                     <Lock className="w-2.5 h-2.5" /> Soon
                   </span>
                 </div>
-                <h4 className="relative leading-tight mb-1.5 break-words [overflow-wrap:anywhere] hyphens-auto" style={{ ...SHARKON, fontSize: "clamp(0.72rem, 3vw, 1.125rem)" }}>
-                  <span className="metallic-text">{c.label}</span>
+                <h4 className="relative leading-tight mb-1.5 text-base sm:text-lg" style={SHARKON}>
+                  <MarqueeText>
+                    <span className="metallic-text">{c.label}</span>
+                  </MarqueeText>
                 </h4>
                 <p className="relative text-white/45 text-xs sm:text-[13px] leading-relaxed">{c.blurb}</p>
               </motion.div>

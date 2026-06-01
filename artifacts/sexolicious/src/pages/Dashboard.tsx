@@ -204,7 +204,7 @@ export default function Dashboard() {
               data-testid={`dash-stat-${s.label.toLowerCase().replace(/\s+/g, "-")}`}
             >
               <div className="flex items-center justify-between mb-2 sm:mb-3 gap-2 min-w-0">
-                <span className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 truncate" style={NEVERA}>{s.label}</span>
+                <MarqueeText className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 min-w-0 flex-1" style={NEVERA}>{s.label}</MarqueeText>
                 <s.icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${s.tone}`} />
               </div>
               <div className={`text-base sm:text-xl md:text-2xl truncate ${s.tone}`} style={SHARKON}>{s.value}</div>
@@ -217,9 +217,11 @@ export default function Dashboard() {
 
         {/* ── Nav cards ── */}
         <section className="space-y-3 min-w-0">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg sm:text-xl md:text-2xl truncate" style={SHARKON}>
-              <span className="metallic-text">Navigate</span>
+          <div className="flex items-center justify-between gap-3 min-w-0">
+            <h2 className="text-lg sm:text-xl md:text-2xl min-w-0 flex-1" style={SHARKON}>
+              <MarqueeText>
+                <span className="metallic-text">Navigate</span>
+              </MarqueeText>
             </h2>
             <span className="text-[9px] sm:text-[10px] tracking-[0.22em] sm:tracking-[0.32em] uppercase text-white/30 shrink-0" style={NEVERA}>4 modules</span>
           </div>
@@ -239,9 +241,9 @@ export default function Dashboard() {
                   </div>
                   <MarqueeText className="text-[9px] sm:text-base md:text-lg leading-tight text-white mb-1" style={SHARKON} title={c.label}>{c.label}</MarqueeText>
                   <div className="text-[9.5px] sm:text-[10.5px] text-white/55 mb-2 sm:mb-3 leading-snug" style={NEVERA}>{c.desc}</div>
-                  <div className={`text-[8.5px] sm:text-[9.5px] tracking-[0.18em] sm:tracking-[0.24em] uppercase font-mono truncate ${c.iconTone}`}>
+                  <MarqueeText className={`text-[8.5px] sm:text-[9.5px] tracking-[0.18em] sm:tracking-[0.24em] uppercase font-mono ${c.iconTone}`}>
                     {c.meta}
-                  </div>
+                  </MarqueeText>
                 </motion.div>
               );
               return isAnchor ? (
@@ -283,9 +285,11 @@ export default function Dashboard() {
           {/* Rentals */}
           <section id="rentals" className="space-y-3 min-w-0">
             <div className="flex items-center justify-between gap-2 min-w-0">
-              <h2 className="text-base sm:text-xl md:text-2xl flex items-center gap-2 sm:gap-2.5 min-w-0 truncate" style={SHARKON}>
+              <h2 className="text-base sm:text-xl md:text-2xl flex items-center gap-2 sm:gap-2.5 min-w-0" style={SHARKON}>
                 <Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 shrink-0" />
-                <span className="metallic-text truncate">Rental income</span>
+                <MarqueeText className="min-w-0 flex-1">
+                  <span className="metallic-text">Rental income</span>
+                </MarqueeText>
               </h2>
               <span className="text-[9px] sm:text-[10px] tracking-[0.22em] sm:tracking-[0.32em] uppercase text-white/30 shrink-0 font-mono" style={NEVERA}>
                 {fmtUsdCompact(rentals.annual)}/yr
@@ -344,9 +348,11 @@ export default function Dashboard() {
           {/* Activity */}
           <section className="space-y-3 min-w-0">
             <div className="flex items-center justify-between gap-2 min-w-0">
-              <h2 className="text-base sm:text-xl md:text-2xl flex items-center gap-2 sm:gap-2.5 min-w-0 truncate" style={SHARKON}>
+              <h2 className="text-base sm:text-xl md:text-2xl flex items-center gap-2 sm:gap-2.5 min-w-0" style={SHARKON}>
                 <ActivityIcon className="w-4 h-4 sm:w-5 sm:h-5 text-secondary shrink-0" />
-                <span className="metallic-text truncate">Recent activity</span>
+                <MarqueeText className="min-w-0 flex-1">
+                  <span className="metallic-text">Recent activity</span>
+                </MarqueeText>
               </h2>
               <span className="text-[9px] sm:text-[10px] tracking-[0.22em] sm:tracking-[0.32em] uppercase text-white/30 shrink-0 font-mono" style={NEVERA}>
                 {activity.length} events
@@ -374,10 +380,10 @@ export default function Dashboard() {
                           <m.icon className="w-4 h-4" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-[12px] text-white truncate" style={NEVERA}>{m.label}</span>
+                          <div className="flex items-center gap-2 min-w-0">
+                            <MarqueeText className="text-[12px] text-white min-w-0 flex-1" style={NEVERA}>{m.label}</MarqueeText>
                             {meta && (
-                              <span className="text-[9.5px] tracking-[0.22em] uppercase text-white/40 font-mono truncate">
+                              <span className="shrink-0 text-[9.5px] tracking-[0.22em] uppercase text-white/40 font-mono truncate">
                                 {meta.prop.token}
                               </span>
                             )}

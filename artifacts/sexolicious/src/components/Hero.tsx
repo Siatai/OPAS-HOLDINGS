@@ -165,7 +165,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[clamp(1.4rem,2.4vw,2.1rem)] leading-[1.18] tracking-[0.01em] mb-6 font-normal"
+              className="text-2xl sm:text-3xl md:text-[2.1rem] leading-[1.18] tracking-[0.01em] mb-6 font-normal"
               style={SHARKON}
             >
               <span className="metallic-text">Own anything,</span>
