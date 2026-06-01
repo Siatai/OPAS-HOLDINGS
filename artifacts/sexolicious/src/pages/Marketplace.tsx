@@ -11,9 +11,9 @@ import {
   getListings, buyListing, cancelListing, lookupProperty, fairValuePerShare,
   fmtUsdCompact, FEES,
   getBids, createBid, cancelBid, settleBid, bidBounds, BID_VARIANCE,
-  getInterest, simulateIncomingInterest, markInterestRead, markAllInterestRead,
-  dismissInterest, unreadInterestCount, expressInterest,
-  type Listing, type Bid, type InterestMessage,
+  getInterest, simulateIncomingInterest, expressInterest,
+  getNotifications, markNotificationRead, markAllNotificationsRead, dismissNotification,
+  type Listing, type Bid, type InterestMessage, type AppNotification,
 } from "@/lib/portfolio";
 import { useWallet } from "@/components/WalletContext";
 import MarqueeText from "@/components/MarqueeText";
@@ -53,11 +53,24 @@ export default function Marketplace() {
   const [bidState, setBidState] = useState<{ propertyId: string; qty: number; perShare: number } | null>(null);
   const [bids, setBids] = useState<Bid[]>([]);
   const [interest, setInterest] = useState<InterestMessage[]>([]);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [toast, setToast] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
 
   useEffect(() => { setListings(getListings()); }, []);
   useEffect(() => { setBids(address ? getBids(address) : []); }, [address]);
-  useEffect(() => { setInterest(address ? getInterest(address) : []); }, [address]);
+
+  // Interest (per-card badges) + the unified notification feed (inbox panel:
+  // interest on own listings + incoming swap offers). Both refresh live on any
+  // store mutation via the "opas:notify" signal.
+  useEffect(() => {
+    const refresh = () => {
+      setInterest(address ? getInterest(address) : []);
+      setNotifications(address ? getNotifications(address) : []);
+    };
+    refresh();
+    window.addEventListener("opas:notify", refresh);
+    return () => window.removeEventListener("opas:notify", refresh);
+  }, [address]);
 
   useEffect(() => {
     if (!toast) return;
@@ -207,7 +220,10 @@ export default function Marketplace() {
     [listings, address],
   );
   const hasOwnListings = myListingIds.size > 0;
-  const unreadInterest = useMemo(() => unreadInterestCount(interest), [interest]);
+  const unreadInterest = useMemo(
+    () => notifications.reduce((n, x) => n + (x.read ? 0 : 1), 0),
+    [notifications],
+  );
   // Count of interested parties per listing id (for per-card badges).
   const interestByListing = useMemo(() => {
     const map = new Map<string, number>();
@@ -217,9 +233,14 @@ export default function Marketplace() {
     return map;
   }, [interest]);
 
-  const onMarkRead = (id: string) => { if (address) setInterest(markInterestRead(address, id)); };
-  const onMarkAllRead = () => { if (address) setInterest(markAllInterestRead(address)); };
-  const onDismissInterest = (id: string) => { if (address) setInterest(dismissInterest(address, id)); };
+  const syncFeeds = () => {
+    if (!address) return;
+    setNotifications(getNotifications(address));
+    setInterest(getInterest(address));
+  };
+  const onMarkRead = (n: AppNotification) => { if (address) { markNotificationRead(address, n); syncFeeds(); } };
+  const onMarkAllRead = () => { if (address) { markAllNotificationsRead(address); syncFeeds(); } };
+  const onDismissInterest = (n: AppNotification) => { if (address) { dismissNotification(address, n); syncFeeds(); } };
 
   // Simulated inbound: while the user holds active listings, a buyer signals
   // interest every so often so the owner sees live notifications.
@@ -431,8 +452,8 @@ export default function Marketplace() {
           </div>
         )}
 
-        {/* Interest inbox — buyers interested in your listings */}
-        {tab === "mine" && (
+        {/* Interest inbox — interest on your listings + incoming swap offers */}
+        {(tab === "mine" || notifications.length > 0) && (
           <div className="rounded-lg p-4 space-y-3"
             style={{ background: "rgba(20,28,48,0.4)", border: "1px solid rgba(11,181,190,0.22)" }}
             data-testid="interest-inbox"
@@ -448,7 +469,7 @@ export default function Marketplace() {
                   )}
                 </span>
                 <span className="text-[9.5px] tracking-[0.3em] uppercase text-white/55" style={NEVERA}>
-                  Interest in your listings
+                  Interest &amp; swap offers
                 </span>
               </div>
               {unreadInterest > 0 && (
@@ -463,21 +484,21 @@ export default function Marketplace() {
               )}
             </div>
 
-            {interest.length === 0 ? (
+            {notifications.length === 0 ? (
               <div className="text-[11px] text-white/45 py-3" style={NEVERA}>
                 {hasOwnListings
                   ? "No interest yet — buyers who bid, express interest or propose a swap on your listings will appear here."
-                  : "List an asset to start receiving interest from buyers."}
+                  : "Nothing yet — bids, expressed interest and swap proposals on your assets will appear here."}
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 gap-2.5">
-                {interest.map((m) => {
+                {notifications.map((m) => {
                   const Icon = m.kind === "bid" ? Gavel : m.kind === "swap" ? ArrowLeftRight : Heart;
                   const tone = m.kind === "bid" ? "text-primary" : m.kind === "swap" ? "text-secondary" : "text-rose-300";
                   return (
                     <div
                       key={m.id}
-                      onClick={() => !m.read && onMarkRead(m.id)}
+                      onClick={() => !m.read && onMarkRead(m)}
                       data-testid={`interest-${m.id}`}
                       className={`relative flex items-start gap-2.5 rounded-md px-3 py-2.5 cursor-default transition-colors ${m.read ? "" : "ring-1 ring-secondary/30"}`}
                       style={{ background: "rgba(8,12,24,0.6)", border: "1px solid rgba(220,225,235,0.06)" }}
@@ -493,7 +514,7 @@ export default function Marketplace() {
                         <div className="text-[8.5px] text-white/30 font-mono mt-0.5">{timeAgo(m.createdAt)}</div>
                       </div>
                       <button
-                        onClick={(e) => { e.stopPropagation(); onDismissInterest(m.id); }}
+                        onClick={(e) => { e.stopPropagation(); onDismissInterest(m); }}
                         className="text-white/30 hover:text-rose-300 shrink-0"
                         aria-label="Dismiss"
                         data-testid={`dismiss-interest-${m.id}`}

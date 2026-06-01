@@ -1,4 +1,5 @@
 - [Opas trading sim design & accounting](sexolicious-trading-sim.md) — single-wallet localStorage sim (no multi-user settlement by design); escrow must move cost basis proportionally; fees must change state, not just display.
+- [Opas notification feed](opas-notifications.md) — bell+inbox share one feed via window "opas:notify"; consumers can mount many times, but generators (sim ticks/seeders) must live in ONE mount (WalletProvider), not the double-mounted bell.
 - [Looping carousel a11y](looping-carousel-a11y.md) — clone-based infinite rails must keep only one copy in tab/AT order (aria-hidden + tabIndex=-1, NOT inert, so clicks still work).
 - [Stale canvas iframe vs live app](stale-iframe-fouc.md) — a "broken/crammed" card in the canvas preview is often a stale cached/FOUC frame, not a code bug; verify the live render before changing code.
 - [FitText shared-scale group](fittext-shared-scale.md) — stat rows render even via FitTextGroup+share; never depend on the group context object in the measuring effect (infinite-loop).

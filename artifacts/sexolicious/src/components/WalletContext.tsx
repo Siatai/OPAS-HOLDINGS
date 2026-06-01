@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useMemo, ReactNode } from "react";
+import React, { createContext, useContext, useState, useMemo, useEffect, ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Loader2, Shield, Zap, Globe2, AlertTriangle, CheckCircle2, ExternalLink, Copy } from "lucide-react";
 import { useAccount, useConnect, useDisconnect, useChainId } from "wagmi";
+import { simulateIncomingSwap, getHoldings } from "@/lib/portfolio";
 import worldSkyline from "@/assets/images/world_skyline.png";
 import { Link } from "wouter";
 
@@ -35,6 +36,21 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const openWallet  = () => setIsOpen(true);
   const closeWallet = () => setIsOpen(false);
+
+  // App-wide swap proposal simulator. While a wallet is connected and holds
+  // assets, a counterparty proposes a swap shortly after connect and again on
+  // an interval. writeSwaps fires "opas:notify", so the navbar bell and the
+  // Marketplace inbox update the moment each proposal arrives. Mounted once
+  // here (a single provider) so it never double-fires alongside the two
+  // responsive NotificationBell instances in the navbar.
+  useEffect(() => {
+    if (!isConnected || !address) return;
+    const acct = address;
+    const tick = () => { if (getHoldings(acct).length > 0) simulateIncomingSwap(acct); };
+    const first = setTimeout(tick, 12000);
+    const loop = setInterval(tick, 45000);
+    return () => { clearTimeout(first); clearInterval(loop); };
+  }, [isConnected, address]);
 
   const hasInjected = useMemo(
     () => typeof window !== "undefined" && !!(window as any).ethereum,

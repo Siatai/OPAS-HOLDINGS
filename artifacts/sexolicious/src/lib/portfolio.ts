@@ -614,6 +614,7 @@ function readSwaps(address: string): SwapOffer[] {
 
 function writeSwaps(address: string, s: SwapOffer[]) {
   window.localStorage.setItem(SWAP_KEY(address), JSON.stringify(s));
+  notifyChanged();
 }
 
 export function getSwapOffers(address: string): SwapOffer[] {
@@ -792,6 +793,38 @@ export function settleOutgoingSwap(
     note: `Swap filled by ${taker} · ${lookupProperty(offer.giveId)?.prop.token ?? offer.giveId} → ${lookupProperty(offer.receiveId)?.prop.token ?? offer.receiveId} · no swap fee`,
   });
   return { ok: true, offers: next };
+}
+
+// Simulated arrival: a counterparty proposes a swap on an asset the wallet
+// holds, offering one of their own in exchange. Fires the change signal via
+// writeSwaps so the navbar bell and Marketplace inbox light up the moment the
+// proposal lands. Returns the updated offers, or null when the wallet holds
+// nothing to swap.
+export function simulateIncomingSwap(address: string): SwapOffer[] | null {
+  if (!address) return null;
+  const holdings = getHoldings(address);
+  if (holdings.length === 0) return null;
+  const give = holdings[Math.floor(Math.random() * holdings.length)];
+  const candidates = Array.from(ASSET_INDEX.keys()).filter((id) => id !== give.propertyId);
+  if (candidates.length === 0) return null;
+  const receiveId = candidates[Math.floor(Math.random() * candidates.length)];
+  const giveShares = Math.max(1, Math.round(give.shares * (0.3 + Math.random() * 0.5)));
+  const receiveShares = Math.max(1, Math.round(giveShares * (0.6 + Math.random() * 0.8)));
+  const offer: SwapOffer = {
+    id: sid(),
+    direction: "incoming",
+    counterparty: SIM_TAKERS[Math.floor(Math.random() * SIM_TAKERS.length)],
+    giveId: give.propertyId,
+    giveShares,
+    receiveId,
+    receiveShares,
+    feeUsd: 0,
+    status: "pending",
+    createdAt: Date.now(),
+  };
+  const next = [offer, ...readSwaps(address)];
+  writeSwaps(address, next);
+  return next;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -988,6 +1021,7 @@ function readInterest(address: string): InterestMessage[] {
 
 function writeInterest(address: string, m: InterestMessage[]) {
   window.localStorage.setItem(INT_KEY(address), JSON.stringify(m.slice(0, 50)));
+  notifyChanged();
 }
 
 // Builds one simulated interest message for a given listing.
@@ -1088,4 +1122,113 @@ export function expressInterest(
     note: `Expressed interest in ${token} · owner notified`,
   });
   return { ok: true };
+}
+
+// ─────────────────────────────────────────────────────────────
+// Unified notification feed — a single attention inbox aggregating
+// everything that needs the holder's eyes:
+//   • interest on their own listings (bid / express / swap)   — interest store
+//   • incoming swap offers on assets they hold                — swap store
+// Backs the global navbar bell AND the Marketplace inbox so the same
+// notifications surface everywhere. Incoming swap offers are seeded by
+// default, so a swap notification is visible immediately on first load.
+// ─────────────────────────────────────────────────────────────
+
+export type AppNotification = {
+  id: string;
+  kind: InterestKind;            // "bid" | "interest" | "swap"
+  source: "interest" | "swap";   // originating store
+  from: string;                  // short counterparty label
+  note: string;
+  createdAt: number;
+  read: boolean;
+  href: string;                  // route to act on it
+};
+
+// Lightweight cross-component change signal. Any mutation to the interest or
+// swap store fires this so the navbar bell and inbox refresh live.
+export function notifyChanged() {
+  if (typeof window !== "undefined") window.dispatchEvent(new Event("opas:notify"));
+}
+
+const SWAP_READ_KEY = (addr: string) => `opas:swapread:${addr.toLowerCase()}`;
+
+function readSwapReadSet(address: string): Set<string> {
+  if (typeof window === "undefined" || !address) return new Set();
+  try {
+    const raw = window.localStorage.getItem(SWAP_READ_KEY(address));
+    if (raw) return new Set(JSON.parse(raw) as string[]);
+  } catch {}
+  return new Set();
+}
+
+function writeSwapReadSet(address: string, set: Set<string>) {
+  window.localStorage.setItem(SWAP_READ_KEY(address), JSON.stringify([...set]));
+}
+
+// An incoming offer: the counterparty wants YOUR giveId, offering their receiveId.
+function swapOfferNote(o: SwapOffer): string {
+  const giveToken = lookupProperty(o.giveId)?.prop.token ?? o.giveId;
+  const recvToken = lookupProperty(o.receiveId)?.prop.token ?? o.receiveId;
+  return `Wants ${o.giveShares} × your ${giveToken} for ${o.receiveShares} × ${recvToken}`;
+}
+
+export function getNotifications(address: string): AppNotification[] {
+  if (typeof window === "undefined" || !address) return [];
+  const interest: AppNotification[] = getInterest(address).map((m) => ({
+    id: m.id,
+    kind: m.kind,
+    source: "interest" as const,
+    from: m.from,
+    note: m.note,
+    createdAt: m.createdAt,
+    read: m.read,
+    href: "/marketplace",
+  }));
+  const readSet = readSwapReadSet(address);
+  const swaps: AppNotification[] = getSwapOffers(address)
+    .filter((o) => o.direction === "incoming" && o.status === "pending")
+    .map((o) => ({
+      id: o.id,
+      kind: "swap" as const,
+      source: "swap" as const,
+      from: o.counterparty,
+      note: swapOfferNote(o),
+      createdAt: o.createdAt,
+      read: readSet.has(o.id),
+      href: "/portfolio",
+    }));
+  return [...interest, ...swaps].sort((a, b) => b.createdAt - a.createdAt);
+}
+
+export function unreadNotificationCount(address: string): number {
+  return getNotifications(address).reduce((n, x) => n + (x.read ? 0 : 1), 0);
+}
+
+export function markNotificationRead(address: string, n: AppNotification): void {
+  if (n.source === "interest") {
+    markInterestRead(address, n.id);
+  } else {
+    const set = readSwapReadSet(address);
+    set.add(n.id);
+    writeSwapReadSet(address, set);
+    notifyChanged();
+  }
+}
+
+export function markAllNotificationsRead(address: string): void {
+  markAllInterestRead(address);
+  const set = readSwapReadSet(address);
+  getSwapOffers(address)
+    .filter((o) => o.direction === "incoming" && o.status === "pending")
+    .forEach((o) => set.add(o.id));
+  writeSwapReadSet(address, set);
+  notifyChanged();
+}
+
+// Dismiss removes an interest message; a real pending swap offer can't be
+// deleted from the feed (it lives in the swap book) so we just mark it read.
+export function dismissNotification(address: string, n: AppNotification): void {
+  if (n.source === "interest") dismissInterest(address, n.id);
+  else markNotificationRead(address, n);
 }

@@ -5,6 +5,7 @@ import { Menu, X, Wallet } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useWallet } from "./WalletContext";
 import OpasPriceTag from "./OpasPriceTag";
+import NotificationBell from "./NotificationBell";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -89,6 +90,7 @@ export default function Navbar() {
           <div className="w-px h-5 bg-white/10" />
           {isConnected ? (
             <div className="flex items-center gap-2">
+              <NotificationBell />
               <Link
                 href="/dashboard"
                 className="btn-metal-silver px-4 py-2 text-[10.5px] tracking-[0.22em] uppercase rounded-sm"
@@ -120,13 +122,16 @@ export default function Navbar() {
           )}
         </nav>
 
-        {/* ── Mobile toggle ── */}
-        <button
-          className="md:hidden text-white/70 hover:text-white p-2 transition-colors"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        {/* ── Mobile actions ── */}
+        <div className="md:hidden flex items-center gap-2">
+          {isConnected && <NotificationBell />}
+          <button
+            className="text-white/70 hover:text-white p-2 transition-colors"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {/* ── Mobile drawer ── */}
