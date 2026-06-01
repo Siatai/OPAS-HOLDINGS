@@ -435,13 +435,13 @@ html, body { overflow-x: hidden; max-width: 100vw; }
   .opas-3d { animation: none; }
 }
 
-/* Roundabout rail — spotlight the centred card, recede the rest. */
+/* Roundabout rail — spotlight the centred card, blur & recede the neighbours. */
 .asset-loop-card {
-  transform: scale(0.9);
-  opacity: 0.45;
-  filter: saturate(0.85) brightness(0.92);
+  transform: scale(0.86);
+  opacity: 0.55;
+  filter: blur(3px) saturate(0.8) brightness(0.85);
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease, filter 0.5s ease;
-  will-change: transform, opacity;
+  will-change: transform, opacity, filter;
 }
 .asset-loop-card.is-center {
   transform: scale(1.05);

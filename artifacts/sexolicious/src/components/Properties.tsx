@@ -423,8 +423,8 @@ function AssetRow({
       {/* Rail */}
       <div className="relative -mx-4 sm:-mx-6 md:-mx-12">
         {/* edge fades */}
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-12 z-10 bg-gradient-to-r from-background to-transparent" />
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-12 z-10 bg-gradient-to-l from-background to-transparent" />
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-5 sm:w-10 z-10 bg-gradient-to-r from-background to-transparent" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-5 sm:w-10 z-10 bg-gradient-to-l from-background to-transparent" />
         <div
           ref={railRef}
           {...pauseHandlers}
@@ -464,7 +464,7 @@ function AssetCard({
 }) {
   return (
     <div
-      className="group relative w-[260px] sm:w-[300px] md:w-[320px] rounded-xl overflow-hidden transition-transform duration-300 hover:-translate-y-1"
+      className="group relative w-[240px] sm:w-[290px] md:w-[320px] rounded-xl overflow-hidden transition-transform duration-300 hover:-translate-y-1"
       style={{
         background: "linear-gradient(160deg, rgba(20,28,48,0.96) 0%, rgba(14,20,36,0.96) 60%, rgba(28,20,12,0.96) 100%)",
         border: "1px solid rgba(220,225,235,0.16)",
