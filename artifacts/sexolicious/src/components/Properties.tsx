@@ -213,7 +213,8 @@ export default function Properties() {
   );
 }
 
-/* ─────────────────────── Auto-scrolling rail hook ─────────────────────── */
+/* ─────────────────────── Simple auto-scrolling rail hook ───────────────────────
+   Used by the gateway-cities rail: auto-advance one tile, loop back at the end. */
 function useAutoRail(autoMs: number) {
   const railRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
@@ -224,8 +225,6 @@ function useAutoRail(autoMs: number) {
     el.scrollBy({ left: el.clientWidth * 0.82 * dir, behavior: "smooth" });
   };
 
-  // Auto-advance one card at a time; loop back at the end. Pause on hover/touch.
-  // Respect users who prefer reduced motion — skip autoplay entirely for them.
   useEffect(() => {
     if (paused) return;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
@@ -253,6 +252,105 @@ function useAutoRail(autoMs: number) {
   return { railRef, scrollByDir, pauseHandlers };
 }
 
+/* ───────────────────── Roundabout (infinite loop) rail hook ─────────────────────
+   The cards are rendered in three identical copies. We keep the scroll position
+   parked inside the middle copy and silently jump by one copy-width whenever the
+   user drifts toward either edge — so the rail loops forever like a roundabout.
+   On every frame we also spotlight whichever card sits closest to the centre. */
+function useLoopRail(autoMs: number) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const centerRef = useRef<HTMLElement | null>(null);
+  const [paused, setPaused] = useState(false);
+
+  const cardStep = (el: HTMLElement) => {
+    const first = el.querySelector<HTMLElement>("[data-card]");
+    return first ? first.offsetWidth + 20 : el.clientWidth * 0.8;
+  };
+
+  // Seamless wrap + centre-card spotlight. Runs on scroll/resize (rAF throttled).
+  const update = () => {
+    const el = railRef.current;
+    if (!el) return;
+    const third = el.scrollWidth / 3;
+    if (third > el.clientWidth) {
+      if (el.scrollLeft < third * 0.5) el.scrollLeft += third;
+      else if (el.scrollLeft > third * 1.5) el.scrollLeft -= third;
+    }
+    const mid = el.scrollLeft + el.clientWidth / 2;
+    let best: HTMLElement | null = null;
+    let bestDist = Infinity;
+    el.querySelectorAll<HTMLElement>("[data-card]").forEach((c) => {
+      const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid);
+      if (d < bestDist) { bestDist = d; best = c; }
+    });
+    const centered = best as HTMLElement | null;
+    if (centered !== centerRef.current) {
+      centerRef.current?.classList.remove("is-center");
+      centered?.classList.add("is-center");
+      centerRef.current = centered;
+    }
+  };
+
+  // Park scroll in the middle copy on mount (card widths are fixed, so layout is
+  // stable immediately — no need to wait for images).
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    const t = window.setTimeout(() => {
+      const third = el.scrollWidth / 3;
+      if (third > el.clientWidth) el.scrollLeft = third;
+      update();
+    }, 60);
+    return () => clearTimeout(t);
+  }, []);
+
+  // rAF-throttled scroll/resize handler keeps the loop + spotlight in sync.
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => { raf = 0; update(); });
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  const scrollByDir = (dir: 1 | -1) => {
+    const el = railRef.current;
+    if (!el) return;
+    el.scrollBy({ left: cardStep(el) * dir, behavior: "smooth" });
+  };
+
+  // Auto-advance one card at a time; the wrap logic makes it loop forever.
+  // Respect users who prefer reduced motion — skip autoplay entirely for them.
+  useEffect(() => {
+    if (paused) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const el = railRef.current;
+    if (!el) return;
+    const id = window.setInterval(() => {
+      el.scrollBy({ left: cardStep(el), behavior: "smooth" });
+    }, autoMs);
+    return () => clearInterval(id);
+  }, [paused, autoMs]);
+
+  const pauseHandlers = {
+    onMouseEnter: () => setPaused(true),
+    onMouseLeave: () => setPaused(false),
+    onTouchStart: () => setPaused(true),
+    onTouchEnd: () => setPaused(false),
+  };
+
+  return { railRef, scrollByDir, pauseHandlers };
+}
+
 /* ─────────────────────── Showcase row ─────────────────────── */
 function AssetRow({
   index, meta, assets, onAcquire, onViewAll,
@@ -263,9 +361,11 @@ function AssetRow({
   onAcquire: () => void;
   onViewAll: () => void;
 }) {
-  const { railRef, scrollByDir, pauseHandlers } = useAutoRail(3200 + index * 500);
+  const { railRef, scrollByDir, pauseHandlers } = useLoopRail(3200 + index * 500);
   const Icon = TAB_ICONS[meta.icon];
   const accent = meta.accent;
+  // Three identical copies → seamless "roundabout" loop.
+  const loop = [0, 1, 2].flatMap((copy) => assets.map((a) => ({ a, copy })));
 
   return (
     <motion.div
@@ -293,6 +393,14 @@ function AssetRow({
           </h3>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={onViewAll}
+            className="hidden sm:flex items-center gap-1.5 h-9 sm:h-10 px-3.5 rounded-full text-[9.5px] tracking-[0.24em] uppercase text-white/70 hover:text-white transition-all hover:scale-105"
+            style={{ ...NEVERA, background: "rgba(20,28,48,0.85)", border: "1px solid rgba(220,225,235,0.18)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}
+          >
+            View all
+            <ArrowUpRight className="w-3.5 h-3.5" style={{ color: accent }} />
+          </button>
           <button
             onClick={() => scrollByDir(-1)}
             aria-label={`Scroll ${meta.label} left`}
@@ -322,27 +430,22 @@ function AssetRow({
           {...pauseHandlers}
           className="flex gap-4 md:gap-5 overflow-x-auto snap-x snap-mandatory px-4 sm:px-6 md:px-12 pb-5 pt-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
         >
-          {assets.map((a) => (
-            <div key={a.id} data-card className="snap-start shrink-0">
-              <AssetCard card={a} accent={accent} rentalNoun={meta.rentalNoun} onAcquire={onAcquire} />
+          {loop.map(({ a, copy }) => (
+            <div
+              key={`${a.id}-${copy}`}
+              data-card
+              className="asset-loop-card snap-center shrink-0"
+              aria-hidden={copy === 1 ? undefined : true}
+            >
+              <AssetCard
+                card={a}
+                accent={accent}
+                rentalNoun={meta.rentalNoun}
+                onAcquire={onAcquire}
+                interactive={copy === 1}
+              />
             </div>
           ))}
-          {/* tail "view all" tile */}
-          <button
-            onClick={onViewAll}
-            className="snap-start shrink-0 w-[150px] sm:w-[170px] self-stretch rounded-xl flex flex-col items-center justify-center gap-3 group transition-all"
-            style={{ background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(220,225,235,0.2)" }}
-          >
-            <span
-              className="w-12 h-12 rounded-full flex items-center justify-center transition-transform group-hover:scale-110"
-              style={{ background: `${accent}1a`, border: `1px solid ${accent}66` }}
-            >
-              <ArrowUpRight className="w-5 h-5" style={{ color: accent }} />
-            </span>
-            <span className="text-[10px] tracking-[0.28em] uppercase text-white/70 text-center px-3" style={NEVERA}>
-              View all<br />{meta.label.toLowerCase()}
-            </span>
-          </button>
         </div>
       </div>
     </motion.div>
@@ -351,12 +454,13 @@ function AssetRow({
 
 /* ─────────────────────── Asset card ─────────────────────── */
 function AssetCard({
-  card, accent, rentalNoun, onAcquire,
+  card, accent, rentalNoun, onAcquire, interactive = true,
 }: {
   card: Asset;
   accent: string;
   rentalNoun: string;
   onAcquire: () => void;
+  interactive?: boolean;
 }) {
   return (
     <div
@@ -449,6 +553,7 @@ function AssetCard({
 
         <button
           onClick={onAcquire}
+          tabIndex={interactive ? undefined : -1}
           className="btn-metal w-full py-2.5 rounded-sm text-[10px] font-bold tracking-[0.28em] uppercase"
           style={NEVERA}
         >

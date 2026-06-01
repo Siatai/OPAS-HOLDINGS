@@ -47,7 +47,7 @@ export default function Navbar() {
           />
           <div className="flex items-baseline gap-2 leading-none">
             <span
-              className="text-[17px] tracking-[0.22em] text-white font-bold uppercase"
+              className="opas-3d text-[17px] tracking-[0.22em] font-bold uppercase"
               style={{ fontFamily: "BankGothic, sans-serif" }}
             >
               OPAS

@@ -1,1 +1,2 @@
 - [Opas trading sim design & accounting](sexolicious-trading-sim.md) — single-wallet localStorage sim (no multi-user settlement by design); escrow must move cost basis proportionally; fees must change state, not just display.
+- [Looping carousel a11y](looping-carousel-a11y.md) — clone-based infinite rails must keep only one copy in tab/AT order (aria-hidden + tabIndex=-1, NOT inert, so clicks still work).

@@ -58,7 +58,7 @@ export default function LoaderScreen({ onComplete }: { onComplete: () => void })
               initial={{ y: 70, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.7, delay: 1.05 + i * 0.06, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[72px] md:text-[96px] leading-none text-white tracking-[0.06em]"
+              className="opas-3d text-[72px] md:text-[96px] leading-none tracking-[0.06em]"
               style={{ fontFamily: "DuneRise, BankGothic, sans-serif" }}
             >
               {letter}

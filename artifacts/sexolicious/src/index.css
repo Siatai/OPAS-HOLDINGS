@@ -401,3 +401,49 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none; transform: none; }
 }
+
+/* OPAS wordmark — shiny, 3D, molten-gold. Used everywhere the brand name shows. */
+.opas-3d {
+  background: linear-gradient(
+    100deg,
+    #c47e12 0%, #f0a513 14%, #ffd470 26%,
+    #fff7da 34%, #ffd470 42%, #f0a513 56%,
+    #c47e12 70%, #ffe9a8 86%, #c47e12 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter:
+    drop-shadow(0 1px 0 #7a4600)
+    drop-shadow(0 2px 1px rgba(80, 45, 0, 0.55))
+    drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45))
+    drop-shadow(0 0 18px rgba(234, 141, 14, 0.4));
+  animation: opas-sheen 4.5s linear infinite;
+}
+@keyframes opas-sheen {
+  0%   { background-position: 0% 0; }
+  100% { background-position: 250% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .opas-3d { animation: none; }
+}
+
+/* Roundabout rail — spotlight the centred card, recede the rest. */
+.asset-loop-card {
+  transform: scale(0.9);
+  opacity: 0.45;
+  filter: saturate(0.85) brightness(0.92);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease, filter 0.5s ease;
+  will-change: transform, opacity;
+}
+.asset-loop-card.is-center {
+  transform: scale(1.05);
+  opacity: 1;
+  filter: none;
+  z-index: 2;
+}
+@media (prefers-reduced-motion: reduce) {
+  .asset-loop-card { transition: none; }
+}
