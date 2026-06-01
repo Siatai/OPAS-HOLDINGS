@@ -21,6 +21,28 @@ of: Properties, Hero, Marketplace, Portfolio, Dashboard, CityPage (and any new
 component). Re-run the sweep after edits: `rg -n "truncate|clamp\(|break-words"
 src --glob '*.tsx'`.
 
+## CRITICAL: MarqueeText overflow detection must NOT use scrollWidth on inline spans
+The measure span is inline phrasing content (so MarqueeText is valid inside
+h3/h4/a/span). `element.scrollWidth`/`clientWidth` return **0 on inline
+elements**, so `overflow = measure.scrollWidth - container.clientWidth` was
+always negative → `shift` stayed 0 → it NEVER animated and text just got
+clipped by the root's `overflow-hidden` (clip WITHOUT ellipsis — looked like a
+plain cut-off title, e.g. "SOUTH BEA").
+**Why:** symptom is sneaky — looks identical to a missing marquee, and a quick
+"no ellipsis" visual check passes. **How to apply:** measure container via
+`clientWidth` (root is `display:block`, reliable) but measure CONTENT via
+`measureRef.getBoundingClientRect().width` (works for inline). Also make the
+measure span `inline-block`. Re-measure on web-font swap: the wide display
+fonts (SHARKON etc.) load after first paint and widen text — listen to
+`document.fonts` `loadingdone` + `document.fonts.ready`, plus a few delayed
+timeouts and a rAF, not just one synchronous measure.
+
+## Pages must open at the top (Wouter)
+Wouter does NOT reset scroll on route change. A `<ScrollToTop>` component
+(`useLocation` effect → `window.scrollTo(0,0)`) is mounted inside `<WouterRouter>`
+in App.tsx. It keys on pathname only, so in-page hash anchors (e.g. #rentals)
+still work.
+
 ## Layout pattern for icon/title/badge rows
 When a heading sits in a flex row next to an icon and/or a badge/count, give
 MarqueeText `className="min-w-0 flex-1"`, the row `min-w-0`, and the icon/badge

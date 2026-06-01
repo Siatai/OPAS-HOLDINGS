@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import React, { useState, useEffect } from "react";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { wagmiConfig } from "@/lib/wagmi";
@@ -18,6 +18,14 @@ import LoaderScreen from "@/components/LoaderScreen";
 import { AnimatePresence } from "framer-motion";
 
 const queryClient = new QueryClient();
+
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location]);
+  return null;
+}
 
 function Router() {
   return (
@@ -43,6 +51,7 @@ function App() {
           <>
             <div style={{ visibility: loaded ? 'visible' : 'hidden', opacity: loaded ? 1 : 0, transition: 'opacity 0.3s' }} className="dark min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/30 selection:text-primary-foreground">
               <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+                <ScrollToTop />
                 <Navbar />
                 <main className="flex-1">
                   <Router />

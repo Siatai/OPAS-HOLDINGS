@@ -15,6 +15,11 @@ type MarqueeTextProps = {
  * is valid phrasing content inside headings, links and spans. The root span is
  * `display:block` so it fills the available width (needed for overflow
  * detection). Font/colour cascade from the parent.
+ *
+ * Measurement uses getBoundingClientRect() because the inner measure span is
+ * inline content — scrollWidth/clientWidth are unreliable (return 0) on inline
+ * elements. We also re-measure after web fonts finish loading (the wide display
+ * fonts swap in well after first paint and change the text width).
  */
 export default function MarqueeText({
   children,
@@ -29,28 +34,47 @@ export default function MarqueeText({
   const [shift, setShift] = useState(0);
 
   useEffect(() => {
+    let raf = 0;
+
     const measure = () => {
       const c = containerRef.current;
       const m = measureRef.current;
       if (!c || !m) return;
-      const overflow = m.scrollWidth - c.clientWidth;
-      setShift(overflow > 1 ? m.scrollWidth + gap : 0);
+      const containerWidth = c.clientWidth;
+      const contentWidth = m.getBoundingClientRect().width;
+      if (containerWidth === 0 || contentWidth === 0) return;
+      const overflow = contentWidth - containerWidth;
+      setShift(overflow > 1 ? Math.ceil(contentWidth) + gap : 0);
     };
 
-    measure();
+    const scheduleMeasure = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    };
 
-    const ro = new ResizeObserver(measure);
+    scheduleMeasure();
+
+    const ro = new ResizeObserver(scheduleMeasure);
     if (containerRef.current) ro.observe(containerRef.current);
     if (measureRef.current) ro.observe(measureRef.current);
 
-    const t = window.setTimeout(measure, 300);
-    if (typeof document !== "undefined" && document.fonts?.ready) {
-      document.fonts.ready.then(measure).catch(() => {});
+    // Re-measure at a few intervals to catch late layout/font swaps.
+    const timers = [60, 200, 500, 1200].map((d) => window.setTimeout(measure, d));
+
+    if (typeof document !== "undefined" && document.fonts) {
+      document.fonts.ready.then(scheduleMeasure).catch(() => {});
+      document.fonts.addEventListener("loadingdone", scheduleMeasure);
     }
+    window.addEventListener("resize", scheduleMeasure);
 
     return () => {
+      cancelAnimationFrame(raf);
       ro.disconnect();
-      window.clearTimeout(t);
+      timers.forEach((t) => window.clearTimeout(t));
+      if (typeof document !== "undefined" && document.fonts) {
+        document.fonts.removeEventListener("loadingdone", scheduleMeasure);
+      }
+      window.removeEventListener("resize", scheduleMeasure);
     };
   }, [children, gap]);
 
@@ -71,11 +95,11 @@ export default function MarqueeText({
             : undefined
         }
       >
-        <span ref={measureRef} className="whitespace-nowrap shrink-0">
+        <span ref={measureRef} className="inline-block whitespace-nowrap shrink-0">
           {children}
         </span>
         {animate && (
-          <span aria-hidden className="whitespace-nowrap shrink-0">
+          <span aria-hidden className="inline-block whitespace-nowrap shrink-0">
             {children}
           </span>
         )}
