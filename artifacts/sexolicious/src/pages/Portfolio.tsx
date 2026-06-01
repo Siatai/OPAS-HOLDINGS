@@ -195,8 +195,8 @@ export default function Portfolio() {
               </span>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl leading-[1.05]" style={SHARKON}>
-              <span className="metallic-text block whitespace-nowrap">Your asset</span>
-              <span className="metallic-warm-text block whitespace-nowrap">portfolio.</span>
+              <span className="metallic-text block">Your asset</span>
+              <span className="metallic-warm-text block">portfolio.</span>
             </h1>
             <div className="flex items-center gap-2 text-[10px] tracking-[0.28em] uppercase text-white/40 font-mono">
               <ShieldCheck className="w-3.5 h-3.5 text-primary/70 shrink-0" />
@@ -286,7 +286,7 @@ export default function Portfolio() {
                               {items.length} held
                             </span>
                           </div>
-                          <p className="text-white/45 text-[11px] sm:text-xs mt-0.5 truncate" style={NEVERA}>{cat.blurb}</p>
+                          <p className="text-white/45 text-[11px] sm:text-xs mt-0.5 line-clamp-2" style={NEVERA}>{cat.blurb}</p>
                         </div>
                       </div>
 
@@ -347,10 +347,10 @@ export default function Portfolio() {
                                 </div>
                               </div>
                               <div className="absolute bottom-3 left-3 right-3">
-                                <TitleTag {...titleProps} className={`text-[15px] text-white font-medium transition-colors block truncate ${city ? "hover:text-primary" : ""}`} style={SHARKON}>
+                                <TitleTag {...titleProps} className={`text-[15px] text-white font-medium transition-colors block line-clamp-2 leading-tight ${city ? "hover:text-primary" : ""}`} style={SHARKON}>
                                   {prop.title}
                                 </TitleTag>
-                                <div className="text-[9.5px] text-white/55 truncate font-mono">{prop.spec ?? prop.subtitle}</div>
+                                <div className="text-[9.5px] text-white/55 line-clamp-2 font-mono">{prop.spec ?? prop.subtitle}</div>
                               </div>
                             </div>
 

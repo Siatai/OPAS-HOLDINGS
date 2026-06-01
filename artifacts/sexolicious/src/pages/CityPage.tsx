@@ -253,7 +253,7 @@ function PropertyCard({
           <div className="text-[10px] tracking-[0.32em] uppercase text-primary/80 mb-1" style={NEVERA}>
             {cityName}
           </div>
-          <h3 className="text-lg sm:text-xl md:text-2xl leading-tight tracking-wide" style={SHARKON}>
+          <h3 className="text-lg sm:text-xl md:text-2xl leading-tight tracking-wide line-clamp-2 break-words" style={SHARKON}>
             <span className="metallic-text">{p.title}</span>
           </h3>
         </div>

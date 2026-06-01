@@ -1,1 +1,1 @@
-- [Opas multi-asset catalog & wallet gate](opas-multi-asset.md) — assets.ts is the single catalog; non-RE assets have city="" so /city/ links must be conditional; Portfolio/Dashboard un-screenshottable (4s loader + injected-wallet gate).
+- [Sharkon font text clipping](sharkon-text-clipping.md) — wide display font; variable text in SHARKON needs clamp()+line-clamp-2, never 1-line truncate/whitespace-nowrap (numeric stats OK).

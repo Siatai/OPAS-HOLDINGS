@@ -236,7 +236,7 @@ export default function Dashboard() {
                     <c.icon className={`w-5 h-5 sm:w-7 sm:h-7 ${c.iconTone}`} />
                     <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/30 group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
                   </div>
-                  <div className="text-[9px] sm:text-base md:text-lg leading-tight text-white mb-1 whitespace-nowrap" style={SHARKON}>{c.label}</div>
+                  <div className="text-[9px] sm:text-base md:text-lg leading-tight text-white mb-1 break-words" style={SHARKON}>{c.label}</div>
                   <div className="text-[9.5px] sm:text-[10.5px] text-white/55 mb-2 sm:mb-3 leading-snug" style={NEVERA}>{c.desc}</div>
                   <div className={`text-[8.5px] sm:text-[9.5px] tracking-[0.18em] sm:tracking-[0.24em] uppercase font-mono truncate ${c.iconTone}`}>
                     {c.meta}
@@ -307,7 +307,7 @@ export default function Dashboard() {
                       <div key={r.propertyId} className="flex items-center gap-3 p-3 sm:p-4 hover:bg-white/[0.02] transition-colors">
                         <img src={meta.prop.image} alt="" className="w-12 h-12 rounded-md object-cover shrink-0" />
                         <div className="min-w-0 flex-1">
-                          <div className="text-[13px] sm:text-sm text-white truncate" style={SHARKON}>{meta.prop.title}</div>
+                          <div className="text-[13px] sm:text-sm text-white line-clamp-2 leading-tight" style={SHARKON}>{meta.prop.title}</div>
                           <div className="text-[9.5px] tracking-[0.24em] uppercase text-white/40 font-mono">
                             {meta.prop.token} · Yield {meta.prop.rentalYield}
                           </div>
@@ -379,7 +379,7 @@ export default function Dashboard() {
                               </span>
                             )}
                           </div>
-                          <div className="text-[10.5px] text-white/50 truncate" style={NEVERA}>{a.note}</div>
+                          <div className="text-[10.5px] text-white/50 line-clamp-2" style={NEVERA}>{a.note}</div>
                         </div>
                         <div className="text-right shrink-0">
                           {a.usd != null && (

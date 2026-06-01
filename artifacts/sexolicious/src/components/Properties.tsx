@@ -171,7 +171,7 @@ export default function Properties() {
                   <div className="text-[9px] sm:text-[10px] tracking-[0.24em] sm:tracking-[0.28em] uppercase mb-0.5 text-white/45 group-hover:text-primary transition-colors" style={NEVERA}>
                     {city.country}
                   </div>
-                  <div className="leading-tight mb-1.5 sm:mb-2 truncate" style={{ ...SHARKON, fontSize: "clamp(0.78rem, 3.4vw, 1.125rem)" }} title={city.name}>
+                  <div className="leading-tight mb-1.5 sm:mb-2 line-clamp-2" style={{ ...SHARKON, fontSize: "clamp(0.78rem, 3.4vw, 1.125rem)" }} title={city.name}>
                     <span className="metallic-text group-hover:hidden">{city.name}</span>
                     <span className="metallic-warm-text hidden group-hover:inline">{city.name}</span>
                   </div>
@@ -397,14 +397,14 @@ function AssetCard({
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="text-[9px] tracking-[0.32em] uppercase mb-1 truncate" style={{ ...NEVERA, color: `${accent}cc` }}>
+          <div className="text-[9px] tracking-[0.32em] uppercase mb-1 line-clamp-2" style={{ ...NEVERA, color: `${accent}cc` }}>
             {card.subtitle} · {card.tier}
           </div>
-          <h4 className="text-lg leading-tight" style={SHARKON}>
+          <h4 className="text-lg leading-tight line-clamp-2 break-words" style={SHARKON}>
             <span className="metallic-text">{card.title}</span>
           </h4>
           {card.spec && (
-            <div className="text-[9px] text-white/45 font-mono mt-1 truncate">{card.spec}</div>
+            <div className="text-[9px] text-white/45 font-mono mt-1 line-clamp-2">{card.spec}</div>
           )}
         </div>
       </div>
