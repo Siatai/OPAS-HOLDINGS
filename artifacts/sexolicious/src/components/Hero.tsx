@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { useWallet } from "./WalletContext";
+import FitText from "./FitText";
 import { useOpasPrice, fmtOpasRate } from "@/lib/opasPrice";
 import worldSkyline from "@/assets/images/world_skyline.png";
 import heroCar from "@/assets/images/assets/car_ferrari.png";
@@ -335,16 +336,27 @@ export default function Hero() {
                 {/* Metallic divider */}
                 <div className="metallic-divider mb-4" />
 
-                {/* Three-stat row */}
-                <div className="grid grid-cols-3 gap-3">
+                {/* Three-stat row — segmented premium panel with hairline dividers */}
+                <div
+                  className="grid grid-cols-3 gap-px rounded-lg overflow-hidden"
+                  style={{
+                    background: "linear-gradient(180deg, rgba(220,225,235,0.10), rgba(220,225,235,0.04))",
+                    border: "1px solid rgba(220,225,235,0.10)",
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
+                  }}
+                >
                   {[
                     { l: "AUM",       v: "$480M" },
                     { l: "Assets",    v: "120"   },
                     { l: "Investors", v: "18k"   },
                   ].map(d => (
-                    <div key={d.l} className="text-center">
-                      <div className="text-[7.5px] tracking-[0.28em] uppercase text-white/30 mb-1" style={NEVERA}>{d.l}</div>
-                      <div className="text-[15px] metallic-text" style={SHARKON}>{d.v}</div>
+                    <div
+                      key={d.l}
+                      className="px-2 py-2.5"
+                      style={{ background: "linear-gradient(180deg, rgba(10,13,22,0.82), rgba(7,9,16,0.92))" }}
+                    >
+                      <FitText align="center" className="text-[7.5px] tracking-[0.26em] uppercase text-white/35 mb-1" style={NEVERA}>{d.l}</FitText>
+                      <FitText align="center" className="text-[18px] leading-none" style={SHARKON}><span className="metallic-text">{d.v}</span></FitText>
                     </div>
                   ))}
                 </div>

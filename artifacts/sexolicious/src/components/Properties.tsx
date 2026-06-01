@@ -225,9 +225,22 @@ function useLoopRail(autoMs: number) {
   const centerRef = useRef<HTMLElement | null>(null);
   const [paused, setPaused] = useState(false);
 
+  // Exact card-to-card distance (width + real gap) measured from two siblings,
+  // so every autoplay/arrow step lands a card dead-centre instead of drifting.
   const cardStep = (el: HTMLElement) => {
-    const first = el.querySelector<HTMLElement>("[data-card]");
-    return first ? first.offsetWidth + 20 : el.clientWidth * 0.8;
+    const cards = el.querySelectorAll<HTMLElement>("[data-card]");
+    if (cards.length >= 2) return cards[1].offsetLeft - cards[0].offsetLeft;
+    return cards[0] ? cards[0].offsetWidth + 20 : el.clientWidth * 0.8;
+  };
+
+  // Park scroll so the first card of the middle copy is horizontally centred in
+  // the viewport (critical on mobile where a single card shows at a time).
+  const centerPark = (el: HTMLElement) => {
+    const cards = el.querySelectorAll<HTMLElement>("[data-card]");
+    const third = el.scrollWidth / 3;
+    if (third <= el.clientWidth || cards.length < 3) return;
+    const target = cards[cards.length / 3];
+    el.scrollLeft = target.offsetLeft - (el.clientWidth - target.offsetWidth) / 2;
   };
 
   // Spotlight whichever card sits closest to the centre. Cheap — runs every rAF
@@ -283,8 +296,7 @@ function useLoopRail(autoMs: number) {
     const el = railRef.current;
     if (!el) return;
     const t = window.setTimeout(() => {
-      const third = el.scrollWidth / 3;
-      if (third > el.clientWidth) el.scrollLeft = third;
+      centerPark(el);
       spotlight();
     }, 60);
     return () => clearTimeout(t);
@@ -297,18 +309,26 @@ function useLoopRail(autoMs: number) {
     if (!el) return;
     let raf = 0;
     let settle = 0;
+    let resizeT = 0;
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(() => { raf = 0; guard(); spotlight(); });
       window.clearTimeout(settle);
       settle = window.setTimeout(() => { wrap(); spotlight(); }, 90);
     };
+    // Re-centre after orientation/viewport changes (debounced) so the spotlighted
+    // card stays dead-centre on rotate or resize, mirroring the mount behaviour.
+    const onResize = () => {
+      window.clearTimeout(resizeT);
+      resizeT = window.setTimeout(() => { centerPark(el); spotlight(); }, 120);
+    };
     el.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize);
     return () => {
       el.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
       if (raf) cancelAnimationFrame(raf);
       window.clearTimeout(settle);
+      window.clearTimeout(resizeT);
     };
   }, []);
 
