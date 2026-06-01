@@ -1,9 +1,9 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import {
   ChevronLeft, ChevronRight, TrendingUp, ArrowUpRight,
-  Building2, Car, Ship, Plane, Lock, Palette, Watch, Grape, Gem,
+  Building2, Car, Ship, Plane, Lock, Palette, Watch, Grape, Gem, Globe,
 } from "lucide-react";
 import { useWallet } from "./WalletContext";
 import { CITIES } from "@/data/cities";
@@ -93,9 +93,9 @@ export default function Properties() {
         {/* ── GATEWAY CITIES RIBBON ── */}
         <div className="mb-16 md:mb-20">
           <div className="flex items-center gap-2.5 mb-5">
-            <Building2 className="w-3.5 h-3.5 text-primary" />
+            <Globe className="w-3.5 h-3.5 text-primary" />
             <span className="text-[10px] tracking-[0.32em] uppercase text-primary/85" style={NEVERA}>
-              Gateway cities · Prime real estate
+              Where Opas operates · {CITIES.length} prime cities worldwide
             </span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4">
@@ -163,9 +163,10 @@ export default function Properties() {
 
         {/* ── FOUR ASSET-CLASS SHOWCASE ROWS ── */}
         <div className="space-y-16 md:space-y-20">
-          {rows.map((row) => (
+          {rows.map((row, i) => (
             <AssetRow
               key={row.meta.id}
+              index={i}
               meta={row.meta}
               assets={row.assets}
               onAcquire={openWallet}
@@ -183,22 +184,42 @@ export default function Properties() {
 
 /* ─────────────────────── Showcase row ─────────────────────── */
 function AssetRow({
-  meta, assets, onAcquire, onViewAll,
+  index, meta, assets, onAcquire, onViewAll,
 }: {
+  index: number;
   meta: CategoryMeta;
   assets: Asset[];
   onAcquire: () => void;
   onViewAll: () => void;
 }) {
   const railRef = useRef<HTMLDivElement>(null);
+  const [paused, setPaused] = useState(false);
   const Icon = TAB_ICONS[meta.icon];
   const accent = meta.accent;
+  const autoMs = 3200 + index * 500;
 
   const scrollByDir = (dir: 1 | -1) => {
     const el = railRef.current;
     if (!el) return;
     el.scrollBy({ left: el.clientWidth * 0.82 * dir, behavior: "smooth" });
   };
+
+  // Auto-advance the rail one card at a time; loop back at the end. Pause on hover/touch.
+  useEffect(() => {
+    if (paused) return;
+    const el = railRef.current;
+    if (!el) return;
+    const id = window.setInterval(() => {
+      const first = el.querySelector<HTMLElement>("[data-card]");
+      const step = first ? first.offsetWidth + 20 : el.clientWidth * 0.8;
+      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 12) {
+        el.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        el.scrollBy({ left: step, behavior: "smooth" });
+      }
+    }, autoMs);
+    return () => clearInterval(id);
+  }, [paused, autoMs]);
 
   return (
     <motion.div
@@ -252,10 +273,14 @@ function AssetRow({
         <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-12 z-10 bg-gradient-to-l from-background to-transparent" />
         <div
           ref={railRef}
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onTouchStart={() => setPaused(true)}
+          onTouchEnd={() => setPaused(false)}
           className="flex gap-4 md:gap-5 overflow-x-auto snap-x snap-mandatory px-4 sm:px-6 md:px-12 pb-5 pt-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
         >
           {assets.map((a) => (
-            <div key={a.id} className="snap-start shrink-0">
+            <div key={a.id} data-card className="snap-start shrink-0">
               <AssetCard card={a} accent={accent} rentalNoun={meta.rentalNoun} onAcquire={onAcquire} />
             </div>
           ))}
