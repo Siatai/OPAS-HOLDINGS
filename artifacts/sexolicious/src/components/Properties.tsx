@@ -449,14 +449,8 @@ function AssetCard({
 
         <button
           onClick={onAcquire}
-          className="w-full py-2.5 rounded-sm text-[10px] tracking-[0.28em] uppercase transition-all duration-300 hover:translate-y-[-1px]"
-          style={{
-            ...NEVERA,
-            background: `linear-gradient(180deg, ${accent}3d 0%, transparent 36%), linear-gradient(180deg, #f5b955 0%, #e89f2e 50%, #b87d1e 100%)`,
-            color: "#1a0e02",
-            fontWeight: 700,
-            boxShadow: `0 8px 24px -10px ${accent}80, inset 0 1px 0 rgba(255,255,255,0.25)`,
-          }}
+          className="btn-metal w-full py-2.5 rounded-sm text-[10px] font-bold tracking-[0.28em] uppercase"
+          style={NEVERA}
         >
           Acquire equity interest · from ${card.price}
         </button>
@@ -541,12 +535,8 @@ function ComingSoon() {
         <div className="relative text-center">
           <a
             href="#waitlist"
-            className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-sm transition-all duration-300 hover:translate-y-[-1px]"
-            style={{
-              ...NEVERA,
-              background: "linear-gradient(180deg, rgba(11,181,190,0.16) 0%, rgba(11,181,190,0.035) 32%, transparent 58%), linear-gradient(180deg, #f5b955 0%, #ea8d0e 50%, #b87d1e 100%)",
-              boxShadow: "0 8px 28px -10px rgba(234,141,14,0.55), inset 0 1px 0 rgba(255,255,255,0.25)",
-            }}
+            className="btn-metal inline-flex items-center gap-2.5 px-7 py-3.5 rounded-sm"
+            style={NEVERA}
           >
             <span className="text-[10.5px] font-bold tracking-[0.28em] uppercase text-[#1a0e02]">
               Join the waitlist

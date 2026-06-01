@@ -278,13 +278,8 @@ function PropertyCard({
 
         <button
           onClick={onAcquire}
-          className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-md text-xs sm:text-sm tracking-[0.3em] uppercase transition-all hover:scale-[1.02]"
-          style={{
-            ...NEVERA,
-            background: "linear-gradient(135deg, rgba(234,141,14,0.95) 0%, rgba(214,121,4,1) 100%)",
-            color: "#100b03",
-            boxShadow: "0 10px 28px -10px rgba(234,141,14,0.55), inset 0 1px 0 rgba(255,255,255,0.35)",
-          }}
+          className="btn-metal w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-md text-xs sm:text-sm font-bold tracking-[0.3em] uppercase text-[#100b03]"
+          style={NEVERA}
         >
           <Coins className="w-3.5 h-3.5" />
           Acquire equity
