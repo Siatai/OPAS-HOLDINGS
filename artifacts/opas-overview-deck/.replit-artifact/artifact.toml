@@ -1,0 +1,31 @@
+kind = "slides"
+previewPath = "/opas-overview-deck/"
+title = "Opas Holdings — Overview"
+version = "1.0.0"
+id = "artifacts/opas-overview-deck"
+router = "path"
+
+[[integratedSkills]]
+name = "slides"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/opas-overview-deck/" ]
+localPort = 24841
+
+[services.development]
+run = "pnpm --filter @workspace/opas-overview-deck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/opas-overview-deck", "run", "build" ]
+publicDir = "artifacts/opas-overview-deck/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24841"
+BASE_PATH = "/opas-overview-deck/"

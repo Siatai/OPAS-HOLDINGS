@@ -1,0 +1,66 @@
+[
+  {
+    "id": "a4f7a50e-1b52-4b9e-b36f-77043d1cefc0",
+    "position": 1,
+    "filepath": "src/pages/slides/Title.tsx",
+    "title": "Title",
+    "description": "Opas Holdings overview cover",
+    "speakerNotes": ""
+  },
+  {
+    "id": "737fbc9c-83cd-444c-9fdb-024475aa523b",
+    "position": 2,
+    "filepath": "src/pages/slides/WhatIsOpas.tsx",
+    "title": "What Opas Is",
+    "description": "Plain-language definition of the platform",
+    "speakerNotes": ""
+  },
+  {
+    "id": "4ff5e760-6062-490d-ba77-18cb3092354e",
+    "position": 3,
+    "filepath": "src/pages/slides/AssetClasses.tsx",
+    "title": "Asset Classes",
+    "description": "Four asset classes you can co-own",
+    "speakerNotes": ""
+  },
+  {
+    "id": "8333b992-1837-4858-ba18-b01453f89e8f",
+    "position": 4,
+    "filepath": "src/pages/slides/HowItWorks.tsx",
+    "title": "How It Works",
+    "description": "Browse, Own, Earn, Trade flow",
+    "speakerNotes": ""
+  },
+  {
+    "id": "ac749af3-1043-4ddf-8c9b-5cf6f12b76a0",
+    "position": 5,
+    "filepath": "src/pages/slides/Market.tsx",
+    "title": "Market Opportunity",
+    "description": "RWA market growth $31B to $5.5T",
+    "speakerNotes": ""
+  },
+  {
+    "id": "619f6ac0-01d5-405b-b907-83149e53da31",
+    "position": 6,
+    "filepath": "src/pages/slides/Differentiators.tsx",
+    "title": "What Sets Opas Apart",
+    "description": "AI valuations, on-chain ownership, liquidity",
+    "speakerNotes": ""
+  },
+  {
+    "id": "123ef06c-51e2-4018-a923-0a8357547d63",
+    "position": 7,
+    "filepath": "src/pages/slides/Vision.tsx",
+    "title": "Vision",
+    "description": "Where the platform is headed",
+    "speakerNotes": ""
+  },
+  {
+    "id": "2f20cee5-719f-40e6-a9b3-359861cb06a6",
+    "position": 8,
+    "filepath": "src/pages/slides/Closing.tsx",
+    "title": "Closing",
+    "description": "Closing brand lockup and CTA",
+    "speakerNotes": ""
+  }
+]

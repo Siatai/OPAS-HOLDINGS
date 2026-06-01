@@ -1,0 +1,66 @@
+[
+  {
+    "id": "a1f0c2d4-1b3e-4a6c-9d10-1e2f3a4b5c61",
+    "position": 1,
+    "filepath": "src/pages/slides/Title.tsx",
+    "title": "Own a Piece of the Extraordinary",
+    "description": "Hero title slide with brand wordmark",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1f0c2d4-1b3e-4a6c-9d10-1e2f3a4b5c62",
+    "position": 2,
+    "filepath": "src/pages/slides/Idea.tsx",
+    "title": "The Idea",
+    "description": "What Opas is and why it exists",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1f0c2d4-1b3e-4a6c-9d10-1e2f3a4b5c63",
+    "position": 3,
+    "filepath": "src/pages/slides/WhatYouOwn.tsx",
+    "title": "What You Can Own",
+    "description": "Four asset classes image grid",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1f0c2d4-1b3e-4a6c-9d10-1e2f3a4b5c64",
+    "position": 4,
+    "filepath": "src/pages/slides/HowItWorks.tsx",
+    "title": "How It Works",
+    "description": "Browse, own, earn, trade",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1f0c2d4-1b3e-4a6c-9d10-1e2f3a4b5c65",
+    "position": 5,
+    "filepath": "src/pages/slides/Yield.tsx",
+    "title": "Real Yield",
+    "description": "Assets pay income to holders",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1f0c2d4-1b3e-4a6c-9d10-1e2f3a4b5c66",
+    "position": 6,
+    "filepath": "src/pages/slides/Liquidity.tsx",
+    "title": "Liquidity",
+    "description": "Trade your stake 24/7",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1f0c2d4-1b3e-4a6c-9d10-1e2f3a4b5c67",
+    "position": 7,
+    "filepath": "src/pages/slides/Trust.tsx",
+    "title": "Built on Trust",
+    "description": "AI valuation, on-chain title, secure custody",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1f0c2d4-1b3e-4a6c-9d10-1e2f3a4b5c68",
+    "position": 8,
+    "filepath": "src/pages/slides/Closing.tsx",
+    "title": "Within Reach",
+    "description": "Closing call to action",
+    "speakerNotes": ""
+  }
+]

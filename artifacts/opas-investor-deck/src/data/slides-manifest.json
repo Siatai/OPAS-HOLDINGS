@@ -1,1 +1,66 @@
-[]
+[
+  {
+    "id": "b1f2c3d4-0001-4a1b-9c2d-1a2b3c4d5e01",
+    "position": 1,
+    "filepath": "src/pages/slides/Title.tsx",
+    "title": "Opas Holdings",
+    "description": "Title — own the world's finest assets, by the share",
+    "speakerNotes": ""
+  },
+  {
+    "id": "b1f2c3d4-0002-4a1b-9c2d-1a2b3c4d5e02",
+    "position": 2,
+    "filepath": "src/pages/slides/Problem.tsx",
+    "title": "The Problem",
+    "description": "Trophy assets are gated, illiquid, and opaque",
+    "speakerNotes": ""
+  },
+  {
+    "id": "b1f2c3d4-0003-4a1b-9c2d-1a2b3c4d5e03",
+    "position": 3,
+    "filepath": "src/pages/slides/Solution.tsx",
+    "title": "The Solution",
+    "description": "Co-ownership of luxury assets from $100",
+    "speakerNotes": ""
+  },
+  {
+    "id": "b1f2c3d4-0004-4a1b-9c2d-1a2b3c4d5e04",
+    "position": 4,
+    "filepath": "src/pages/slides/Market.tsx",
+    "title": "Market Opportunity",
+    "description": "RWA tokenization: $31B today to $5.5T by 2030",
+    "speakerNotes": ""
+  },
+  {
+    "id": "b1f2c3d4-0005-4a1b-9c2d-1a2b3c4d5e05",
+    "position": 5,
+    "filepath": "src/pages/slides/HowItWorks.tsx",
+    "title": "How It Works",
+    "description": "AI valuation, on-chain ownership, yield, 24/7 market",
+    "speakerNotes": ""
+  },
+  {
+    "id": "b1f2c3d4-0006-4a1b-9c2d-1a2b3c4d5e06",
+    "position": 6,
+    "filepath": "src/pages/slides/Portfolio.tsx",
+    "title": "The Portfolio",
+    "description": "Four asset classes with real yield data",
+    "speakerNotes": ""
+  },
+  {
+    "id": "b1f2c3d4-0007-4a1b-9c2d-1a2b3c4d5e07",
+    "position": 7,
+    "filepath": "src/pages/slides/BusinessModel.tsx",
+    "title": "Business Model",
+    "description": "Three aligned revenue streams",
+    "speakerNotes": ""
+  },
+  {
+    "id": "b1f2c3d4-0008-4a1b-9c2d-1a2b3c4d5e08",
+    "position": 8,
+    "filepath": "src/pages/slides/Ask.tsx",
+    "title": "The Ask",
+    "description": "Raise, use of funds, and contact",
+    "speakerNotes": ""
+  }
+]
