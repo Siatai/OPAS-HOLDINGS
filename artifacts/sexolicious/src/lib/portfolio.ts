@@ -420,7 +420,7 @@ export function fmtUsdCompact(n: number): string {
 // Activity ledger (per-wallet)
 // ─────────────────────────────────────────────────────────────
 
-export type ActivityKind = "buy" | "sell" | "list" | "cancel" | "rent" | "vote" | "swap";
+export type ActivityKind = "buy" | "sell" | "list" | "cancel" | "rent" | "vote" | "swap" | "withdraw";
 
 export type Activity = {
   id: string;
@@ -504,6 +504,43 @@ export function getActivity(address: string): Activity[] {
     return readActivity(address);
   }
   return existing;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Withdrawable proceeds (USDT)
+//   Distributions (rent/charter + sale proceeds) accrue to a USDT
+//   balance the holder can withdraw to an external wallet.
+// ─────────────────────────────────────────────────────────────
+export function proceedsFromActivity(acts: Activity[]): { available: number; earned: number; withdrawn: number } {
+  let earned = 0;
+  let withdrawn = 0;
+  for (const a of acts) {
+    if (a.kind === "rent" || a.kind === "sell") earned += a.usd || 0;
+    else if (a.kind === "withdraw") withdrawn += a.usd || 0;
+  }
+  return { available: Math.max(0, earned - withdrawn), earned, withdrawn };
+}
+
+export function proceedsBalance(address: string): { available: number; earned: number; withdrawn: number } {
+  return proceedsFromActivity(getActivity(address));
+}
+
+export function withdrawProceeds(
+  address: string,
+  amountUsd: number,
+  destination: string,
+): { ok: boolean; reason?: string; balance?: number } {
+  if (!address) return { ok: false, reason: "Connect a wallet first." };
+  if (!(amountUsd > 0)) return { ok: false, reason: "Enter an amount greater than zero." };
+  const dest = destination.trim();
+  if (!/^0x[a-fA-F0-9]{40}$/.test(dest)) return { ok: false, reason: "Enter a valid wallet address (0x…)." };
+  const { available } = proceedsBalance(address);
+  if (amountUsd > available + 1e-6) return { ok: false, reason: `Only ${fmtUsdCompact(available)} available.` };
+  logActivity(address, {
+    kind: "withdraw", propertyId: "", usd: amountUsd,
+    note: `Withdrawn in USDT to ${dest.slice(0, 6)}…${dest.slice(-4)}`,
+  });
+  return { ok: true, balance: proceedsBalance(address).available };
 }
 
 export function rentalSummary(holdings: Holding[]) {

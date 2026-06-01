@@ -5,11 +5,11 @@ import { useAccount, useChainId } from "wagmi";
 import {
   Wallet, Building2, Store, Vote, Coins, TrendingUp, TrendingDown,
   Tag, ShoppingCart, ShieldCheck, Receipt, ArrowUpRight, ArrowDownRight,
-  Activity as ActivityIcon, ChevronRight, BadgePercent, ArrowLeftRight,
+  Activity as ActivityIcon, ChevronRight, BadgePercent, ArrowLeftRight, Banknote,
 } from "lucide-react";
 import {
   getHoldings, getProposals, getListings, getActivity,
-  portfolioStats, rentalSummary, lookupProperty, fmtUsdCompact,
+  portfolioStats, rentalSummary, lookupProperty, fmtUsdCompact, proceedsFromActivity,
   type Holding, type Proposal, type Listing, type Activity, type ActivityKind,
 } from "@/lib/portfolio";
 import { useWallet } from "@/components/WalletContext";
@@ -40,6 +40,7 @@ const ACT_META: Record<ActivityKind, { icon: any; tone: string; label: string }>
   rent:   { icon: Receipt,      tone: "text-amber-300 border-amber-400/40 bg-amber-400/10",       label: "Rent" },
   vote:   { icon: Vote,         tone: "text-secondary border-secondary/40 bg-secondary/10",       label: "Vote" },
   swap:   { icon: ArrowLeftRight, tone: "text-secondary border-secondary/40 bg-secondary/10",     label: "Swap" },
+  withdraw: { icon: Banknote,    tone: "text-secondary border-secondary/40 bg-secondary/10",     label: "Withdraw" },
 };
 
 export default function Dashboard() {
@@ -75,6 +76,7 @@ export default function Dashboard() {
     () => activity.filter((a) => a.kind === "rent").reduce((s, a) => s + (a.usd || 0), 0),
     [activity],
   );
+  const proceeds = useMemo(() => proceedsFromActivity(activity), [activity]);
 
   if (!isConnected) {
     return (
@@ -136,6 +138,15 @@ export default function Dashboard() {
       tone: "from-amber-400/20 to-amber-400/0 border-amber-400/30",
       iconTone: "text-amber-300",
       meta: `${fmtUsdCompact(rentals.monthly)} / mo`,
+    },
+    {
+      label: "Withdraw",
+      desc: "Cash out USDT proceeds",
+      icon: Banknote,
+      href: "/withdraw",
+      tone: "from-secondary/25 to-secondary/5 border-secondary/30",
+      iconTone: "text-secondary",
+      meta: `${fmtUsdCompact(proceeds.available)} available`,
     },
     {
       label: "Governance",
@@ -383,7 +394,7 @@ export default function Dashboard() {
                   {recent.map((a) => {
                     const m = ACT_META[a.kind];
                     const meta = lookupProperty(a.propertyId);
-                    const isOut = a.kind === "buy" || a.kind === "list";
+                    const isOut = a.kind === "buy" || a.kind === "list" || a.kind === "withdraw";
                     const isIn  = a.kind === "rent" || a.kind === "sell";
                     return (
                       <div key={a.id} className="flex items-center gap-3 p-3 sm:p-4 hover:bg-white/[0.02] transition-colors" data-testid={`activity-${a.kind}`}>

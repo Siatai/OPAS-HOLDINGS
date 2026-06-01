@@ -13,6 +13,7 @@ import CityPage from "@/pages/CityPage";
 import Portfolio from "@/pages/Portfolio";
 import Marketplace from "@/pages/Marketplace";
 import Dashboard from "@/pages/Dashboard";
+import Withdraw from "@/pages/Withdraw";
 import NotFound from "@/pages/not-found";
 import LoaderScreen from "@/components/LoaderScreen";
 import { AnimatePresence } from "framer-motion";
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/portfolio" component={Portfolio} />
       <Route path="/marketplace" component={Marketplace} />
+      <Route path="/withdraw" component={Withdraw} />
       <Route component={NotFound} />
     </Switch>
   );
