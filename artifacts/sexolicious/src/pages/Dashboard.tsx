@@ -312,8 +312,8 @@ export default function Dashboard() {
                       <div key={r.propertyId} className="flex items-center gap-3 p-3 sm:p-4 hover:bg-white/[0.02] transition-colors">
                         <img src={meta.prop.image} alt="" className="w-12 h-12 rounded-md object-cover shrink-0" />
                         <div className="min-w-0 flex-1">
-                          <div className="text-[13px] sm:text-sm text-white leading-tight" style={SHARKON}>
-                            <MarqueeText title={meta.prop.title}>{meta.prop.title}</MarqueeText>
+                          <div className="text-[13px] sm:text-sm text-white leading-tight break-words" style={SHARKON}>
+                            {meta.prop.title}
                           </div>
                           <div className="text-[9.5px] tracking-[0.24em] uppercase text-white/40 font-mono">
                             {meta.prop.token} · Yield {meta.prop.rentalYield}
