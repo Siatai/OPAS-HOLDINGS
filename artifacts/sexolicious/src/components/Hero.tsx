@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { useWallet } from "./WalletContext";
+import { useOpasPrice, fmtOpasRate } from "@/lib/opasPrice";
 import worldSkyline from "@/assets/images/world_skyline.png";
 import heroCar from "@/assets/images/assets/car_ferrari.png";
 import heroYacht from "@/assets/images/assets/yacht_riva.png";
@@ -28,6 +29,7 @@ export default function Hero() {
   const y       = useTransform(scrollY, [0, 800], [0, 120]);
   const opacity = useTransform(scrollY, [0, 380], [1, 0]);
   const { openWallet } = useWallet();
+  const { price: opasPrice, changePct: opasChange } = useOpasPrice();
 
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const sectionRef = useRef<HTMLElement>(null);
@@ -266,6 +268,34 @@ export default function Hero() {
                   <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
                     <span className="text-[8.5px] tracking-[0.3em] uppercase text-secondary/80" style={NEVERA}>online</span>
+                  </div>
+                </div>
+
+                {/* Live $OPAS price */}
+                <div
+                  className="flex items-center justify-between mb-5 rounded-lg px-3 py-2.5"
+                  style={{
+                    background: "rgba(11,181,190,0.07)",
+                    border: "1px solid rgba(11,181,190,0.22)",
+                  }}
+                >
+                  <div className="leading-tight">
+                    <div className="text-[7.5px] tracking-[0.3em] uppercase text-white/35 mb-0.5" style={NEVERA}>
+                      $OPAS · USDT
+                    </div>
+                    <div className="text-[20px] leading-none text-secondary" style={SHARKON}>
+                      {fmtOpasRate(opasPrice)}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <TrendingUp
+                      className={`w-3 h-3 ${opasChange >= 0 ? "text-emerald-400" : "text-rose-400 rotate-180"}`}
+                    />
+                    <span
+                      className={`text-[11px] font-mono tabular-nums ${opasChange >= 0 ? "text-emerald-300" : "text-rose-300"}`}
+                    >
+                      {opasChange >= 0 ? "+" : ""}{opasChange.toFixed(2)}%
+                    </span>
                   </div>
                 </div>
 
