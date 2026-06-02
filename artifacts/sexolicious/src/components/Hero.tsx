@@ -8,6 +8,7 @@ import worldSkyline from "@/assets/images/world_skyline.png";
 import heroCar from "@/assets/images/assets/car_ferrari.png";
 import heroYacht from "@/assets/images/assets/yacht_riva.png";
 import heroJet from "@/assets/images/assets/jet_gulfstream.png";
+import heroEstate from "@/assets/images/dubai.png";
 
 const TICKER_ITEMS = [
   "120 assets", "4 asset classes", "$480M aum", "18,000 investors",
@@ -19,10 +20,13 @@ const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
 const SERIF   = { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" as const };
 
+// Four asset classes → a balanced quadrilateral row. Inner two cards are lifted
+// (marginBottom) so the four card-tops trace a trapezoid over the skyline.
 const HERO_ASSETS = [
-  { img: heroCar,   label: "Supercars",    yld: "12.6%", accent: "#EA8D0E", delay: 0.9,  dur: 5.0 },
-  { img: heroYacht, label: "Yachts",       yld: "11.0%", accent: "#0BB5BE", delay: 1.1,  dur: 6.0 },
-  { img: heroJet,   label: "Private Jets", yld: "10.8%", accent: "#22D3EE", delay: 1.3,  dur: 5.5 },
+  { img: heroEstate, label: "Real Estate",  yld: "9.4%",  accent: "#C9CCD2", delay: 0.8, dur: 5.5, lift: 0  },
+  { img: heroCar,    label: "Supercars",    yld: "12.6%", accent: "#EA8D0E", delay: 1.0, dur: 5.0, lift: 24 },
+  { img: heroYacht,  label: "Yachts",       yld: "11.0%", accent: "#0BB5BE", delay: 1.2, dur: 6.0, lift: 24 },
+  { img: heroJet,    label: "Private Jets", yld: "10.8%", accent: "#22D3EE", delay: 1.4, dur: 5.5, lift: 0  },
 ];
 
 export default function Hero() {
@@ -97,12 +101,12 @@ export default function Hero() {
         />
       </div>
 
-      {/* Floating tokenized-asset cards — tidy centered row along the skyline (desktop only) */}
-      <div className="hidden lg:flex absolute bottom-[5%] left-1/2 -translate-x-1/2 z-[5] gap-5 pointer-events-none">
+      {/* Floating tokenized-asset cards — four-asset trapezoid along the skyline (desktop only) */}
+      <div className="hidden lg:flex items-end absolute bottom-[5%] left-1/2 -translate-x-1/2 z-[5] gap-4 pointer-events-none">
         {HERO_ASSETS.map((a) => (
           <motion.div
             key={a.label}
-            className="w-[150px] rounded-lg overflow-hidden"
+            className="w-[140px] rounded-lg overflow-hidden"
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: [0, -10, 0] }}
             transition={{
@@ -110,6 +114,7 @@ export default function Hero() {
               y: { duration: a.dur, repeat: Infinity, ease: "easeInOut", delay: a.delay },
             }}
             style={{
+              marginBottom: a.lift,
               border: `1px solid ${a.accent}59`,
               boxShadow: `0 20px 50px -20px rgba(0,0,0,0.7), 0 0 42px -16px ${a.accent}80`,
             }}

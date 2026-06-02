@@ -46,7 +46,7 @@ export default function Navbar() {
             alt="Opas"
             className="w-9 h-9 object-contain drop-shadow-[0_0_12px_rgba(234,141,14,0.6)] group-hover:drop-shadow-[0_0_20px_rgba(234,141,14,0.9)] transition-all duration-300"
           />
-          <div className="flex items-baseline gap-2 leading-none">
+          <div className="flex items-baseline gap-2 leading-[1.25] py-0.5">
             <span
               className="opas-3d text-[18px] tracking-[0.14em] uppercase"
               style={{ fontFamily: "DuneRise, Sharkon, sans-serif" }}
@@ -66,7 +66,7 @@ export default function Navbar() {
         </Link>
 
         {/* ── Desktop nav ── */}
-        <nav className="hidden md:flex items-center gap-7">
+        <nav className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-7">
           {navLinks.map((link) => link.internal ? (
             <Link
               key={link.label}
@@ -86,24 +86,26 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
-          <OpasPriceTag withSparkline />
+          <span className="hidden xl:inline-flex items-center">
+            <OpasPriceTag withSparkline />
+          </span>
           <div className="w-px h-5 bg-white/10" />
           {isConnected ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 metallic-border rounded-lg px-1.5 py-1">
               <NotificationBell />
               <Link
                 href="/dashboard"
-                className="btn-metal-silver px-4 py-2 text-[10.5px] tracking-[0.22em] uppercase rounded-sm"
+                className="btn-metal-silver px-3.5 py-1.5 text-[10.5px] tracking-[0.22em] uppercase rounded-md"
                 style={{ fontFamily: "Neuropol, sans-serif" }}
               >
-                Dashboard
+                <span className="metallic-text">Dashboard</span>
               </Link>
               <button
                 onClick={openWallet}
-                className="btn-metal-silver flex items-center gap-2 px-4 py-2 text-[10.5px] tracking-[0.18em] uppercase rounded-sm font-mono"
+                className="btn-metal-silver flex items-center gap-2 px-3.5 py-1.5 text-[10.5px] tracking-[0.18em] uppercase rounded-md font-mono"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                {shortAddr}
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="metallic-text">{shortAddr}</span>
               </button>
             </div>
           ) : (
