@@ -40,6 +40,8 @@ export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const showCenter = useMinWidth(1280);
   const reduceMotion = useReducedMotion();
+  const tiltY = (mousePos.x - 0.5) * 14;
+  const tiltX = -(mousePos.y - 0.5) * 14;
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -121,13 +123,22 @@ export default function Hero() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="absolute z-[6] top-[45%] left-[calc(50%_+_24px)] -translate-x-1/2 -translate-y-1/2 w-[288px] h-[288px] pointer-events-none"
+          style={{ perspective: "1300px" }}
         >
+         <div
+           className="relative w-full h-full"
+           style={{
+             transformStyle: "preserve-3d",
+             transform: reduceMotion ? undefined : `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`,
+             transition: "transform 0.35s ease-out",
+           }}
+         >
           {/* Soft core glow */}
           <div
-            className="absolute inset-0 rounded-full blur-3xl opacity-80"
+            className="absolute inset-0 rounded-full blur-3xl opacity-90"
             style={{
               background:
-                "radial-gradient(circle at 50% 50%, rgba(234,141,14,0.10) 0%, rgba(200,210,225,0.05) 38%, transparent 66%)",
+                "radial-gradient(circle at 50% 50%, rgba(234,141,14,0.18) 0%, rgba(200,210,225,0.07) 38%, transparent 66%)",
             }}
           />
 
@@ -151,6 +162,13 @@ export default function Hero() {
                 <stop offset="55%" stopColor="rgba(220,225,235,0.08)" />
                 <stop offset="100%" stopColor="rgba(234,141,14,0.14)" />
               </linearGradient>
+              <filter id="pipGlow" x="-400%" y="-400%" width="900%" height="900%">
+                <feGaussianBlur stdDeviation="2.4" result="b" />
+                <feMerge>
+                  <feMergeNode in="b" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
             </defs>
 
             {/* concentric rings */}
@@ -188,6 +206,18 @@ export default function Hero() {
               className="animate-spin motion-reduce:animate-none"
               style={{ animationDuration: "30s", animationDirection: "reverse", transformBox: "fill-box", transformOrigin: "center" }}
             />
+
+            {/* traveling light pips orbiting the core */}
+            {!reduceMotion && (
+              <g className="animate-spin" style={{ animationDuration: "9s", transformBox: "fill-box", transformOrigin: "center" }}>
+                <circle cx="144" cy="72" r="2.8" fill="#EA8D0E" filter="url(#pipGlow)" />
+              </g>
+            )}
+            {!reduceMotion && (
+              <g className="animate-spin" style={{ animationDuration: "16s", animationDirection: "reverse", transformBox: "fill-box", transformOrigin: "center" }}>
+                <circle cx="144" cy="54" r="2.2" fill="#0BB5BE" filter="url(#pipGlow)" />
+              </g>
+            )}
 
             {/* energy spokes — dashes flow outward from the logo to each asset */}
             {CLASSES.map((c) => (
@@ -232,8 +262,22 @@ export default function Hero() {
               className="relative w-full h-full rounded-full object-cover"
               style={{
                 boxShadow:
-                  "0 0 0 1px rgba(220,225,235,0.20), inset 0 0 18px rgba(0,0,0,0.5), 0 0 46px -8px rgba(234,141,14,0.55)",
+                  "0 0 0 1px rgba(220,225,235,0.22), inset 0 0 18px rgba(0,0,0,0.5), 0 0 56px -6px rgba(234,141,14,0.6)",
               }}
+            />
+            {/* rotating gloss sheen across the orb */}
+            <div
+              className="absolute inset-0 rounded-full overflow-hidden mix-blend-screen animate-spin motion-reduce:hidden"
+              style={{
+                animationDuration: "7s",
+                background:
+                  "conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.22) 16deg, rgba(255,236,200,0.05) 34deg, transparent 52deg)",
+              }}
+            />
+            {/* crisp metallic rim */}
+            <div
+              className="absolute inset-0 rounded-full pointer-events-none"
+              style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.14), inset 0 1px 2px rgba(255,255,255,0.18)" }}
             />
           </div>
 
@@ -263,6 +307,7 @@ export default function Hero() {
               <span className="text-[6px] tracking-[0.26em] uppercase text-white/55 mt-1 whitespace-nowrap" style={NEVERA}>{c.label}</span>
             </motion.div>
           ))}
+         </div>
         </motion.div>
       )}
 
