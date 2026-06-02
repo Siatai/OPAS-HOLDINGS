@@ -3,6 +3,7 @@
 - [Looping carousel a11y](looping-carousel-a11y.md) — clone-based infinite rails must keep only one copy in tab/AT order (aria-hidden + tabIndex=-1, NOT inert, so clicks still work).
 - [Stale canvas iframe vs live app](stale-iframe-fouc.md) — a "broken/crammed" card in the canvas preview is often a stale cached/FOUC frame, not a code bug; verify the live render before changing code.
 - [FitText shared-scale group](fittext-shared-scale.md) — stat rows render even via FitTextGroup+share; never depend on the group context object in the measuring effect (infinite-loop).
+- [Mobile-untouched render gating](responsive-render-gating.md) — `hidden xl:block` still ships DOM + fetches imgs on mobile; gate desktop-only UI with `useMinWidth(px)` render, not CSS hide.
 - [Navbar overflow fix](navbar-overflow.md) — fix desktop nav right-edge overflow via spacing + xl-gating the price tag, NOT by shifting md/lg breakpoints (that breaks the tablet/mobile contract).
 - [Wallet connectors](wallet-connectors.md) — mobile wallets via conditional walletConnect connector (needs public VITE_WALLETCONNECT_PROJECT_ID); type the connectors array `CreateConnectorFn[]` or TS narrows to the first connector.
 - [Opas hosting architecture](hosting-architecture.md) — 4 separate static apps glued by Replit path-routing; /pitch links to absolute deck paths; off-Replit hosting must reproduce routing; no backend needed.

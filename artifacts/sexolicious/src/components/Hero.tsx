@@ -4,7 +4,12 @@ import { ArrowRight, TrendingUp } from "lucide-react";
 import { useWallet } from "./WalletContext";
 import FitText, { FitTextGroup } from "./FitText";
 import { useOpasPrice, fmtOpasRate } from "@/lib/opasPrice";
+import { useMinWidth } from "@/hooks/use-mobile";
 import worldSkyline from "@/assets/images/world_skyline.png";
+import heroCar from "@/assets/images/assets/car_ferrari.png";
+import heroYacht from "@/assets/images/assets/yacht_riva.png";
+import heroJet from "@/assets/images/assets/jet_gulfstream.png";
+import heroEstate from "@/assets/images/dubai.png";
 
 const TICKER_ITEMS = [
   "120 assets", "4 asset classes", "$480M aum", "18,000 investors",
@@ -16,6 +21,50 @@ const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
 const SERIF   = { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" as const };
 
+// Four asset classes arranged as a staggered collage that fills the hero's
+// central negative space (wide desktop only).
+const COLLAGE = {
+  estate: { img: heroEstate, label: "Real Estate",  yld: "9.4%",  accent: "#C9CCD2", delay: 0.70 },
+  yacht:  { img: heroYacht,  label: "Yachts",       yld: "11.0%", accent: "#0BB5BE", delay: 1.00 },
+  car:    { img: heroCar,    label: "Supercars",    yld: "12.6%", accent: "#EA8D0E", delay: 0.85 },
+  jet:    { img: heroJet,    label: "Private Jets", yld: "10.8%", accent: "#22D3EE", delay: 1.15 },
+};
+
+function CollageTile({
+  img, label, yld, accent, delay, ratio,
+}: { img: string; label: string; yld: string; accent: string; delay: number; ratio: string }) {
+  return (
+    <motion.div
+      className={`relative ${ratio} rounded-lg overflow-hidden`}
+      initial={{ opacity: 0, y: 22 }}
+      animate={{ opacity: 1, y: [0, -8, 0] }}
+      transition={{
+        opacity: { duration: 0.8, delay },
+        y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay },
+      }}
+      style={{
+        border: `1px solid ${accent}59`,
+        boxShadow: `0 18px 44px -20px rgba(0,0,0,0.7), 0 0 34px -16px ${accent}80`,
+      }}
+    >
+      <img src={img} alt={label} className="w-full h-full object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+      <span
+        className="absolute top-1.5 left-1.5 text-[6.5px] tracking-[0.26em] uppercase px-1.5 py-0.5 rounded backdrop-blur-sm"
+        style={{ ...NEVERA, background: `${accent}33`, color: "#fff" }}
+      >
+        Tokenized
+      </span>
+      <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between gap-1">
+        <span className="text-[7px] tracking-[0.22em] uppercase text-white/85 truncate" style={NEVERA}>{label}</span>
+        <span className="inline-flex items-center gap-0.5 text-[8px] shrink-0" style={{ ...NEVERA, color: accent }}>
+          <TrendingUp className="w-2 h-2" /> {yld}
+        </span>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function Hero() {
   const { scrollY } = useScroll();
   const y       = useTransform(scrollY, [0, 800], [0, 120]);
@@ -25,6 +74,7 @@ export default function Hero() {
 
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const sectionRef = useRef<HTMLElement>(null);
+  const showCollage = useMinWidth(1280);
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -93,6 +143,25 @@ export default function Hero() {
         bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)]
         bg-[size:4rem_4rem]
         [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_15%,transparent_100%)]" />
+
+      {/* Asset collage — fills the hero's central negative space between the copy
+          and the index panel. Rendered only at >=1280px (the gap only exists there),
+          so mobile/tablet ship no extra DOM or image fetches. Layered below the
+          z-10 copy/panel so it never overlaps them. */}
+      {showCollage && (
+        <div className="absolute z-[6] top-[46%] left-[51%] -translate-x-1/2 -translate-y-1/2 w-[266px] pointer-events-none">
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="flex flex-col gap-2.5">
+              <CollageTile {...COLLAGE.estate} ratio="aspect-square" />
+              <CollageTile {...COLLAGE.yacht} ratio="aspect-[4/5]" />
+            </div>
+            <div className="flex flex-col gap-2.5 mt-8">
+              <CollageTile {...COLLAGE.car} ratio="aspect-[4/5]" />
+              <CollageTile {...COLLAGE.jet} ratio="aspect-square" />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Main content ── */}
       <motion.div

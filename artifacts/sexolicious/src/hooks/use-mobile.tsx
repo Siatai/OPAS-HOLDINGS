@@ -17,3 +17,17 @@ export function useIsMobile() {
 
   return !!isMobile
 }
+
+export function useMinWidth(minWidth: number) {
+  const [matches, setMatches] = React.useState(false)
+
+  React.useEffect(() => {
+    const mql = window.matchMedia(`(min-width: ${minWidth}px)`)
+    const onChange = () => setMatches(mql.matches)
+    mql.addEventListener("change", onChange)
+    setMatches(mql.matches)
+    return () => mql.removeEventListener("change", onChange)
+  }, [minWidth])
+
+  return matches
+}
