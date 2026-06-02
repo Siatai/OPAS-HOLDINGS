@@ -1,5 +1,5 @@
 import { http, createConfig, type CreateConnectorFn } from "wagmi";
-import { mainnet } from "wagmi/chains";
+import { bsc } from "wagmi/chains";
 import { injected, walletConnect } from "wagmi/connectors";
 
 // WalletConnect lets visitors connect a wallet installed on their phone
@@ -26,16 +26,16 @@ if (wcProjectId) {
   );
 }
 
-// Only Ethereum mainnet is requested. Requesting several chains at once made
+// Only BNB Smart Chain (BSC) is requested. Requesting several chains at once made
 // some mobile wallets (notably Trust) reject the WalletConnect session with a
 // "required chains not supported" error. The app never sends real on-chain
-// transactions (chain is display-only), so a single, universally-supported
-// chain maximises wallet compatibility.
+// transactions (chain is display-only), so a single chain maximises wallet
+// compatibility.
 export const wagmiConfig = createConfig({
-  chains: [mainnet],
+  chains: [bsc],
   connectors,
   transports: {
-    [mainnet.id]: http(),
+    [bsc.id]: http(),
   },
 });
 

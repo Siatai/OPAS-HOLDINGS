@@ -18,7 +18,7 @@ const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
 
 const CHAIN_NAME: Record<number, string> = {
-  1: "Ethereum", 137: "Polygon", 8453: "Base", 42161: "Arbitrum",
+  56: "BNB Smart Chain", 1: "Ethereum", 137: "Polygon", 8453: "Base", 42161: "Arbitrum",
 };
 
 function shortAddr(a?: string) {
