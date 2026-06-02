@@ -20,9 +20,9 @@ const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
 const SERIF   = { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" as const };
 
 const HERO_ASSETS = [
-  { img: heroCar,   label: "Supercars",    yld: "12.6%", accent: "#EA8D0E", pos: "bottom-[16%] left-[3%]",  delay: 0.9,  dur: 5.0 },
-  { img: heroYacht, label: "Yachts",       yld: "11.0%", accent: "#0BB5BE", pos: "bottom-[10%] left-[22%]", delay: 1.1,  dur: 6.0 },
-  { img: heroJet,   label: "Private Jets", yld: "10.8%", accent: "#22D3EE", pos: "bottom-[24%] left-[40%]", delay: 1.3,  dur: 5.5 },
+  { img: heroCar,   label: "Supercars",    yld: "12.6%", accent: "#EA8D0E", delay: 0.9,  dur: 5.0 },
+  { img: heroYacht, label: "Yachts",       yld: "11.0%", accent: "#0BB5BE", delay: 1.1,  dur: 6.0 },
+  { img: heroJet,   label: "Private Jets", yld: "10.8%", accent: "#22D3EE", delay: 1.3,  dur: 5.5 },
 ];
 
 export default function Hero() {
@@ -97,12 +97,12 @@ export default function Hero() {
         />
       </div>
 
-      {/* Floating tokenized-asset cards over the skyline (desktop) */}
-      <div className="hidden lg:block absolute inset-0 z-[5] pointer-events-none">
+      {/* Floating tokenized-asset cards — tidy centered row along the skyline (desktop only) */}
+      <div className="hidden lg:flex absolute bottom-[5%] left-1/2 -translate-x-1/2 z-[5] gap-5 pointer-events-none">
         {HERO_ASSETS.map((a) => (
           <motion.div
             key={a.label}
-            className={`absolute ${a.pos} w-[160px] rounded-lg overflow-hidden`}
+            className="w-[150px] rounded-lg overflow-hidden"
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: [0, -10, 0] }}
             transition={{

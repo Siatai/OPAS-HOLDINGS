@@ -1,5 +1,5 @@
 import { http, createConfig, type CreateConnectorFn } from "wagmi";
-import { mainnet, polygon, base, arbitrum } from "wagmi/chains";
+import { mainnet } from "wagmi/chains";
 import { injected, walletConnect } from "wagmi/connectors";
 
 // WalletConnect lets visitors connect a wallet installed on their phone
@@ -26,14 +26,16 @@ if (wcProjectId) {
   );
 }
 
+// Only Ethereum mainnet is requested. Requesting several chains at once made
+// some mobile wallets (notably Trust) reject the WalletConnect session with a
+// "required chains not supported" error. The app never sends real on-chain
+// transactions (chain is display-only), so a single, universally-supported
+// chain maximises wallet compatibility.
 export const wagmiConfig = createConfig({
-  chains: [mainnet, polygon, base, arbitrum],
+  chains: [mainnet],
   connectors,
   transports: {
-    [mainnet.id]:  http(),
-    [polygon.id]:  http(),
-    [base.id]:     http(),
-    [arbitrum.id]: http(),
+    [mainnet.id]: http(),
   },
 });
 

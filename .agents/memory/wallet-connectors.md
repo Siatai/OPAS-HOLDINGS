@@ -20,6 +20,17 @@ when neither is available.
   works with injected-only. Never construct `walletConnect()` with an empty
   projectId (it throws at connect time).
 
+## Gotcha: too many chains breaks mobile wallets
+**Symptom:** Trust Wallet (and some other mobile wallets) reject the WalletConnect
+session with "required chains not supported" / "some of the required chains not
+here" when the wagmi config lists several chains.
+**Why:** wagmi's walletConnect connector passes every config chain into the WC
+session proposal; mobile wallets that don't have all of them enabled refuse.
+**Fix here:** the app does NO real on-chain transactions (chainId is display-only
+via `CHAIN_NAME[chainId]` with a fallback), so `wagmiConfig.chains` is reduced to
+`[mainnet]` only — universally supported, maximum connect success. Only revisit
+(add chains) if real tx flows that target other networks are introduced.
+
 ## Gotcha: typing a mixed connectors array
 **Rule:** annotate the connectors array as `CreateConnectorFn[]` before pushing a
 second connector type.
