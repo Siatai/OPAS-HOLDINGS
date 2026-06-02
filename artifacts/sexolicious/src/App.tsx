@@ -14,6 +14,7 @@ import Portfolio from "@/pages/Portfolio";
 import Marketplace from "@/pages/Marketplace";
 import Dashboard from "@/pages/Dashboard";
 import Withdraw from "@/pages/Withdraw";
+import Pitch from "@/pages/Pitch";
 import NotFound from "@/pages/not-found";
 import LoaderScreen from "@/components/LoaderScreen";
 import { AnimatePresence } from "framer-motion";
@@ -33,6 +34,21 @@ function ScrollToTop() {
   return null;
 }
 
+function Shell() {
+  const [location] = useLocation();
+  const immersive = location.replace(/\/+$/, "") === "/pitch";
+  return (
+    <>
+      <ScrollToTop />
+      {!immersive && <Navbar />}
+      <main className="flex-1">
+        <Router />
+      </main>
+      {!immersive && <Footer />}
+    </>
+  );
+}
+
 function Router() {
   return (
     <Switch>
@@ -42,6 +58,7 @@ function Router() {
       <Route path="/portfolio" component={Portfolio} />
       <Route path="/marketplace" component={Marketplace} />
       <Route path="/withdraw" component={Withdraw} />
+      <Route path="/pitch" component={Pitch} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -62,12 +79,7 @@ function App() {
           <>
             <div style={{ visibility: loaded ? 'visible' : 'hidden', opacity: loaded ? 1 : 0, transition: 'opacity 0.3s' }} className="dark min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/30 selection:text-primary-foreground">
               <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-                <ScrollToTop />
-                <Navbar />
-                <main className="flex-1">
-                  <Router />
-                </main>
-                <Footer />
+                <Shell />
               </WouterRouter>
             </div>
             {!loaded && <LoaderScreen onComplete={() => setLoaded(true)} />}
