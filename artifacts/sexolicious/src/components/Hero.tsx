@@ -38,10 +38,13 @@ export default function Hero() {
 
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const sectionRef = useRef<HTMLElement>(null);
-  const showCenter = useMinWidth(1280);
+  const showCenter = useMinWidth(1535);
   const reduceMotion = useReducedMotion();
   const tiltY = (mousePos.x - 0.5) * 14;
   const tiltX = -(mousePos.y - 0.5) * 14;
+  const RADAR_PERIOD = 8;
+  const radarDelay = (x: number, y: number) =>
+    (((((Math.atan2(x - 144, -(y - 144)) * 180) / Math.PI) + 360) % 360) / 360) * RADAR_PERIOD;
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -144,13 +147,13 @@ export default function Hero() {
 
           {/* Slowly-rotating radar sweep — whisper-subtle "live index" motion */}
           <div
-            className="absolute inset-[26px] rounded-full animate-spin motion-reduce:animate-none"
+            className="absolute inset-[20px] rounded-full animate-spin motion-reduce:hidden"
             style={{
-              animationDuration: "22s",
+              animationDuration: "8s",
               background:
-                "conic-gradient(from 0deg, transparent 0deg, rgba(234,141,14,0.10) 28deg, rgba(234,141,14,0.02) 56deg, transparent 70deg)",
-              maskImage: "radial-gradient(circle, transparent 28%, #000 42%, #000 96%, transparent 100%)",
-              WebkitMaskImage: "radial-gradient(circle, transparent 28%, #000 42%, #000 96%, transparent 100%)",
+                "conic-gradient(from 0deg, rgba(234,141,14,0.36) 0deg, rgba(234,141,14,0.12) 16deg, rgba(234,141,14,0.03) 40deg, transparent 64deg)",
+              maskImage: "radial-gradient(circle, transparent 24%, #000 40%, #000 97%, transparent 100%)",
+              WebkitMaskImage: "radial-gradient(circle, transparent 24%, #000 40%, #000 97%, transparent 100%)",
             }}
           />
 
@@ -207,41 +210,64 @@ export default function Hero() {
               style={{ animationDuration: "30s", animationDirection: "reverse", transformBox: "fill-box", transformOrigin: "center" }}
             />
 
-            {/* traveling light pips orbiting the core */}
-            {!reduceMotion && (
-              <g className="animate-spin" style={{ animationDuration: "9s", transformBox: "fill-box", transformOrigin: "center" }}>
-                <circle cx="144" cy="72" r="2.8" fill="#EA8D0E" filter="url(#pipGlow)" />
-              </g>
-            )}
-            {!reduceMotion && (
-              <g className="animate-spin" style={{ animationDuration: "16s", animationDirection: "reverse", transformBox: "fill-box", transformOrigin: "center" }}>
-                <circle cx="144" cy="54" r="2.2" fill="#0BB5BE" filter="url(#pipGlow)" />
-              </g>
-            )}
-
-            {/* energy spokes — dashes flow outward from the logo to each asset */}
+            {/* faint spoke rails to each asset */}
             {CLASSES.map((c) => (
-              <motion.line
-                key={c.label}
+              <line
+                key={`rail-${c.label}`}
                 x1="144" y1="144" x2={c.x} y2={c.y}
-                stroke={c.accent} strokeOpacity="0.45" strokeWidth="1" strokeDasharray="2 5"
-                animate={reduceMotion ? undefined : { strokeDashoffset: [0, -14] }}
-                transition={reduceMotion ? undefined : { duration: 1.8, repeat: Infinity, ease: "linear", delay: c.delay }}
+                stroke={c.accent} strokeOpacity="0.12" strokeWidth="1" strokeDasharray="2 5"
               />
             ))}
 
-            {/* node markers on the mid ring — gently pulsing halo */}
-            {CLASSES.map((c) => (
-              <g key={`m-${c.label}`}>
-                <motion.circle
-                  cx={c.x} cy={c.y} fill="none" stroke={c.accent} strokeWidth="1"
-                  initial={{ r: 6, strokeOpacity: 0.5 }}
-                  animate={reduceMotion ? { r: 7, strokeOpacity: 0.3 } : { r: [6, 9, 6], strokeOpacity: [0.5, 0.1, 0.5] }}
-                  transition={reduceMotion ? undefined : { duration: 3, repeat: Infinity, ease: "easeInOut", delay: c.delay }}
-                />
-                <circle cx={c.x} cy={c.y} r="2.6" fill={c.accent} />
-              </g>
+            {/* radar emission — a light dot fires out to each asset as the sweep crosses it */}
+            {!reduceMotion && CLASSES.map((c) => (
+              <motion.circle
+                key={`beam-${c.label}`}
+                r="2.8" fill={c.accent} filter="url(#pipGlow)"
+                initial={{ cx: 144, cy: 144, opacity: 0 }}
+                animate={{
+                  cx: [144, 144, c.x, c.x, c.x],
+                  cy: [144, 144, c.y, c.y, c.y],
+                  opacity: [0, 0, 1, 0, 0],
+                }}
+                transition={{
+                  duration: RADAR_PERIOD,
+                  times: [0, 0.02, 0.13, 0.26, 1],
+                  repeat: Infinity,
+                  ease: "easeOut",
+                  delay: radarDelay(c.x, c.y),
+                }}
+              />
             ))}
+
+            {/* node markers — light up only when the radar sweep reaches them */}
+            {CLASSES.map((c) => {
+              const delay = radarDelay(c.x, c.y);
+              return (
+                <g key={`m-${c.label}`}>
+                  {!reduceMotion && (
+                    <motion.circle
+                      cx={c.x} cy={c.y} fill="none" stroke={c.accent} strokeWidth="1.5"
+                      initial={{ r: 6, strokeOpacity: 0 }}
+                      animate={{ r: [6, 6, 15, 15], strokeOpacity: [0, 0.9, 0, 0] }}
+                      transition={{ duration: RADAR_PERIOD, times: [0, 0.13, 0.34, 1], repeat: Infinity, ease: "easeOut", delay }}
+                    />
+                  )}
+                  <motion.circle
+                    cx={c.x} cy={c.y} fill="none" stroke={c.accent} strokeWidth="1"
+                    initial={{ r: 6, strokeOpacity: 0.18 }}
+                    animate={reduceMotion ? { strokeOpacity: 0.3 } : { strokeOpacity: [0.18, 0.18, 0.85, 0.18, 0.18] }}
+                    transition={reduceMotion ? undefined : { duration: RADAR_PERIOD, times: [0, 0.05, 0.13, 0.3, 1], repeat: Infinity, ease: "easeOut", delay }}
+                  />
+                  <motion.circle
+                    cx={c.x} cy={c.y} r="2.6" fill={c.accent}
+                    initial={{ opacity: 0.35 }}
+                    animate={reduceMotion ? { opacity: 0.5 } : { opacity: [0.35, 0.35, 1, 0.35, 0.35] }}
+                    transition={reduceMotion ? undefined : { duration: RADAR_PERIOD, times: [0, 0.06, 0.13, 0.3, 1], repeat: Infinity, ease: "easeOut", delay }}
+                  />
+                </g>
+              );
+            })}
           </svg>
 
           {/* Center: OPAS logo mark with a breathing glow */}
@@ -299,9 +325,23 @@ export default function Hero() {
                 boxShadow: "0 8px 22px -12px rgba(0,0,0,0.7)",
               }}
             >
-              <span
+              {/* radar highlight pulse — fires when the sweep crosses this asset */}
+              {!reduceMotion && (
+                <motion.span
+                  aria-hidden
+                  className="absolute inset-0 rounded-lg pointer-events-none"
+                  style={{ boxShadow: `0 0 0 1px ${c.accent}, 0 0 18px -2px ${c.accent}` }}
+                  initial={{ opacity: 0, scale: 1 }}
+                  animate={{ opacity: [0, 0, 0.9, 0, 0], scale: [1, 1, 1.05, 1.16, 1.16] }}
+                  transition={{ duration: RADAR_PERIOD, times: [0, 0.05, 0.13, 0.32, 1], repeat: Infinity, ease: "easeOut", delay: radarDelay(c.x, c.y) }}
+                />
+              )}
+              <motion.span
                 className="w-1.5 h-1.5 rounded-full mb-1"
-                style={{ background: c.accent, boxShadow: `0 0 12px ${c.accent}` }}
+                style={{ background: c.accent }}
+                initial={{ boxShadow: `0 0 6px ${c.accent}` }}
+                animate={reduceMotion ? undefined : { boxShadow: [`0 0 6px ${c.accent}`, `0 0 6px ${c.accent}`, `0 0 16px 2px ${c.accent}`, `0 0 6px ${c.accent}`, `0 0 6px ${c.accent}`] }}
+                transition={reduceMotion ? undefined : { duration: RADAR_PERIOD, times: [0, 0.06, 0.13, 0.3, 1], repeat: Infinity, ease: "easeOut", delay: radarDelay(c.x, c.y) }}
               />
               <span className="text-[11px] leading-none" style={{ ...SHARKON, color: c.accent }}>{c.yld}</span>
               <span className="text-[6px] tracking-[0.26em] uppercase text-white/55 mt-1 whitespace-nowrap" style={NEVERA}>{c.label}</span>

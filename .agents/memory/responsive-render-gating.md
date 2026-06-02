@@ -35,6 +35,17 @@ is already correct and there's no flash / pop-in on load.
 4 asset-class node chips around an OPAS disc, no imagery). Subtle slow rotations
 are OK (radar sweep / dashed orbit, ~22–30s) but NO bobbing/float.
 
+**Radar-sweep node highlighting (current design):** the emblem is a "radar" — a
+rotating conic amber beam (leading edge at `from 0deg`, ~8s/rev) that lights up
+each asset node ONLY as it crosses. No per-frame JS: each node fires its
+highlight on a phase delay = `(angleClockwiseFromTop/360)*PERIOD`, where
+`angle = atan2(x-144, -(y-144))` normalized to [0,360) (144 = emblem center in
+288 viewBox). All synced effects (center→node emission dot, node ripple, chip
+pulse) use `duration: PERIOD`, `repeat: Infinity`, same `delay`, and keyframe
+`times` arrays that MUST end at 1. The conic bright stop sits at 0deg so beam
+angle == rotation angle, matching the delay formula. Gate is now
+`useMinWidth(1535)` (was 1280).
+
 **Gap-centering (don't covered-by-columns):** a `z-[6]` absolute decoration in
 the Hero gap will be painted over by the `z-10` columns unless it lives in the
 genuinely empty band. The Hero grid is asymmetric (left `col-span-7` copy
