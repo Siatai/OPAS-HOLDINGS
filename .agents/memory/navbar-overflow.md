@@ -23,5 +23,11 @@ touch mobile UI" constraint. An architect review will (correctly) fail it.
 - The connected Dashboard + address cluster is "metallicized" by wrapping it in a
   `metallic-border rounded-lg` pill with `metallic-text` on the label/address and
   `btn-metal-silver` buttons (all classes already in index.css).
+- The CONNECTED cluster is the widest state. Two must-dos so the wallet address
+  never wraps to 2 lines / clips at the right corner: (1) `whitespace-nowrap` +
+  `leading-none` on both pill buttons and `shrink-0` on the pill so flex can't
+  squeeze them; (2) hide the wide price ticker earlier when connected —
+  `isConnected ? "hidden 2xl:inline-flex" : "hidden xl:inline-flex"` — to reclaim
+  the width the Dashboard+address need.
 - Loader replays ~4s on every load, so the screenshot tool always catches it —
   verify Navbar/Hero via `runTest` with a ~6s wait, not the screenshot tool.

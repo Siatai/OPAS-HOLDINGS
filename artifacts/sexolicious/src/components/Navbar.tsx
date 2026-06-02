@@ -40,21 +40,21 @@ export default function Navbar() {
       <div className="container mx-auto px-6 lg:px-12 flex items-center justify-between gap-4">
 
         {/* ── Logo ── */}
-        <Link href="/" className="flex items-center gap-3 shrink-0 group">
+        <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
           <img
             src="/opas-logo.png"
             alt="Opas"
             className="w-9 h-9 object-contain drop-shadow-[0_0_12px_rgba(234,141,14,0.6)] group-hover:drop-shadow-[0_0_20px_rgba(234,141,14,0.9)] transition-all duration-300"
           />
-          <div className="flex items-baseline gap-2 leading-[1.25] py-0.5">
+          <div className="flex items-baseline gap-2">
             <span
-              className="opas-3d text-[18px] tracking-[0.14em] uppercase"
+              className="opas-3d text-[18px] leading-[1.4] tracking-[0.14em] uppercase"
               style={{ fontFamily: "DuneRise, Sharkon, sans-serif" }}
             >
               OPAS
             </span>
             <span
-              className="text-[11px] tracking-[0.24em] text-primary/80 uppercase"
+              className="text-[11px] leading-[1.4] tracking-[0.22em] text-primary/80 uppercase"
               style={{ fontFamily: "DuneRise, Sharkon, sans-serif" }}
             >
               HOLDINGS
@@ -86,23 +86,23 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
-          <span className="hidden xl:inline-flex items-center">
+          <span className={`items-center ${isConnected ? "hidden 2xl:inline-flex" : "hidden xl:inline-flex"}`}>
             <OpasPriceTag withSparkline />
           </span>
           <div className="w-px h-5 bg-white/10" />
           {isConnected ? (
-            <div className="flex items-center gap-1.5 metallic-border rounded-lg px-1.5 py-1">
+            <div className="flex items-center gap-1.5 shrink-0 metallic-border rounded-lg px-1.5 py-1">
               <NotificationBell />
               <Link
                 href="/dashboard"
-                className="btn-metal-silver px-3.5 py-1.5 text-[10.5px] tracking-[0.22em] uppercase rounded-md"
+                className="btn-metal-silver whitespace-nowrap px-3.5 py-1.5 text-[10.5px] leading-none tracking-[0.2em] uppercase rounded-md"
                 style={{ fontFamily: "Neuropol, sans-serif" }}
               >
                 <span className="metallic-text">Dashboard</span>
               </Link>
               <button
                 onClick={openWallet}
-                className="btn-metal-silver flex items-center gap-2 px-3.5 py-1.5 text-[10.5px] tracking-[0.18em] uppercase rounded-md font-mono"
+                className="btn-metal-silver flex items-center gap-2 whitespace-nowrap px-3.5 py-1.5 text-[10.5px] leading-none tracking-[0.2em] uppercase rounded-md font-mono"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
                 <span className="metallic-text">{shortAddr}</span>
