@@ -19,8 +19,8 @@ if (wcProjectId) {
       metadata: {
         name: "Opas Holdings",
         description: "Luxury tokenized-asset co-ownership platform",
-        url: typeof window !== "undefined" ? window.location.origin : "https://opas.holdings",
-        icons: ["https://opas.holdings/opas-logo.png"],
+        url: typeof window !== "undefined" ? window.location.origin : "https://opasholdings.com",
+        icons: ["https://opasholdings.com/opas-logo.png"],
       },
     }),
   );
