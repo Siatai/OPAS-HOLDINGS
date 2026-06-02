@@ -17,15 +17,20 @@ breakpoint), don't just CSS-hide it.
 
 **How to apply (this repo):** `src/hooks/use-mobile.tsx` exports
 `useMinWidth(px)` (matchMedia-based). `const showX = useMinWidth(1280);` then
-`{showX && (<desktop-only JSX/>)}`. Hook returns `false` on first render and
-flips after mount — fine here because such hero decals already have entrance
-animation delays, so there's no visible pop-in.
+`{showX && (<desktop-only JSX/>)}`. The Hero's central ≥1280px decoration uses
+this gate (`showCenter`).
 
-**Why:** purely-visual `hidden` left the collage imagery fetching on phones; the
-code-review architect flagged it as failing the "mobile untouched" objective.
+**Why:** purely-visual `hidden` left desktop-only decoration (originally an
+image collage) fetching/shipping on phones; the code-review architect flagged it
+as failing the "mobile untouched" objective.
 
 **Related:** `MarqueeText` has a `desktopStatic` prop built on the same
 `useMinWidth(768)` — on desktop it renders plain truncated text instead of the
 auto-scroll, while mobile keeps marqueeing. `useMinWidth` initialises its state
 synchronously from `matchMedia` (lazy `useState` initialiser) so the first paint
-is already correct and there's no marquee-flash / collage-pop on load.
+is already correct and there's no flash / pop-in on load.
+
+**History:** the Hero center has been an image collage → flipped-L collage →
+(current) abstract metallic "index-core" emblem (SVG rings + dashed spokes +
+4 asset-class nodes around an OPAS disc, no imagery). The user dislikes excess
+hero motion — keep it settled (entrance fade/scale only, no infinite float).

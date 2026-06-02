@@ -6,10 +6,6 @@ import FitText, { FitTextGroup } from "./FitText";
 import { useOpasPrice, fmtOpasRate } from "@/lib/opasPrice";
 import { useMinWidth } from "@/hooks/use-mobile";
 import worldSkyline from "@/assets/images/world_skyline.png";
-import heroCar from "@/assets/images/assets/car_ferrari.png";
-import heroYacht from "@/assets/images/assets/yacht_riva.png";
-import heroJet from "@/assets/images/assets/jet_gulfstream.png";
-import heroEstate from "@/assets/images/dubai.png";
 
 const TICKER_ITEMS = [
   "120 assets", "4 asset classes", "$480M aum", "18,000 investors",
@@ -21,46 +17,16 @@ const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
 const SERIF   = { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" as const };
 
-// Four asset classes arranged as a staggered collage that fills the hero's
-// central negative space (wide desktop only).
-const COLLAGE = {
-  estate: { img: heroEstate, label: "Real Estate",  yld: "9.4%",  accent: "#C9CCD2", delay: 0.70 },
-  yacht:  { img: heroYacht,  label: "Yachts",       yld: "11.0%", accent: "#0BB5BE", delay: 1.00 },
-  car:    { img: heroCar,    label: "Supercars",    yld: "12.6%", accent: "#EA8D0E", delay: 0.85 },
-  jet:    { img: heroJet,    label: "Private Jets", yld: "10.8%", accent: "#22D3EE", delay: 1.15 },
-};
-
-function CollageTile({
-  img, label, yld, accent, delay, className,
-}: { img: string; label: string; yld: string; accent: string; delay: number; className: string }) {
-  return (
-    <motion.div
-      className={`absolute rounded-lg overflow-hidden ${className}`}
-      initial={{ opacity: 0, y: 16, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
-      style={{
-        border: `1px solid ${accent}59`,
-        boxShadow: `0 18px 44px -20px rgba(0,0,0,0.7), 0 0 34px -16px ${accent}80`,
-      }}
-    >
-      <img src={img} alt={label} className="w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
-      <span
-        className="absolute top-1.5 left-1.5 text-[6.5px] tracking-[0.26em] uppercase px-1.5 py-0.5 rounded backdrop-blur-sm"
-        style={{ ...NEVERA, background: `${accent}33`, color: "#fff" }}
-      >
-        Tokenized
-      </span>
-      <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between gap-1">
-        <span className="text-[7px] tracking-[0.22em] uppercase text-white/85 truncate" style={NEVERA}>{label}</span>
-        <span className="inline-flex items-center gap-0.5 text-[8px] shrink-0" style={{ ...NEVERA, color: accent }}>
-          <TrendingUp className="w-2 h-2" /> {yld}
-        </span>
-      </div>
-    </motion.div>
-  );
-}
+// Four asset classes shown as a refined "index core" emblem — a metallic
+// orbital constellation (no imagery) that fills the hero's central negative
+// space on wide desktop and echoes the Opas Index panel. Coordinates are in
+// the emblem's 280x280 viewBox; center is (140,140).
+const CLASSES = [
+  { label: "Real Estate",  yld: "9.4%",  accent: "#C9CCD2", x: 140, y: 44,  delay: 0.7  },
+  { label: "Supercars",    yld: "12.6%", accent: "#EA8D0E", x: 236, y: 140, delay: 0.85 },
+  { label: "Yachts",       yld: "11.0%", accent: "#0BB5BE", x: 140, y: 236, delay: 1.0  },
+  { label: "Private Jets", yld: "10.8%", accent: "#22D3EE", x: 44,  y: 140, delay: 1.15 },
+];
 
 export default function Hero() {
   const { scrollY } = useScroll();
@@ -71,7 +37,7 @@ export default function Hero() {
 
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const sectionRef = useRef<HTMLElement>(null);
-  const showCollage = useMinWidth(1280);
+  const showCenter = useMinWidth(1280);
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -141,20 +107,89 @@ export default function Hero() {
         bg-[size:4rem_4rem]
         [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_15%,transparent_100%)]" />
 
-      {/* Asset collage — fills the hero's central negative space between the copy
-          and the index panel. Rendered only at >=1280px (the gap only exists there),
-          so mobile/tablet ship no extra DOM or image fetches. Layered below the
+      {/* Index-core emblem — fills the hero's central negative space between the
+          copy and the index panel. A metallic orbital constellation of the four
+          asset classes (no imagery). Rendered only at >=1280px (the gap only
+          exists there), so mobile/tablet ship no extra DOM. Layered below the
           z-10 copy/panel so it never overlaps them. */}
-      {showCollage && (
-        <div className="absolute z-[6] top-[46%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] pointer-events-none">
-          {/* Real estate is the large base card; the three smaller cards layer on
-              top of it, hugging the right edge and bottom so the exposed real
-              estate reads as a flipped-L. */}
-          <CollageTile {...COLLAGE.estate} className="top-0 left-0 w-[196px] h-[230px]" />
-          <CollageTile {...COLLAGE.car}    className="top-[6px] right-0 w-[118px] h-[122px]" />
-          <CollageTile {...COLLAGE.yacht}  className="bottom-[42px] right-[10px] w-[128px] h-[112px]" />
-          <CollageTile {...COLLAGE.jet}    className="bottom-0 left-[44px] w-[156px] h-[96px]" />
-        </div>
+      {showCenter && (
+        <motion.div
+          aria-hidden
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute z-[6] top-[46%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] pointer-events-none"
+        >
+          {/* Soft core glow */}
+          <div
+            className="absolute inset-0 rounded-full blur-2xl opacity-70"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 50%, rgba(234,141,14,0.07) 0%, rgba(200,210,225,0.04) 35%, transparent 65%)",
+            }}
+          />
+
+          {/* Concentric rings + spokes */}
+          <svg viewBox="0 0 280 280" className="absolute inset-0 w-full h-full">
+            {[48, 72, 96].map((r) => (
+              <circle
+                key={r}
+                cx="140"
+                cy="140"
+                r={r}
+                fill="none"
+                stroke="rgba(220,225,235,0.10)"
+                strokeWidth="1"
+              />
+            ))}
+            {CLASSES.map((c) => (
+              <line
+                key={c.label}
+                x1="140"
+                y1="140"
+                x2={c.x}
+                y2={c.y}
+                stroke="rgba(220,225,235,0.09)"
+                strokeWidth="1"
+                strokeDasharray="2 3"
+              />
+            ))}
+          </svg>
+
+          {/* Center emblem */}
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[72px] h-[72px] rounded-full flex flex-col items-center justify-center text-center"
+            style={{
+              background:
+                "linear-gradient(155deg, rgba(28,38,62,0.96), rgba(20,28,48,0.96))",
+              border: "1px solid rgba(220,225,235,0.18)",
+              boxShadow:
+                "inset 0 1px 0 rgba(255,255,255,0.12), 0 0 30px -10px rgba(234,141,14,0.4)",
+            }}
+          >
+            <span className="metallic-warm-text text-[13px] leading-none" style={SHARKON}>OPAS</span>
+            <span className="text-[6px] tracking-[0.3em] uppercase text-white/40 mt-1" style={NEVERA}>4 classes</span>
+          </div>
+
+          {/* Asset-class nodes */}
+          {CLASSES.map((c) => (
+            <motion.div
+              key={c.label}
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: c.delay, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
+              style={{ left: `${(c.x / 280) * 100}%`, top: `${(c.y / 280) * 100}%` }}
+            >
+              <span
+                className="w-2 h-2 rounded-full mb-1"
+                style={{ background: c.accent, boxShadow: `0 0 10px ${c.accent}` }}
+              />
+              <span className="text-[10px] leading-none" style={{ ...SHARKON, color: c.accent }}>{c.yld}</span>
+              <span className="text-[6.5px] tracking-[0.24em] uppercase text-white/45 mt-0.5 whitespace-nowrap" style={NEVERA}>{c.label}</span>
+            </motion.div>
+          ))}
+        </motion.div>
       )}
 
       {/* ── Main content ── */}
