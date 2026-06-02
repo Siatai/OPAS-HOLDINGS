@@ -86,9 +86,6 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
-          <span className={`items-center ${isConnected ? "hidden 2xl:inline-flex" : "hidden xl:inline-flex"}`}>
-            <OpasPriceTag withSparkline />
-          </span>
           <div className="w-px h-5 bg-white/10" />
           {isConnected ? (
             <div className="flex items-center gap-1.5 shrink-0 metallic-border rounded-lg px-1.5 py-1">

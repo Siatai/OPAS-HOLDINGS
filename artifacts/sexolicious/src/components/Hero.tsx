@@ -5,10 +5,6 @@ import { useWallet } from "./WalletContext";
 import FitText, { FitTextGroup } from "./FitText";
 import { useOpasPrice, fmtOpasRate } from "@/lib/opasPrice";
 import worldSkyline from "@/assets/images/world_skyline.png";
-import heroCar from "@/assets/images/assets/car_ferrari.png";
-import heroYacht from "@/assets/images/assets/yacht_riva.png";
-import heroJet from "@/assets/images/assets/jet_gulfstream.png";
-import heroEstate from "@/assets/images/dubai.png";
 
 const TICKER_ITEMS = [
   "120 assets", "4 asset classes", "$480M aum", "18,000 investors",
@@ -19,14 +15,6 @@ const TICKER_ITEMS = [
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
 const SERIF   = { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" as const };
-
-// Four asset classes shown as one cohesive, evenly-aligned row (no stagger).
-const HERO_ASSETS = [
-  { img: heroEstate, label: "Real Estate",  yld: "9.4%",  accent: "#C9CCD2", delay: 0.8, dur: 5.5 },
-  { img: heroCar,    label: "Supercars",    yld: "12.6%", accent: "#EA8D0E", delay: 1.0, dur: 5.0 },
-  { img: heroYacht,  label: "Yachts",       yld: "11.0%", accent: "#0BB5BE", delay: 1.2, dur: 6.0 },
-  { img: heroJet,    label: "Private Jets", yld: "10.8%", accent: "#22D3EE", delay: 1.4, dur: 5.5 },
-];
 
 export default function Hero() {
   const { scrollY } = useScroll();
@@ -98,43 +86,6 @@ export default function Hero() {
               "radial-gradient(ellipse 60% 100% at 50% 100%, rgba(234,141,14,0.3), transparent 70%)",
           }}
         />
-      </div>
-
-      {/* Floating tokenized-asset cards — one cohesive, evenly-aligned row (desktop only) */}
-      <div className="hidden lg:flex items-end absolute bottom-[5%] left-1/2 -translate-x-1/2 z-[5] gap-3 pointer-events-none">
-        {HERO_ASSETS.map((a) => (
-          <motion.div
-            key={a.label}
-            className="w-[140px] rounded-lg overflow-hidden"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: [0, -10, 0] }}
-            transition={{
-              opacity: { duration: 0.8, delay: a.delay },
-              y: { duration: a.dur, repeat: Infinity, ease: "easeInOut", delay: a.delay },
-            }}
-            style={{
-              border: `1px solid ${a.accent}59`,
-              boxShadow: `0 20px 50px -20px rgba(0,0,0,0.7), 0 0 42px -16px ${a.accent}80`,
-            }}
-          >
-            <div className="relative aspect-[16/10]">
-              <img src={a.img} alt={a.label} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-              <span
-                className="absolute top-2 left-2 text-[7px] tracking-[0.28em] uppercase px-1.5 py-0.5 rounded backdrop-blur-sm"
-                style={{ ...NEVERA, background: `${a.accent}33`, color: "#fff" }}
-              >
-                Tokenized
-              </span>
-              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
-                <span className="text-[8px] tracking-[0.26em] uppercase text-white/85" style={NEVERA}>{a.label}</span>
-                <span className="inline-flex items-center gap-1 text-[9px]" style={{ ...NEVERA, color: a.accent }}>
-                  <TrendingUp className="w-2.5 h-2.5" /> {a.yld}
-                </span>
-              </div>
-            </div>
-          </motion.div>
-        ))}
       </div>
 
       {/* Refined HUD grid — even more subtle */}
