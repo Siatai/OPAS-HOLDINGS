@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { useWallet } from "./WalletContext";
 import FitText, { FitTextGroup } from "./FitText";
@@ -39,6 +39,7 @@ export default function Hero() {
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const sectionRef = useRef<HTMLElement>(null);
   const showCenter = useMinWidth(1280);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -155,69 +156,85 @@ export default function Hero() {
             {/* concentric rings */}
             <circle cx="144" cy="144" r="118" fill="none" stroke="rgba(220,225,235,0.06)" strokeWidth="1" />
             <circle cx="144" cy="144" r="90"  fill="none" stroke="url(#ringStroke)" strokeWidth="1" />
-            <circle cx="144" cy="144" r="54"  fill="none" stroke="rgba(220,225,235,0.10)" strokeWidth="1" />
 
-            {/* gauge bezel — 60 fine ticks on the outer ring, every 5th longer */}
-            {Array.from({ length: 60 }, (_, i) => {
-              const a = (i / 60) * Math.PI * 2 - Math.PI / 2;
-              const major = i % 5 === 0;
-              const r1 = 118;
-              const r2 = 118 - (major ? 7 : 3.5);
-              return (
-                <line
-                  key={i}
-                  x1={144 + Math.cos(a) * r1}
-                  y1={144 + Math.sin(a) * r1}
-                  x2={144 + Math.cos(a) * r2}
-                  y2={144 + Math.sin(a) * r2}
-                  stroke={major ? "rgba(220,225,235,0.22)" : "rgba(220,225,235,0.10)"}
-                  strokeWidth="1"
-                />
-              );
-            })}
+            {/* gauge bezel — slowly rotating, 60 fine ticks (every 5th longer) */}
+            <g
+              className="animate-spin motion-reduce:animate-none"
+              style={{ animationDuration: "90s", transformBox: "fill-box", transformOrigin: "center" }}
+            >
+              {Array.from({ length: 60 }, (_, i) => {
+                const a = (i / 60) * Math.PI * 2 - Math.PI / 2;
+                const major = i % 5 === 0;
+                const r1 = 118;
+                const r2 = 118 - (major ? 7 : 3.5);
+                return (
+                  <line
+                    key={i}
+                    x1={144 + Math.cos(a) * r1}
+                    y1={144 + Math.sin(a) * r1}
+                    x2={144 + Math.cos(a) * r2}
+                    y2={144 + Math.sin(a) * r2}
+                    stroke={major ? "rgba(220,225,235,0.22)" : "rgba(220,225,235,0.10)"}
+                    strokeWidth="1"
+                  />
+                );
+              })}
+            </g>
 
-            {/* dashed rotating orbit between the inner rings */}
+            {/* dashed counter-rotating orbit around the logo */}
             <circle
               cx="144" cy="144" r="72" fill="none"
               stroke="rgba(220,225,235,0.16)" strokeWidth="1" strokeDasharray="1.5 7"
               className="animate-spin motion-reduce:animate-none"
-              style={{ animationDuration: "30s", transformBox: "fill-box", transformOrigin: "center" }}
+              style={{ animationDuration: "30s", animationDirection: "reverse", transformBox: "fill-box", transformOrigin: "center" }}
             />
 
-            {/* spokes from core to each node */}
+            {/* energy spokes — dashes flow outward from the logo to each asset */}
             {CLASSES.map((c) => (
-              <line
+              <motion.line
                 key={c.label}
                 x1="144" y1="144" x2={c.x} y2={c.y}
-                stroke="rgba(220,225,235,0.10)" strokeWidth="1" strokeDasharray="2 4"
+                stroke={c.accent} strokeOpacity="0.45" strokeWidth="1" strokeDasharray="2 5"
+                animate={reduceMotion ? undefined : { strokeDashoffset: [0, -14] }}
+                transition={reduceMotion ? undefined : { duration: 1.8, repeat: Infinity, ease: "linear", delay: c.delay }}
               />
             ))}
 
-            {/* node markers on the mid ring */}
+            {/* node markers on the mid ring — gently pulsing halo */}
             {CLASSES.map((c) => (
               <g key={`m-${c.label}`}>
-                <circle cx={c.x} cy={c.y} r="7" fill="none" stroke={c.accent} strokeOpacity="0.35" strokeWidth="1" />
+                <motion.circle
+                  cx={c.x} cy={c.y} fill="none" stroke={c.accent} strokeWidth="1"
+                  initial={{ r: 6, strokeOpacity: 0.5 }}
+                  animate={reduceMotion ? { r: 7, strokeOpacity: 0.3 } : { r: [6, 9, 6], strokeOpacity: [0.5, 0.1, 0.5] }}
+                  transition={reduceMotion ? undefined : { duration: 3, repeat: Infinity, ease: "easeInOut", delay: c.delay }}
+                />
                 <circle cx={c.x} cy={c.y} r="2.6" fill={c.accent} />
               </g>
             ))}
           </svg>
 
-          {/* Center disc */}
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[84px] h-[84px] rounded-full flex flex-col items-center justify-center text-center"
-            style={{
-              background:
-                "linear-gradient(155deg, rgba(34,46,74,0.97) 0%, rgba(20,28,48,0.97) 52%, rgba(40,29,15,0.97) 100%)",
-              border: "1px solid rgba(220,225,235,0.22)",
-              boxShadow:
-                "inset 0 1px 0 rgba(255,255,255,0.16), inset 0 0 22px rgba(0,0,0,0.55), 0 0 40px -10px rgba(234,141,14,0.5)",
-            }}
-          >
-            {/* inner hairline ring */}
-            <div className="absolute inset-[6px] rounded-full border border-white/10" />
-            <span className="metallic-warm-text text-[15px] leading-none tracking-[0.06em]" style={SHARKON}>OPAS</span>
-            <span className="mt-1.5 text-[5.5px] tracking-[0.42em] uppercase text-white/45" style={NEVERA}>Index</span>
-            <span className="mt-0.5 text-[5.5px] tracking-[0.34em] uppercase text-primary/70" style={NEVERA}>4 classes</span>
+          {/* Center: OPAS logo mark with a breathing glow */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[116px] h-[116px]">
+            <motion.div
+              aria-hidden
+              className="absolute inset-[-16px] rounded-full motion-reduce:hidden"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(234,141,14,0.42) 0%, rgba(234,141,14,0.08) 46%, transparent 70%)",
+              }}
+              animate={reduceMotion ? { opacity: 0.55, scale: 1 } : { opacity: [0.5, 0.85, 0.5], scale: [0.94, 1.06, 0.94] }}
+              transition={reduceMotion ? undefined : { duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <img
+              src="/opas-logo.png"
+              alt="Opas"
+              className="relative w-full h-full rounded-full object-cover"
+              style={{
+                boxShadow:
+                  "0 0 0 1px rgba(220,225,235,0.20), inset 0 0 18px rgba(0,0,0,0.5), 0 0 46px -8px rgba(234,141,14,0.55)",
+              }}
+            />
           </div>
 
           {/* Asset-class node chips */}
