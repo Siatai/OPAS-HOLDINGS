@@ -50,3 +50,8 @@ externalPort = 3003
 [[ports]]
 localPort = 24841
 externalPort = 3001
+
+[userenv]
+
+[userenv.shared]
+VITE_WALLETCONNECT_PROJECT_ID = "76f883600e0c97368c598abb958393f2"
