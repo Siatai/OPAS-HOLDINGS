@@ -23,3 +23,9 @@ animation delays, so there's no visible pop-in.
 
 **Why:** purely-visual `hidden` left the collage imagery fetching on phones; the
 code-review architect flagged it as failing the "mobile untouched" objective.
+
+**Related:** `MarqueeText` has a `desktopStatic` prop built on the same
+`useMinWidth(768)` — on desktop it renders plain truncated text instead of the
+auto-scroll, while mobile keeps marqueeing. `useMinWidth` initialises its state
+synchronously from `matchMedia` (lazy `useState` initialiser) so the first paint
+is already correct and there's no marquee-flash / collage-pop on load.

@@ -223,6 +223,7 @@ export default function Properties() {
 function useLoopRail(autoMs: number) {
   const railRef = useRef<HTMLDivElement>(null);
   const centerRef = useRef<HTMLElement | null>(null);
+  const hoverRef = useRef<HTMLElement | null>(null);
   const [paused, setPaused] = useState(false);
 
   // Exact card-to-card distance (width + real gap) measured from two siblings,
@@ -243,32 +244,33 @@ function useLoopRail(autoMs: number) {
     el.scrollLeft = target.offsetLeft - (el.clientWidth - target.offsetWidth) / 2;
   };
 
-  // Smooth depth-of-field: every card's blur/scale/opacity is a continuous
-  // function of how far it sits from the rail centre, measured in card-steps so
-  // the falloff is identical on every screen size. The closest card is the
-  // sharp "centre"; clarity tapers off smoothly toward both edges. Runs every
-  // rAF while scrolling — cheap inline-style writes the CSS transition animates.
+  // Game-style depth-of-field: just THREE discrete steps — the focused card is
+  // sharp, its immediate neighbours get a touch of blur, everything further out
+  // gets a bit more (and stops there). The focus is normally whichever card sits
+  // closest to the rail centre, but while the pointer hovers a card the focus
+  // SHIFTS to it (it sharpens, its prev/next pick up the same stepped blur).
+  // Cheap inline-style writes that the `.asset-loop-card` CSS transition animates.
+  const LVL_BLUR = [0, 1.1, 2.2];      // sharp · a little · a little more
+  const LVL_SCALE = [1.04, 0.99, 0.95];
+  const LVL_OPACITY = [1, 0.9, 0.8];
   const spotlight = () => {
     const el = railRef.current;
     if (!el) return;
-    const mid = el.scrollLeft + el.clientWidth / 2;
     const step = cardStep(el) || 1;
+    // Focus on the hovered card if present, otherwise the rail centre.
+    const focus = hoverRef.current;
+    const mid = focus
+      ? focus.offsetLeft + focus.offsetWidth / 2
+      : el.scrollLeft + el.clientWidth / 2;
     let best: HTMLElement | null = null;
     let bestDist = Infinity;
     el.querySelectorAll<HTMLElement>("[data-card]").forEach((c) => {
       const dist = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid);
-      // Distance from centre in card units, capped so far cards share a floor.
-      const u = Math.min(dist / step, 3);
-      const t = Math.min(u, 1); // 0 at centre → 1 one card out (for scale/tone)
-      const blur = +(u * 1.9).toFixed(2);               // 0px centre → up to ~5.7px
-      const scale = +(1.05 - t * 0.13).toFixed(3);      // 1.05 centre → 0.92
-      const opacity = +(1 - u * 0.13).toFixed(3);       // gently recede outward
-      const sat = +(1 - t * 0.08).toFixed(3);
-      const bright = +(1 - t * 0.06).toFixed(3);
-      c.style.transform = `scale(${scale})`;
-      c.style.opacity = `${Math.max(opacity, 0.55)}`;
-      c.style.filter = blur < 0.15 ? "none" : `blur(${blur}px) saturate(${sat}) brightness(${bright})`;
-      c.style.zIndex = u < 0.5 ? "2" : "1";
+      const lvl = Math.min(Math.round(dist / step), 2); // 0 | 1 | 2
+      c.style.transform = `scale(${LVL_SCALE[lvl]})`;
+      c.style.opacity = `${LVL_OPACITY[lvl]}`;
+      c.style.filter = lvl === 0 ? "none" : `blur(${LVL_BLUR[lvl]}px)`;
+      c.style.zIndex = lvl === 0 ? "2" : "1";
       if (dist < bestDist) { bestDist = dist; best = c; }
     });
     const centered = best as HTMLElement | null;
@@ -337,10 +339,22 @@ function useLoopRail(autoMs: number) {
       window.clearTimeout(resizeT);
       resizeT = window.setTimeout(() => { centerPark(el); spotlight(); }, 120);
     };
+    // Pointer-hover focus: shift the sharp card to whatever the user hovers.
+    const onOver = (e: Event) => {
+      const card = (e.target as HTMLElement)?.closest<HTMLElement>("[data-card]");
+      if (card && card !== hoverRef.current) { hoverRef.current = card; spotlight(); }
+    };
+    const onLeave = () => {
+      if (hoverRef.current) { hoverRef.current = null; spotlight(); }
+    };
     el.addEventListener("scroll", onScroll, { passive: true });
+    el.addEventListener("mouseover", onOver);
+    el.addEventListener("mouseleave", onLeave);
     window.addEventListener("resize", onResize);
     return () => {
       el.removeEventListener("scroll", onScroll);
+      el.removeEventListener("mouseover", onOver);
+      el.removeEventListener("mouseleave", onLeave);
       window.removeEventListener("resize", onResize);
       if (raf) cancelAnimationFrame(raf);
       window.clearTimeout(settle);

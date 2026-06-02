@@ -54,3 +54,21 @@ in card-step units, not px).
 **How to apply:** control side-card blur/scale from the spotlight JS, not CSS — any
 `.asset-loop-card`/`.is-center` filter rules are overridden by the inline styles and
 will silently do nothing.
+
+## Depth-of-field: discrete game-style levels + hover-focus (user preference)
+
+The user explicitly preferred a **discrete 3-step** falloff over the earlier
+continuous distance function: focused card sharp, immediate neighbours a touch
+blurred, everything further out a bit more — and it stops there (capped). Keep the
+blur gentle (~1–2px), "like car-select screens in games." Don't reintroduce a
+strong continuous falloff.
+
+**Hover shifts the focus:** the sharp card is normally the one nearest rail centre,
+but while the pointer hovers a card the focus moves to *it* (it sharpens, its
+prev/next take the stepped blur). Implemented by a `hoverRef` that the spotlight
+uses as the focus centre instead of `scrollLeft + clientWidth/2`. Hover is detected
+by **delegated** `mouseover`/`mouseleave` listeners on the rail (not per-card), and
+autoplay is already paused on hover so the focus stays put.
+
+**Why:** continuous + strong blur read as "too much"; discrete steps look
+intentional and let the hovered card pop without the rail moving.

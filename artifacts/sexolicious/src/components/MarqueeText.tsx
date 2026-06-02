@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useMinWidth } from "@/hooks/use-mobile";
 
 type MarqueeTextProps = {
   children: ReactNode;
@@ -7,6 +8,8 @@ type MarqueeTextProps = {
   title?: string;
   speed?: number;
   gap?: number;
+  /** Disable the auto-scroll on desktop (>=768px) and truncate instead. Mobile keeps marqueeing. */
+  desktopStatic?: boolean;
 };
 
 /**
@@ -28,7 +31,10 @@ export default function MarqueeText({
   title,
   speed = 45,
   gap = 56,
+  desktopStatic = false,
 }: MarqueeTextProps) {
+  const isDesktop = useMinWidth(768);
+  const forceStatic = desktopStatic && isDesktop;
   const containerRef = useRef<HTMLSpanElement>(null);
   const measureRef = useRef<HTMLSpanElement>(null);
   const [shift, setShift] = useState(0);
@@ -78,8 +84,16 @@ export default function MarqueeText({
     };
   }, [children, gap]);
 
-  const animate = shift > 0;
+  const animate = shift > 0 && !forceStatic;
   const duration = animate ? shift / speed : 0;
+
+  if (forceStatic) {
+    return (
+      <span className={`block truncate ${className ?? ""}`} style={style} title={title}>
+        {children}
+      </span>
+    );
+  }
 
   return (
     <span ref={containerRef} className={`block overflow-hidden ${className ?? ""}`} style={style} title={title}>

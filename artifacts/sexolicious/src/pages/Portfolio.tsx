@@ -401,7 +401,7 @@ export default function Portfolio() {
               style={{ background: "rgba(20,28,48,0.5)", border: "1px solid rgba(220,225,235,0.08)" }}
             >
               <div className="flex items-center justify-between mb-2 sm:mb-3 gap-2 min-w-0">
-                <MarqueeText className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 min-w-0 flex-1" style={NEVERA}>{s.label}</MarqueeText>
+                <MarqueeText desktopStatic className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 min-w-0 flex-1" style={NEVERA}>{s.label}</MarqueeText>
                 <s.icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${s.tone}`} />
               </div>
               <FitText share className={`text-base sm:text-xl md:text-2xl ${s.tone}`} style={SHARKON}>{s.value}</FitText>
@@ -452,7 +452,7 @@ export default function Portfolio() {
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 min-w-0">
                             <h2 className="text-xl sm:text-2xl min-w-0 flex-1" style={SHARKON}>
-                              <MarqueeText>
+                              <MarqueeText desktopStatic>
                                 <span className="metallic-text">{cat.label}</span>
                               </MarqueeText>
                             </h2>
@@ -525,7 +525,7 @@ export default function Portfolio() {
                               </div>
                               <div className="absolute bottom-3 left-3 right-3">
                                 <TitleTag {...titleProps} className={`text-[15px] text-white font-medium transition-colors block leading-tight ${city ? "hover:text-primary" : ""}`} style={SHARKON}>
-                                  <MarqueeText title={prop.title}>{prop.title}</MarqueeText>
+                                  <MarqueeText desktopStatic title={prop.title}>{prop.title}</MarqueeText>
                                 </TitleTag>
                                 <div className="text-[9.5px] text-white/55 line-clamp-2 font-mono">{prop.spec ?? prop.subtitle}</div>
                               </div>
@@ -620,7 +620,7 @@ export default function Portfolio() {
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-xl md:text-2xl flex items-center gap-3 min-w-0" style={SHARKON}>
               <ArrowLeftRight className="w-5 h-5 text-secondary shrink-0" />
-              <MarqueeText className="min-w-0 flex-1">
+              <MarqueeText desktopStatic className="min-w-0 flex-1">
                 <span className="metallic-text">Equity swaps</span>
               </MarqueeText>
             </h2>
@@ -658,7 +658,7 @@ export default function Portfolio() {
           <div className="flex items-center justify-between">
             <h2 className="text-xl md:text-2xl flex items-center gap-3 min-w-0" style={SHARKON}>
               <Vote className="w-5 h-5 text-primary shrink-0" />
-              <MarqueeText className="min-w-0 flex-1">
+              <MarqueeText desktopStatic className="min-w-0 flex-1">
                 <span className="metallic-text">DAO governance</span>
               </MarqueeText>
             </h2>

@@ -221,7 +221,7 @@ export default function Dashboard() {
               data-testid={`dash-stat-${s.label.toLowerCase().replace(/\s+/g, "-")}`}
             >
               <div className="flex items-center justify-between mb-2 sm:mb-3 gap-2 min-w-0">
-                <MarqueeText className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 min-w-0 flex-1" style={NEVERA}>{s.label}</MarqueeText>
+                <MarqueeText desktopStatic className="text-[7.5px] sm:text-[8.5px] tracking-[0.24em] sm:tracking-[0.32em] uppercase text-white/40 min-w-0 flex-1" style={NEVERA}>{s.label}</MarqueeText>
                 <s.icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${s.tone}`} />
               </div>
               <FitText share className={`text-base sm:text-xl md:text-2xl ${s.tone}`} style={SHARKON}>{s.value}</FitText>
@@ -237,7 +237,7 @@ export default function Dashboard() {
         <section className="space-y-3 min-w-0">
           <div className="flex items-center justify-between gap-3 min-w-0">
             <h2 className="text-lg sm:text-xl md:text-2xl min-w-0 flex-1" style={SHARKON}>
-              <MarqueeText>
+              <MarqueeText desktopStatic>
                 <span className="metallic-text">Navigate</span>
               </MarqueeText>
             </h2>
@@ -257,9 +257,9 @@ export default function Dashboard() {
                     <c.icon className={`w-5 h-5 sm:w-7 sm:h-7 ${c.iconTone}`} />
                     <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/30 group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
                   </div>
-                  <MarqueeText className="text-[9px] sm:text-base md:text-lg leading-tight text-white mb-1" style={SHARKON} title={c.label}>{c.label}</MarqueeText>
+                  <MarqueeText desktopStatic className="text-[9px] sm:text-base md:text-lg leading-tight text-white mb-1" style={SHARKON} title={c.label}>{c.label}</MarqueeText>
                   <div className="text-[9.5px] sm:text-[10.5px] text-white/55 mb-2 sm:mb-3 leading-snug" style={NEVERA}>{c.desc}</div>
-                  <MarqueeText className={`text-[8.5px] sm:text-[9.5px] tracking-[0.18em] sm:tracking-[0.24em] uppercase font-mono ${c.iconTone}`}>
+                  <MarqueeText desktopStatic className={`text-[8.5px] sm:text-[9.5px] tracking-[0.18em] sm:tracking-[0.24em] uppercase font-mono ${c.iconTone}`}>
                     {c.meta}
                   </MarqueeText>
                 </motion.div>
@@ -305,7 +305,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between gap-2 min-w-0">
               <h2 className="text-base sm:text-xl md:text-2xl flex items-center gap-2 sm:gap-2.5 min-w-0" style={SHARKON}>
                 <Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 shrink-0" />
-                <MarqueeText className="min-w-0 flex-1">
+                <MarqueeText desktopStatic className="min-w-0 flex-1">
                   <span className="metallic-text">Rental income</span>
                 </MarqueeText>
               </h2>
@@ -378,7 +378,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between gap-2 min-w-0">
               <h2 className="text-base sm:text-xl md:text-2xl flex items-center gap-2 sm:gap-2.5 min-w-0" style={SHARKON}>
                 <ActivityIcon className="w-4 h-4 sm:w-5 sm:h-5 text-secondary shrink-0" />
-                <MarqueeText className="min-w-0 flex-1">
+                <MarqueeText desktopStatic className="min-w-0 flex-1">
                   <span className="metallic-text">Recent activity</span>
                 </MarqueeText>
               </h2>
@@ -409,7 +409,7 @@ export default function Dashboard() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 min-w-0">
-                            <MarqueeText className="text-[12px] text-white min-w-0 flex-1" style={NEVERA}>{m.label}</MarqueeText>
+                            <MarqueeText desktopStatic className="text-[12px] text-white min-w-0 flex-1" style={NEVERA}>{m.label}</MarqueeText>
                             {meta && (
                               <span className="shrink-0 text-[9.5px] tracking-[0.22em] uppercase text-white/40 font-mono truncate">
                                 {meta.prop.token}

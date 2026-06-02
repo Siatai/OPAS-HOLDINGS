@@ -19,7 +19,11 @@ export function useIsMobile() {
 }
 
 export function useMinWidth(minWidth: number) {
-  const [matches, setMatches] = React.useState(false)
+  // Initialise synchronously from matchMedia so the first paint is already
+  // correct — avoids a flicker (desktop briefly marqueeing / collage popping in).
+  const [matches, setMatches] = React.useState(() =>
+    typeof window !== "undefined" && window.matchMedia(`(min-width: ${minWidth}px)`).matches
+  )
 
   React.useEffect(() => {
     const mql = window.matchMedia(`(min-width: ${minWidth}px)`)

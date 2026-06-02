@@ -31,17 +31,14 @@ const COLLAGE = {
 };
 
 function CollageTile({
-  img, label, yld, accent, delay, ratio,
-}: { img: string; label: string; yld: string; accent: string; delay: number; ratio: string }) {
+  img, label, yld, accent, delay, className,
+}: { img: string; label: string; yld: string; accent: string; delay: number; className: string }) {
   return (
     <motion.div
-      className={`relative ${ratio} rounded-lg overflow-hidden`}
-      initial={{ opacity: 0, y: 22 }}
-      animate={{ opacity: 1, y: [0, -8, 0] }}
-      transition={{
-        opacity: { duration: 0.8, delay },
-        y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay },
-      }}
+      className={`absolute rounded-lg overflow-hidden ${className}`}
+      initial={{ opacity: 0, y: 16, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
       style={{
         border: `1px solid ${accent}59`,
         boxShadow: `0 18px 44px -20px rgba(0,0,0,0.7), 0 0 34px -16px ${accent}80`,
@@ -149,17 +146,14 @@ export default function Hero() {
           so mobile/tablet ship no extra DOM or image fetches. Layered below the
           z-10 copy/panel so it never overlaps them. */}
       {showCollage && (
-        <div className="absolute z-[6] top-[46%] left-[51%] -translate-x-1/2 -translate-y-1/2 w-[266px] pointer-events-none">
-          <div className="grid grid-cols-2 gap-2.5">
-            <div className="flex flex-col gap-2.5">
-              <CollageTile {...COLLAGE.estate} ratio="aspect-square" />
-              <CollageTile {...COLLAGE.yacht} ratio="aspect-[4/5]" />
-            </div>
-            <div className="flex flex-col gap-2.5 mt-8">
-              <CollageTile {...COLLAGE.car} ratio="aspect-[4/5]" />
-              <CollageTile {...COLLAGE.jet} ratio="aspect-square" />
-            </div>
-          </div>
+        <div className="absolute z-[6] top-[46%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] pointer-events-none">
+          {/* Real estate is the large base card; the three smaller cards layer on
+              top of it, hugging the right edge and bottom so the exposed real
+              estate reads as a flipped-L. */}
+          <CollageTile {...COLLAGE.estate} className="top-0 left-0 w-[196px] h-[230px]" />
+          <CollageTile {...COLLAGE.car}    className="top-[6px] right-0 w-[118px] h-[122px]" />
+          <CollageTile {...COLLAGE.yacht}  className="bottom-[42px] right-[10px] w-[128px] h-[112px]" />
+          <CollageTile {...COLLAGE.jet}    className="bottom-0 left-[44px] w-[156px] h-[96px]" />
         </div>
       )}
 
