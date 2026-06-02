@@ -20,12 +20,13 @@ const SERIF   = { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" a
 // Four asset classes shown as a refined "index core" emblem — a metallic
 // orbital constellation (no imagery) that fills the hero's central negative
 // space on wide desktop and echoes the Opas Index panel. Coordinates are in
-// the emblem's 280x280 viewBox; center is (140,140).
+// the emblem's 288x288 viewBox; center is (144,144), nodes sit on r=90.
+const EMBLEM = 288;
 const CLASSES = [
-  { label: "Real Estate",  yld: "9.4%",  accent: "#C9CCD2", x: 140, y: 44,  delay: 0.7  },
-  { label: "Supercars",    yld: "12.6%", accent: "#EA8D0E", x: 236, y: 140, delay: 0.85 },
-  { label: "Yachts",       yld: "11.0%", accent: "#0BB5BE", x: 140, y: 236, delay: 1.0  },
-  { label: "Private Jets", yld: "10.8%", accent: "#22D3EE", x: 44,  y: 140, delay: 1.15 },
+  { label: "Real Estate",  yld: "9.4%",  accent: "#C9CCD2", x: 144, y: 54,  delay: 0.7  },
+  { label: "Supercars",    yld: "12.6%", accent: "#EA8D0E", x: 234, y: 144, delay: 0.85 },
+  { label: "Yachts",       yld: "11.0%", accent: "#0BB5BE", x: 144, y: 234, delay: 1.0  },
+  { label: "Private Jets", yld: "10.8%", accent: "#22D3EE", x: 54,  y: 144, delay: 1.15 },
 ];
 
 export default function Hero() {
@@ -117,76 +118,132 @@ export default function Hero() {
           aria-hidden
           initial={{ opacity: 0, scale: 0.92 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute z-[6] top-[46%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] pointer-events-none"
+          transition={{ duration: 1.1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute z-[6] top-[45%] left-[calc(50%_+_24px)] -translate-x-1/2 -translate-y-1/2 w-[288px] h-[288px] pointer-events-none"
         >
           {/* Soft core glow */}
           <div
-            className="absolute inset-0 rounded-full blur-2xl opacity-70"
+            className="absolute inset-0 rounded-full blur-3xl opacity-80"
             style={{
               background:
-                "radial-gradient(circle at 50% 50%, rgba(234,141,14,0.07) 0%, rgba(200,210,225,0.04) 35%, transparent 65%)",
+                "radial-gradient(circle at 50% 50%, rgba(234,141,14,0.10) 0%, rgba(200,210,225,0.05) 38%, transparent 66%)",
             }}
           />
 
-          {/* Concentric rings + spokes */}
-          <svg viewBox="0 0 280 280" className="absolute inset-0 w-full h-full">
-            {[48, 72, 96].map((r) => (
-              <circle
-                key={r}
-                cx="140"
-                cy="140"
-                r={r}
-                fill="none"
-                stroke="rgba(220,225,235,0.10)"
-                strokeWidth="1"
-              />
-            ))}
+          {/* Slowly-rotating radar sweep — whisper-subtle "live index" motion */}
+          <div
+            className="absolute inset-[26px] rounded-full animate-spin motion-reduce:animate-none"
+            style={{
+              animationDuration: "22s",
+              background:
+                "conic-gradient(from 0deg, transparent 0deg, rgba(234,141,14,0.10) 28deg, rgba(234,141,14,0.02) 56deg, transparent 70deg)",
+              maskImage: "radial-gradient(circle, transparent 28%, #000 42%, #000 96%, transparent 100%)",
+              WebkitMaskImage: "radial-gradient(circle, transparent 28%, #000 42%, #000 96%, transparent 100%)",
+            }}
+          />
+
+          {/* Rings · bezel ticks · spokes · node markers */}
+          <svg viewBox="0 0 288 288" className="absolute inset-0 w-full h-full overflow-visible">
+            <defs>
+              <linearGradient id="ringStroke" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="rgba(220,225,235,0.22)" />
+                <stop offset="55%" stopColor="rgba(220,225,235,0.08)" />
+                <stop offset="100%" stopColor="rgba(234,141,14,0.14)" />
+              </linearGradient>
+            </defs>
+
+            {/* concentric rings */}
+            <circle cx="144" cy="144" r="118" fill="none" stroke="rgba(220,225,235,0.06)" strokeWidth="1" />
+            <circle cx="144" cy="144" r="90"  fill="none" stroke="url(#ringStroke)" strokeWidth="1" />
+            <circle cx="144" cy="144" r="54"  fill="none" stroke="rgba(220,225,235,0.10)" strokeWidth="1" />
+
+            {/* gauge bezel — 60 fine ticks on the outer ring, every 5th longer */}
+            {Array.from({ length: 60 }, (_, i) => {
+              const a = (i / 60) * Math.PI * 2 - Math.PI / 2;
+              const major = i % 5 === 0;
+              const r1 = 118;
+              const r2 = 118 - (major ? 7 : 3.5);
+              return (
+                <line
+                  key={i}
+                  x1={144 + Math.cos(a) * r1}
+                  y1={144 + Math.sin(a) * r1}
+                  x2={144 + Math.cos(a) * r2}
+                  y2={144 + Math.sin(a) * r2}
+                  stroke={major ? "rgba(220,225,235,0.22)" : "rgba(220,225,235,0.10)"}
+                  strokeWidth="1"
+                />
+              );
+            })}
+
+            {/* dashed rotating orbit between the inner rings */}
+            <circle
+              cx="144" cy="144" r="72" fill="none"
+              stroke="rgba(220,225,235,0.16)" strokeWidth="1" strokeDasharray="1.5 7"
+              className="animate-spin motion-reduce:animate-none"
+              style={{ animationDuration: "30s", transformBox: "fill-box", transformOrigin: "center" }}
+            />
+
+            {/* spokes from core to each node */}
             {CLASSES.map((c) => (
               <line
                 key={c.label}
-                x1="140"
-                y1="140"
-                x2={c.x}
-                y2={c.y}
-                stroke="rgba(220,225,235,0.09)"
-                strokeWidth="1"
-                strokeDasharray="2 3"
+                x1="144" y1="144" x2={c.x} y2={c.y}
+                stroke="rgba(220,225,235,0.10)" strokeWidth="1" strokeDasharray="2 4"
               />
+            ))}
+
+            {/* node markers on the mid ring */}
+            {CLASSES.map((c) => (
+              <g key={`m-${c.label}`}>
+                <circle cx={c.x} cy={c.y} r="7" fill="none" stroke={c.accent} strokeOpacity="0.35" strokeWidth="1" />
+                <circle cx={c.x} cy={c.y} r="2.6" fill={c.accent} />
+              </g>
             ))}
           </svg>
 
-          {/* Center emblem */}
+          {/* Center disc */}
           <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[72px] h-[72px] rounded-full flex flex-col items-center justify-center text-center"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[84px] h-[84px] rounded-full flex flex-col items-center justify-center text-center"
             style={{
               background:
-                "linear-gradient(155deg, rgba(28,38,62,0.96), rgba(20,28,48,0.96))",
-              border: "1px solid rgba(220,225,235,0.18)",
+                "linear-gradient(155deg, rgba(34,46,74,0.97) 0%, rgba(20,28,48,0.97) 52%, rgba(40,29,15,0.97) 100%)",
+              border: "1px solid rgba(220,225,235,0.22)",
               boxShadow:
-                "inset 0 1px 0 rgba(255,255,255,0.12), 0 0 30px -10px rgba(234,141,14,0.4)",
+                "inset 0 1px 0 rgba(255,255,255,0.16), inset 0 0 22px rgba(0,0,0,0.55), 0 0 40px -10px rgba(234,141,14,0.5)",
             }}
           >
-            <span className="metallic-warm-text text-[13px] leading-none" style={SHARKON}>OPAS</span>
-            <span className="text-[6px] tracking-[0.3em] uppercase text-white/40 mt-1" style={NEVERA}>4 classes</span>
+            {/* inner hairline ring */}
+            <div className="absolute inset-[6px] rounded-full border border-white/10" />
+            <span className="metallic-warm-text text-[15px] leading-none tracking-[0.06em]" style={SHARKON}>OPAS</span>
+            <span className="mt-1.5 text-[5.5px] tracking-[0.42em] uppercase text-white/45" style={NEVERA}>Index</span>
+            <span className="mt-0.5 text-[5.5px] tracking-[0.34em] uppercase text-primary/70" style={NEVERA}>4 classes</span>
           </div>
 
-          {/* Asset-class nodes */}
+          {/* Asset-class node chips */}
           {CLASSES.map((c) => (
             <motion.div
               key={c.label}
-              initial={{ opacity: 0, scale: 0.7 }}
+              initial={{ opacity: 0, scale: 0.6 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: c.delay, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
-              style={{ left: `${(c.x / 280) * 100}%`, top: `${(c.y / 280) * 100}%` }}
+              className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center px-2.5 py-1.5 rounded-lg"
+              style={{
+                left: `${(c.x / EMBLEM) * 100}%`,
+                top: `${(c.y / EMBLEM) * 100}%`,
+                background: "rgba(12,17,28,0.55)",
+                border: "1px solid rgba(220,225,235,0.10)",
+                backdropFilter: "blur(6px)",
+                WebkitBackdropFilter: "blur(6px)",
+                boxShadow: "0 8px 22px -12px rgba(0,0,0,0.7)",
+              }}
             >
               <span
-                className="w-2 h-2 rounded-full mb-1"
-                style={{ background: c.accent, boxShadow: `0 0 10px ${c.accent}` }}
+                className="w-1.5 h-1.5 rounded-full mb-1"
+                style={{ background: c.accent, boxShadow: `0 0 12px ${c.accent}` }}
               />
-              <span className="text-[10px] leading-none" style={{ ...SHARKON, color: c.accent }}>{c.yld}</span>
-              <span className="text-[6.5px] tracking-[0.24em] uppercase text-white/45 mt-0.5 whitespace-nowrap" style={NEVERA}>{c.label}</span>
+              <span className="text-[11px] leading-none" style={{ ...SHARKON, color: c.accent }}>{c.yld}</span>
+              <span className="text-[6px] tracking-[0.26em] uppercase text-white/55 mt-1 whitespace-nowrap" style={NEVERA}>{c.label}</span>
             </motion.div>
           ))}
         </motion.div>
