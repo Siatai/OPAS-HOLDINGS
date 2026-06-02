@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useMemo, useEffect, ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Loader2, Shield, Zap, Globe2, AlertTriangle, CheckCircle2, ExternalLink, Copy } from "lucide-react";
+import { X, Loader2, Shield, Zap, Globe2, AlertTriangle, CheckCircle2, ExternalLink, Copy, QrCode } from "lucide-react";
 import { useAccount, useConnect, useDisconnect, useChainId } from "wagmi";
 import { simulateIncomingSwap, getHoldings } from "@/lib/portfolio";
 import worldSkyline from "@/assets/images/world_skyline.png";
@@ -56,7 +56,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     () => typeof window !== "undefined" && !!(window as any).ethereum,
     [],
   );
-  const injected = connectors.find((c) => c.id === "injected") ?? connectors[0];
+  const injectedConnector = connectors.find((c) => c.id === "injected");
+  const wcConnector = connectors.find((c) => c.id === "walletConnect");
 
   const copy = async () => {
     if (!address) return;
@@ -211,7 +212,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                           <span className="metallic-warm-text">equity interest.</span>
                         </h3>
                         <p className="text-white/55 text-[13.5px] leading-relaxed" style={NEVERA}>
-                          Connect MetaMask, Trust Wallet or any EIP-1193 browser wallet to enter the Opas vault.
+                          Connect a browser extension — or scan a QR code with a wallet app on your phone — to enter the Opas vault.
                         </p>
                       </div>
 
@@ -237,36 +238,58 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                         ))}
                       </div>
 
-                      <button
-                        onClick={() => injected && connect({ connector: injected })}
-                        disabled={isPending || !hasInjected}
-                        className="btn-metal group relative w-full overflow-hidden px-5 py-3.5 text-[11px] font-bold tracking-[0.22em] text-[#050810] uppercase rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{ fontFamily: "BankGothic, sans-serif" }}
-                      >
-                        {isPending ? (
-                          <span className="flex items-center justify-center gap-2">
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Awaiting signature…
-                          </span>
-                        ) : hasInjected ? (
-                          "Connect Wallet"
-                        ) : (
-                          "No browser wallet detected"
+                      <div className="w-full space-y-2.5">
+                        {hasInjected && injectedConnector && (
+                          <button
+                            onClick={() => connect({ connector: injectedConnector })}
+                            disabled={isPending}
+                            className="btn-metal group relative w-full overflow-hidden px-5 py-3.5 text-[11px] font-bold tracking-[0.22em] text-[#050810] uppercase rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            style={{ fontFamily: "BankGothic, sans-serif" }}
+                          >
+                            {isPending ? (
+                              <span className="flex items-center justify-center gap-2">
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Awaiting signature…
+                              </span>
+                            ) : (
+                              "Connect browser wallet"
+                            )}
+                          </button>
                         )}
-                      </button>
 
-                      {!hasInjected && (
-                        <div className="w-full flex items-start gap-2 p-3 rounded-md text-[11px] text-amber-200/80"
-                          style={{ background: "rgba(234,141,14,0.06)", border: "1px solid rgba(234,141,14,0.18)" }}
-                        >
-                          <AlertTriangle className="w-3.5 h-3.5 mt-px shrink-0 text-primary" />
-                          <span style={NEVERA}>
-                            Install MetaMask or open this site inside Trust Wallet's in-app browser to continue.{" "}
-                            <a href="https://metamask.io/download" target="_blank" rel="noreferrer" className="underline decoration-primary/40 hover:text-primary">
-                              Get MetaMask <ExternalLink className="inline w-3 h-3" />
-                            </a>
-                          </span>
-                        </div>
-                      )}
+                        {wcConnector && (
+                          <button
+                            onClick={() => connect({ connector: wcConnector })}
+                            disabled={isPending}
+                            className={
+                              hasInjected
+                                ? "w-full flex flex-col items-center gap-0.5 px-5 py-3 rounded-sm border border-white/15 hover:border-primary/45 hover:bg-white/[0.03] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                : "btn-metal group relative w-full overflow-hidden flex flex-col items-center gap-0.5 px-5 py-3.5 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            }
+                            style={hasInjected ? undefined : { fontFamily: "BankGothic, sans-serif" }}
+                          >
+                            <span className={`flex items-center justify-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase ${hasInjected ? "text-white/85" : "text-[#050810]"}`}>
+                              <QrCode className="w-3.5 h-3.5" /> Use a mobile wallet
+                            </span>
+                            <span className={`text-[8.5px] tracking-[0.22em] uppercase ${hasInjected ? "text-white/40" : "text-[#050810]/60"}`} style={NEVERA}>
+                              Scan QR · MetaMask, Trust, Rainbow &amp; more
+                            </span>
+                          </button>
+                        )}
+
+                        {!hasInjected && !wcConnector && (
+                          <div className="w-full flex items-start gap-2 p-3 rounded-md text-[11px] text-amber-200/80"
+                            style={{ background: "rgba(234,141,14,0.06)", border: "1px solid rgba(234,141,14,0.18)" }}
+                          >
+                            <AlertTriangle className="w-3.5 h-3.5 mt-px shrink-0 text-primary" />
+                            <span style={NEVERA}>
+                              Install MetaMask or open this site inside your wallet's in-app browser to continue.{" "}
+                              <a href="https://metamask.io/download" target="_blank" rel="noreferrer" className="underline decoration-primary/40 hover:text-primary">
+                                Get MetaMask <ExternalLink className="inline w-3 h-3" />
+                              </a>
+                            </span>
+                          </div>
+                        )}
+                      </div>
 
                       {connectError && (
                         <div className="w-full text-[11px] text-red-300/80" style={NEVERA}>
