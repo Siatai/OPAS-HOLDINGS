@@ -1,10 +1,28 @@
-import React, { createContext, useContext, useState, useMemo, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Loader2, Shield, Zap, Globe2, AlertTriangle, CheckCircle2, ExternalLink, Copy, QrCode } from "lucide-react";
-import { useAccount, useConnect, useDisconnect, useChainId } from "wagmi";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Copy,
+  ExternalLink,
+  Globe2,
+  Loader2,
+  QrCode,
+  Shield,
+  X,
+  Zap,
+} from "lucide-react";
+import { Link } from "wouter";
+import { useAccount, useChainId, useConnect, useDisconnect } from "wagmi";
 import { simulateIncomingSwap, getHoldings } from "@/lib/portfolio";
 import worldSkyline from "@/assets/images/world_skyline.png";
-import { Link } from "wouter";
 
 interface WalletContextType {
   isOpen: boolean;
@@ -15,14 +33,18 @@ interface WalletContextType {
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
-const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
+const NEVERA = { fontFamily: "Nevera, Inter, sans-serif" };
 
 const CHAIN_NAME: Record<number, string> = {
-  56: "BNB Smart Chain", 1: "Ethereum", 137: "Polygon", 8453: "Base", 42161: "Arbitrum",
+  1: "Ethereum",
+  56: "BNB Smart Chain",
+  137: "Polygon",
+  8453: "Base",
+  42161: "Arbitrum",
 };
 
-function shortAddr(a?: string) {
-  return a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "";
+function shortAddr(address?: string) {
+  return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "";
 }
 
 export function WalletProvider({ children }: { children: ReactNode }) {
@@ -34,30 +56,29 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const { connectors, connect, error: connectError, isPending } = useConnect();
   const { disconnect } = useDisconnect();
 
-  const openWallet  = () => setIsOpen(true);
+  const openWallet = () => setIsOpen(true);
   const closeWallet = () => setIsOpen(false);
 
-  // App-wide swap proposal simulator. While a wallet is connected and holds
-  // assets, a counterparty proposes a swap shortly after connect and again on
-  // an interval. writeSwaps fires "opas:notify", so the navbar bell and the
-  // Marketplace inbox update the moment each proposal arrives. Mounted once
-  // here (a single provider) so it never double-fires alongside the two
-  // responsive NotificationBell instances in the navbar.
   useEffect(() => {
     if (!isConnected || !address) return;
-    const acct = address;
-    const tick = () => { if (getHoldings(acct).length > 0) simulateIncomingSwap(acct); };
+    const account = address;
+    const tick = () => {
+      if (getHoldings(account).length > 0) simulateIncomingSwap(account);
+    };
     const first = setTimeout(tick, 12000);
     const loop = setInterval(tick, 45000);
-    return () => { clearTimeout(first); clearInterval(loop); };
+    return () => {
+      clearTimeout(first);
+      clearInterval(loop);
+    };
   }, [isConnected, address]);
 
   const hasInjected = useMemo(
-    () => typeof window !== "undefined" && !!(window as any).ethereum,
+    () => typeof window !== "undefined" && !!(window as Window & { ethereum?: unknown }).ethereum,
     [],
   );
-  const injectedConnector = connectors.find((c) => c.id === "injected");
-  const wcConnector = connectors.find((c) => c.id === "walletConnect");
+  const injectedConnector = connectors.find((connector) => connector.id === "injected");
+  const wcConnector = connectors.find((connector) => connector.id === "walletConnect");
 
   const copy = async () => {
     if (!address) return;
@@ -76,15 +97,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeWallet}
-            className="fixed inset-0 z-50 flex items-start md:items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/85 p-4 backdrop-blur-md md:items-center"
           >
             <motion.div
               initial={{ scale: 0.96, opacity: 0, y: 24 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.96, opacity: 0, y: 24 }}
               transition={{ delay: 0.05, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              onClick={(e) => e.stopPropagation()}
-              className="metallic-border relative w-full max-w-3xl my-auto rounded-xl overflow-hidden shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] max-h-[calc(100vh-2rem)] overflow-y-auto"
+              onClick={(event) => event.stopPropagation()}
+              className="metallic-border relative my-auto max-h-[calc(100vh-2rem)] w-full max-w-3xl overflow-hidden overflow-y-auto rounded-xl shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)]"
               style={{
                 background:
                   "linear-gradient(160deg, rgba(12,18,32,0.96) 0%, rgba(8,12,24,0.96) 55%, rgba(20,12,4,0.96) 100%)",
@@ -92,42 +113,43 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             >
               <button
                 onClick={closeWallet}
-                className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-[#050810]/70 backdrop-blur border border-white/10 text-white/70 hover:text-primary hover:border-primary/40 transition-colors text-[10px] tracking-[0.22em] uppercase font-mono"
+                className="absolute left-3 top-3 z-20 flex items-center gap-1.5 rounded-md border border-white/10 bg-[#050810]/70 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-white/70 backdrop-blur transition-colors hover:border-primary/40 hover:text-primary"
                 aria-label="Back"
               >
                 ← Back
               </button>
               <button
                 onClick={closeWallet}
-                className="absolute top-3 right-3 z-20 p-1.5 rounded-md bg-[#050810]/70 backdrop-blur border border-white/10 text-white/50 hover:text-primary hover:border-primary/40 transition-colors"
+                className="absolute right-3 top-3 z-20 rounded-md border border-white/10 bg-[#050810]/70 p-1.5 text-white/50 backdrop-blur transition-colors hover:border-primary/40 hover:text-primary"
                 aria-label="Close"
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
               </button>
 
               <div className="grid grid-cols-1 md:grid-cols-[1.05fr_1fr]">
-
-                {/* ── Left: Skyline hero panel ── */}
-                <div className="relative h-[180px] md:h-auto md:min-h-[480px] overflow-hidden">
+                <div className="relative h-[180px] overflow-hidden md:h-auto md:min-h-[480px]">
                   <img
                     src={worldSkyline}
                     alt=""
-                    className="absolute inset-0 w-full h-full object-cover object-bottom"
+                    className="absolute inset-0 h-full w-full object-cover object-bottom"
                     style={{ filter: "saturate(1.05) contrast(1.05)" }}
                   />
-                  <div className="absolute inset-0"
+                  <div
+                    className="absolute inset-0"
                     style={{
                       background:
                         "linear-gradient(180deg, rgba(8,12,24,0.6) 0%, rgba(8,12,24,0.15) 35%, rgba(8,12,24,0.5) 80%, rgba(8,12,24,0.9) 100%)",
                     }}
                   />
-                  <div className="hidden md:block absolute inset-y-0 right-0 w-32"
+                  <div
+                    className="absolute inset-y-0 right-0 hidden w-32 md:block"
                     style={{
                       background:
                         "linear-gradient(90deg, transparent 0%, rgba(8,12,24,0.85) 100%)",
                     }}
                   />
-                  <div className="absolute inset-x-0 bottom-[18%] h-32 opacity-60 pointer-events-none"
+                  <div
+                    className="pointer-events-none absolute inset-x-0 bottom-[18%] h-32 opacity-60"
                     style={{
                       background:
                         "radial-gradient(ellipse 60% 100% at 50% 100%, rgba(234,141,14,0.35), transparent 70%)",
@@ -138,7 +160,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                     initial={{ opacity: 0, scale: 0.85 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%]"
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[60%]"
                   >
                     <div className="relative">
                       <motion.div
@@ -151,10 +173,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                         className="absolute inset-0 rounded-full"
                         style={{ border: "1px solid rgba(11,181,190,0.4)" }}
                         animate={{ scale: [1, 1.8], opacity: [0.5, 0] }}
-                        transition={{ repeat: Infinity, duration: 3.2, ease: "easeOut", delay: 0.4 }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 3.2,
+                          ease: "easeOut",
+                          delay: 0.4,
+                        }}
                       />
                       <div
-                        className="relative w-[110px] h-[110px] rounded-full flex items-center justify-center"
+                        className="relative flex h-[110px] w-[110px] items-center justify-center rounded-full"
                         style={{
                           background:
                             "radial-gradient(circle at 30% 30%, rgba(234,141,14,0.55), rgba(234,141,14,0.08) 70%)",
@@ -171,7 +198,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                             OPAS
                           </div>
                           <div
-                            className="text-[7px] tracking-[0.4em] uppercase text-primary mt-0.5"
+                            className="mt-0.5 text-[7px] uppercase tracking-[0.4em] text-primary"
                             style={NEVERA}
                           >
                             Vault · 001
@@ -181,24 +208,30 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                     </div>
                   </motion.div>
 
-                  <div className="absolute top-4 left-4 flex items-center gap-1.5 z-10">
-                    <span className={`w-1 h-1 rounded-full ${isConnected ? "bg-emerald-400" : "bg-secondary"} animate-pulse`} />
-                    <span className="text-[8px] font-mono tracking-[0.32em] uppercase text-white/55">
+                  <div className="absolute left-4 top-4 z-10 flex items-center gap-1.5">
+                    <span
+                      className={`h-1 w-1 rounded-full ${isConnected ? "bg-emerald-400" : "bg-secondary"} animate-pulse`}
+                    />
+                    <span className="font-mono text-[8px] uppercase tracking-[0.32em] text-white/55">
                       {isConnected ? "Channel open · TLS 1.3" : "Encrypted · TLS 1.3"}
                     </span>
                   </div>
-                  <div className="absolute bottom-4 left-4 z-10 text-[8px] font-mono tracking-[0.32em] uppercase text-white/35">
+                  <div className="absolute bottom-4 left-4 z-10 font-mono text-[8px] uppercase tracking-[0.32em] text-white/35">
                     {isConnected
                       ? `${CHAIN_NAME[chainId] ?? `chain ${chainId}`} · ${shortAddr(address)}`
                       : "16 markets · 8 cities · live"}
                   </div>
                 </div>
 
-                {/* ── Right: Connection content ── */}
-                <div className="relative flex flex-col items-start text-left p-7 md:p-9 space-y-5 bg-[rgba(8,12,24,0.6)]">
-                  <div className="metallic-border inline-flex items-center gap-2 px-3 py-1 rounded-full">
-                    <span className={`w-1 h-1 rounded-full ${isConnected ? "bg-emerald-400" : "bg-secondary"} animate-pulse`} />
-                    <span className="text-[8.5px] tracking-[0.32em] uppercase metallic-text" style={NEVERA}>
+                <div className="relative flex flex-col items-start space-y-5 bg-[rgba(8,12,24,0.6)] p-7 text-left md:p-9">
+                  <div className="metallic-border inline-flex items-center gap-2 rounded-full px-3 py-1">
+                    <span
+                      className={`h-1 w-1 rounded-full ${isConnected ? "bg-emerald-400" : "bg-secondary"} animate-pulse`}
+                    />
+                    <span
+                      className="metallic-text text-[8.5px] uppercase tracking-[0.32em]"
+                      style={NEVERA}
+                    >
                       {isConnected ? "Wallet connected" : "Secure channel"}
                     </span>
                   </div>
@@ -206,32 +239,37 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                   {!isConnected && (
                     <>
                       <div>
-                        <h3 className="text-[26px] md:text-[30px] leading-[1.05] mb-3" style={SHARKON}>
+                        <h3 className="mb-3 text-[26px] leading-[1.05] md:text-[30px]" style={SHARKON}>
                           <span className="metallic-text">Acquire your</span>
                           <br />
                           <span className="metallic-warm-text">equity interest.</span>
                         </h3>
-                        <p className="text-white/55 text-[13.5px] leading-relaxed" style={NEVERA}>
-                          Connect a browser extension — or scan a QR code with a wallet app on your phone — to enter the Opas vault.
+                        <p className="text-[13.5px] leading-relaxed text-white/55" style={NEVERA}>
+                          Connect with MetaMask, Trust Wallet, Rainbow, Coinbase Wallet, or any
+                          WalletConnect-compatible app on your phone. Browser extensions stay
+                          available, but they are no longer required.
                         </p>
                       </div>
 
-                      <div className="w-full grid grid-cols-3 gap-2">
+                      <div className="grid w-full grid-cols-3 gap-2">
                         {[
                           { icon: Shield, label: "Audited" },
-                          { icon: Zap,    label: "Instant" },
+                          { icon: Zap, label: "Instant" },
                           { icon: Globe2, label: "Global" },
                         ].map(({ icon: Icon, label }) => (
                           <div
                             key={label}
-                            className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-md"
+                            className="flex flex-col items-center justify-center gap-1 rounded-md py-2.5"
                             style={{
                               background: "rgba(20,28,48,0.6)",
                               border: "1px solid rgba(220,225,235,0.08)",
                             }}
                           >
-                            <Icon className="w-3.5 h-3.5 text-primary/80" />
-                            <span className="text-[8.5px] tracking-[0.28em] uppercase text-white/55" style={NEVERA}>
+                            <Icon className="h-3.5 w-3.5 text-primary/80" />
+                            <span
+                              className="text-[8.5px] uppercase tracking-[0.28em] text-white/55"
+                              style={NEVERA}
+                            >
                               {label}
                             </span>
                           </div>
@@ -239,52 +277,71 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                       </div>
 
                       <div className="w-full space-y-2.5">
-                        {hasInjected && injectedConnector && (
-                          <button
-                            onClick={() => connect({ connector: injectedConnector })}
-                            disabled={isPending}
-                            className="btn-metal group relative w-full overflow-hidden px-5 py-3.5 text-[11px] font-bold tracking-[0.22em] text-[#050810] uppercase rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                            style={{ fontFamily: "BankGothic, sans-serif" }}
-                          >
-                            {isPending ? (
-                              <span className="flex items-center justify-center gap-2">
-                                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Awaiting signature…
-                              </span>
-                            ) : (
-                              "Connect browser wallet"
-                            )}
-                          </button>
-                        )}
-
                         {wcConnector && (
                           <button
                             onClick={() => connect({ connector: wcConnector })}
                             disabled={isPending}
-                            className={
-                              hasInjected
-                                ? "w-full flex flex-col items-center gap-0.5 px-5 py-3 rounded-sm border border-white/15 hover:border-primary/45 hover:bg-white/[0.03] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                : "btn-metal group relative w-full overflow-hidden flex flex-col items-center gap-0.5 px-5 py-3.5 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                            }
-                            style={hasInjected ? undefined : { fontFamily: "BankGothic, sans-serif" }}
+                            className="btn-metal group relative flex w-full flex-col items-center gap-1 overflow-hidden rounded-sm px-5 py-3.5 disabled:cursor-not-allowed disabled:opacity-50"
+                            style={{ fontFamily: "BankGothic, sans-serif" }}
                           >
-                            <span className={`flex items-center justify-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase ${hasInjected ? "text-white/85" : "text-[#050810]"}`}>
-                              <QrCode className="w-3.5 h-3.5" /> Use a mobile wallet
+                            <span className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-[#050810]">
+                              <QrCode className="h-3.5 w-3.5" /> Connect mobile wallet
                             </span>
-                            <span className={`text-[8.5px] tracking-[0.22em] uppercase ${hasInjected ? "text-white/40" : "text-[#050810]/60"}`} style={NEVERA}>
-                              Scan QR · MetaMask, Trust, Rainbow &amp; more
+                            <span
+                              className="text-[8.5px] uppercase tracking-[0.22em] text-[#050810]/70"
+                              style={NEVERA}
+                            >
+                              Scan QR on desktop or open your installed wallet on mobile
                             </span>
                           </button>
                         )}
 
-                        {!hasInjected && !wcConnector && (
-                          <div className="w-full flex items-start gap-2 p-3 rounded-md text-[11px] text-amber-200/80"
-                            style={{ background: "rgba(234,141,14,0.06)", border: "1px solid rgba(234,141,14,0.18)" }}
+                        {hasInjected && injectedConnector && (
+                          <button
+                            onClick={() => connect({ connector: injectedConnector })}
+                            disabled={isPending}
+                            className="flex w-full flex-col items-center gap-0.5 rounded-sm border border-white/15 px-5 py-3 transition-colors hover:border-primary/45 hover:bg-white/[0.03] disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            <AlertTriangle className="w-3.5 h-3.5 mt-px shrink-0 text-primary" />
+                            {isPending ? (
+                              <span className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-white/85">
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Awaiting
+                                signature...
+                              </span>
+                            ) : (
+                              <>
+                                <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/85">
+                                  Connect browser wallet
+                                </span>
+                                <span
+                                  className="text-[8.5px] uppercase tracking-[0.22em] text-white/40"
+                                  style={NEVERA}
+                                >
+                                  MetaMask, Rabby, Brave, Coinbase extension
+                                </span>
+                              </>
+                            )}
+                          </button>
+                        )}
+
+                        {!wcConnector && (
+                          <div
+                            className="flex w-full items-start gap-2 rounded-md p-3 text-[11px] text-amber-200/80"
+                            style={{
+                              background: "rgba(234,141,14,0.06)",
+                              border: "1px solid rgba(234,141,14,0.18)",
+                            }}
+                          >
+                            <AlertTriangle className="mt-px h-3.5 w-3.5 shrink-0 text-primary" />
                             <span style={NEVERA}>
-                              Install MetaMask or open this site inside your wallet's in-app browser to continue.{" "}
-                              <a href="https://metamask.io/download" target="_blank" rel="noreferrer" className="underline decoration-primary/40 hover:text-primary">
-                                Get MetaMask <ExternalLink className="inline w-3 h-3" />
+                              WalletConnect is unavailable in this build. Add a Reown project id
+                              or install MetaMask to continue.{" "}
+                              <a
+                                href="https://metamask.io/download"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="underline decoration-primary/40 hover:text-primary"
+                              >
+                                Get MetaMask <ExternalLink className="inline h-3 w-3" />
                               </a>
                             </span>
                           </div>
@@ -298,7 +355,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                       )}
 
                       <div className="metallic-divider w-full" />
-                      <div className="w-full text-[8.5px] tracking-[0.3em] uppercase text-white/25" style={NEVERA}>
+                      <div
+                        className="w-full text-[8.5px] uppercase tracking-[0.3em] text-white/25"
+                        style={NEVERA}
+                      >
                         Beta · v1.0.4 · OPA-IDX-001
                       </div>
                     </>
@@ -307,46 +367,78 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                   {isConnected && (
                     <>
                       <div>
-                        <h3 className="text-[24px] md:text-[28px] leading-[1.05] mb-2" style={SHARKON}>
+                        <h3 className="mb-2 text-[24px] leading-[1.05] md:text-[28px]" style={SHARKON}>
                           <span className="metallic-text">Welcome,</span>{" "}
                           <span className="metallic-warm-text">investor.</span>
                         </h3>
-                        <p className="text-white/55 text-[13px] leading-relaxed" style={NEVERA}>
-                          Your vault is live across {CHAIN_NAME[chainId] ?? "your network"}. Review holdings and vote on active proposals.
+                        <p className="text-[13px] leading-relaxed text-white/55" style={NEVERA}>
+                          Your vault is live across {CHAIN_NAME[chainId] ?? "your network"}.
+                          Review holdings and vote on active proposals.
                         </p>
                       </div>
 
-                      <div className="w-full rounded-md p-3 space-y-2"
-                        style={{ background: "rgba(20,28,48,0.6)", border: "1px solid rgba(220,225,235,0.08)" }}
+                      <div
+                        className="w-full space-y-2 rounded-md p-3"
+                        style={{
+                          background: "rgba(20,28,48,0.6)",
+                          border: "1px solid rgba(220,225,235,0.08)",
+                        }}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-[8.5px] tracking-[0.32em] uppercase text-white/40" style={NEVERA}>Address</span>
-                          <button onClick={copy} className="flex items-center gap-1.5 text-[11px] text-white/85 hover:text-primary transition-colors font-mono">
+                          <span
+                            className="text-[8.5px] uppercase tracking-[0.32em] text-white/40"
+                            style={NEVERA}
+                          >
+                            Address
+                          </span>
+                          <button
+                            onClick={copy}
+                            className="flex items-center gap-1.5 font-mono text-[11px] text-white/85 transition-colors hover:text-primary"
+                          >
                             {shortAddr(address)}
-                            {copied
-                              ? <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                              : <Copy className="w-3 h-3" />}
+                            {copied ? (
+                              <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
                           </button>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-[8.5px] tracking-[0.32em] uppercase text-white/40" style={NEVERA}>Network</span>
-                          <span className="text-[11px] text-white/85" style={NEVERA}>{CHAIN_NAME[chainId] ?? `Chain ${chainId}`}</span>
+                          <span
+                            className="text-[8.5px] uppercase tracking-[0.32em] text-white/40"
+                            style={NEVERA}
+                          >
+                            Network
+                          </span>
+                          <span className="text-[11px] text-white/85" style={NEVERA}>
+                            {CHAIN_NAME[chainId] ?? `Chain ${chainId}`}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-[8.5px] tracking-[0.32em] uppercase text-white/40" style={NEVERA}>Status</span>
-                          <span className="text-[11px] text-emerald-300" style={NEVERA}>{status}</span>
+                          <span
+                            className="text-[8.5px] uppercase tracking-[0.32em] text-white/40"
+                            style={NEVERA}
+                          >
+                            Status
+                          </span>
+                          <span className="text-[11px] text-emerald-300" style={NEVERA}>
+                            {status}
+                          </span>
                         </div>
                       </div>
 
-                      <div className="w-full flex flex-col gap-2">
-                        <Link href="/dashboard" onClick={closeWallet}
-                          className="btn-metal w-full text-center px-5 py-3 text-[11px] font-bold tracking-[0.22em] text-[#050810] uppercase rounded-sm"
+                      <div className="flex w-full flex-col gap-2">
+                        <Link
+                          href="/dashboard"
+                          onClick={closeWallet}
+                          className="btn-metal w-full rounded-sm px-5 py-3 text-center font-bold uppercase tracking-[0.22em] text-[#050810]"
                           style={{ fontFamily: "BankGothic, sans-serif" }}
                         >
                           Open Dashboard
                         </Link>
-                        <button onClick={() => disconnect()}
-                          className="w-full px-5 py-2.5 text-[10.5px] tracking-[0.22em] text-white/55 hover:text-white uppercase border border-white/10 hover:border-white/25 rounded-sm transition-colors"
+                        <button
+                          onClick={() => disconnect()}
+                          className="w-full rounded-sm border border-white/10 px-5 py-2.5 text-[10.5px] uppercase tracking-[0.22em] text-white/55 transition-colors hover:border-white/25 hover:text-white"
                           style={NEVERA}
                         >
                           Disconnect
@@ -355,7 +447,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                     </>
                   )}
                 </div>
-
               </div>
             </motion.div>
           </motion.div>
