@@ -16,12 +16,21 @@ export default function Title() {
       <div className="relative h-full w-full flex flex-col justify-between px-[8vw] py-[7vh]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-[1.1vw]">
-            <img
-              src={`${base}img/opas-logo.png`}
-              crossOrigin="anonymous"
-              alt="Opas Holdings logo"
-              className="h-[9vh] w-[9vh] object-contain"
-            />
+            <div
+              className="relative flex h-[10.5vh] w-[10.5vh] items-center justify-center rounded-full"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(234,141,14,0.24) 0%, rgba(234,141,14,0.08) 38%, transparent 72%)",
+                boxShadow: "0 0 48px rgba(234,141,14,0.16)",
+              }}
+            >
+              <img
+                src={`${base}img/opas-logo.png`}
+                crossOrigin="anonymous"
+                alt="Opas Holdings logo"
+                className="h-[8.8vh] w-[8.8vh] object-contain"
+              />
+            </div>
             <span className="font-body uppercase tracking-[0.45em] text-[1.15vw] text-fg/80">
               Opas Holdings
             </span>

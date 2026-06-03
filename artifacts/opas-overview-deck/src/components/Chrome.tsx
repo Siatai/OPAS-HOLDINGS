@@ -10,12 +10,20 @@ export function SlideHeader({
   return (
     <div className="absolute top-[4.5vh] left-[8vw] right-[8vw] flex items-center justify-between z-20">
       <div className="flex items-center gap-[1vw]">
-        <img
-          src={`${base}img/opas-logo.png`}
-          crossOrigin="anonymous"
-          alt="Opas Holdings logo"
-          className="h-[6vh] w-[6vh] object-contain"
-        />
+        <div
+          className="relative flex h-[6.8vh] w-[6.8vh] items-center justify-center rounded-full"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(234,141,14,0.20) 0%, rgba(234,141,14,0.06) 38%, transparent 72%)",
+          }}
+        >
+          <img
+            src={`${base}img/opas-logo.png`}
+            crossOrigin="anonymous"
+            alt="Opas Holdings logo"
+            className="h-[5.9vh] w-[5.9vh] object-contain"
+          />
+        </div>
         <span className="font-body uppercase tracking-[0.4em] text-[1vw] text-fg/70">
           Opas Holdings
         </span>
