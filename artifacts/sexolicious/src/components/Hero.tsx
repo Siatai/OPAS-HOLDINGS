@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { useWallet } from "./WalletContext";
 import FitText, { FitTextGroup } from "./FitText";
 import { useOpasPrice, fmtOpasRate } from "@/lib/opasPrice";
 import { useMinWidth } from "@/hooks/use-mobile";
 import worldSkyline from "@/assets/images/world_skyline.png";
+import propPenthouse from "@/assets/images/properties/lux_penthouse_skyline.jpg";
+import yachtRiva from "@/assets/images/assets/yacht_riva.png";
 
 const TICKER_ITEMS = [
   "120 assets", "4 asset classes", "$480M aum", "18,000 investors",
@@ -14,24 +16,31 @@ const TICKER_ITEMS = [
 ];
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
-const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
-const SERIF   = { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" as const };
+const NEVERA = { fontFamily: "Nevera, Inter, sans-serif" };
+const SERIF = { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" as const };
 
-// Four asset classes shown as a refined "index core" emblem — a metallic
-// orbital constellation (no imagery) that fills the hero's central negative
-// space on wide desktop and echoes the Opas Index panel. Coordinates are in
-// the emblem's 288x288 viewBox; center is (144,144), nodes sit on r=90.
-const EMBLEM = 288;
-const CLASSES = [
-  { label: "Real Estate",  yld: "9.4%",  accent: "#C9CCD2", x: 144, y: 54,  delay: 0.7  },
-  { label: "Supercars",    yld: "12.6%", accent: "#EA8D0E", x: 234, y: 144, delay: 0.85 },
-  { label: "Yachts",       yld: "11.0%", accent: "#0BB5BE", x: 144, y: 234, delay: 1.0  },
-  { label: "Private Jets", yld: "10.8%", accent: "#22D3EE", x: 54,  y: 144, delay: 1.15 },
-];
+const LEDGER_FRAGMENTS = [
+  {
+    label: "Mayfair Penthouse",
+    meta: "Prime residential",
+    stat: "+17.2%",
+    image: propPenthouse,
+    accent: "#E8D7B6",
+    className: "left-[-20px] top-[40px] w-[154px] rotate-[-7deg]",
+  },
+  {
+    label: "Riva 110 Dolcevita",
+    meta: "Mediterranean charter",
+    stat: "+19.1%",
+    image: yachtRiva,
+    accent: "#3ED6C3",
+    className: "right-[-18px] bottom-[34px] w-[168px] rotate-[7deg]",
+  },
+] as const;
 
 export default function Hero() {
   const { scrollY } = useScroll();
-  const y       = useTransform(scrollY, [0, 800], [0, 120]);
+  const y = useTransform(scrollY, [0, 800], [0, 120]);
   const opacity = useTransform(scrollY, [0, 520, 780], [1, 1, 0]);
   const { openWallet } = useWallet();
   const { price: opasPrice, changePct: opasChange } = useOpasPrice();
@@ -42,9 +51,6 @@ export default function Hero() {
   const reduceMotion = useReducedMotion();
   const tiltY = (mousePos.x - 0.5) * 14;
   const tiltX = -(mousePos.y - 0.5) * 14;
-  const RADAR_PERIOD = 8;
-  const radarDelay = (x: number, y: number) =>
-    (((((Math.atan2(x - 144, -(y - 144)) * 180) / Math.PI) + 360) % 360) / 360) * RADAR_PERIOD;
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -58,7 +64,6 @@ export default function Hero() {
 
   return (
     <section ref={sectionRef} className="relative min-h-screen w-full overflow-hidden bg-background flex flex-col">
-      {/* Subtle mouse-tracking radial — much softer than before */}
       <div
         className="absolute inset-0 pointer-events-none z-0"
         style={{
@@ -66,15 +71,10 @@ export default function Hero() {
         }}
       />
 
-      {/* Cool silver wash on the right side — metallic atmosphere */}
       <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_45%_60%_at_75%_45%,rgba(200,210,225,0.045)_0%,transparent_70%)]" />
-
-      {/* Faint amber wash on the left */}
       <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_45%_55%_at_22%_55%,rgba(234,141,14,0.04)_0%,transparent_70%)]" />
 
-      {/* World-landmarks skyline — infinite, dimmed, classy marquee band */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[44%] z-0 overflow-hidden">
-        {/* Mirror-tiled track: [A][A-flipped] repeated → seamless infinite loop */}
         <div className="skyline-scroll flex h-full w-max items-end will-change-transform">
           {Array.from({ length: 8 }, (_, i) => i).map((i) => (
             <img
@@ -87,7 +87,6 @@ export default function Hero() {
             />
           ))}
         </div>
-        {/* Top fade — blend strip into the dark hero background */}
         <div
           className="absolute inset-0"
           style={{
@@ -95,10 +94,8 @@ export default function Hero() {
               "linear-gradient(180deg, hsl(222,47%,5%) 0%, rgba(8,12,24,0.55) 30%, rgba(8,12,24,0.12) 62%, transparent 100%)",
           }}
         />
-        {/* Side vignette fades — keep the loop edges soft & refined */}
         <div className="absolute inset-y-0 left-0 w-24 md:w-44 bg-gradient-to-r from-background to-transparent" />
         <div className="absolute inset-y-0 right-0 w-24 md:w-44 bg-gradient-to-l from-background to-transparent" />
-        {/* Whisper-soft amber horizon */}
         <div
           className="absolute inset-x-0 bottom-0 h-20 opacity-[0.16]"
           style={{
@@ -108,260 +105,152 @@ export default function Hero() {
         />
       </div>
 
-      {/* Refined HUD grid — even more subtle */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03]
         bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)]
         bg-[size:4rem_4rem]
         [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_15%,transparent_100%)]" />
 
-      {/* Index-core emblem — fills the hero's central negative space between the
-          copy and the index panel. A metallic orbital constellation of the four
-          asset classes (no imagery). Rendered only at >=1280px (the gap only
-          exists there), so mobile/tablet ship no extra DOM. Layered below the
-          z-10 copy/panel so it never overlaps them. */}
       {showCenter && (
         <motion.div
           aria-hidden
           initial={{ opacity: 0, scale: 0.92 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute z-[6] top-[45%] left-[calc(50%_+_24px)] -translate-x-1/2 -translate-y-1/2 w-[288px] h-[288px] pointer-events-none"
+          className="absolute z-[6] top-[45%] left-[calc(50%_+_24px)] -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] pointer-events-none"
           style={{ perspective: "1300px" }}
         >
-         <div
-           className="relative w-full h-full"
-           style={{
-             transformStyle: "preserve-3d",
-             transform: reduceMotion ? undefined : `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`,
-             transition: "transform 0.35s ease-out",
-           }}
-         >
-          {/* Soft core glow */}
           <div
-            className="absolute inset-0 rounded-full blur-3xl opacity-90"
+            className="relative w-full h-full"
             style={{
-              background:
-                "radial-gradient(circle at 50% 50%, rgba(234,141,14,0.18) 0%, rgba(200,210,225,0.07) 38%, transparent 66%)",
+              transformStyle: "preserve-3d",
+              transform: reduceMotion ? undefined : `rotateX(${tiltX * 0.55}deg) rotateY(${tiltY * 0.55}deg)`,
+              transition: "transform 0.35s ease-out",
             }}
-          />
-
-          {/* Slowly-rotating radar sweep — whisper-subtle "live index" motion */}
-          <div
-            className="absolute inset-[20px] rounded-full animate-spin motion-reduce:hidden"
-            style={{
-              animationDuration: "8s",
-              background:
-                "conic-gradient(from 0deg, rgba(234,141,14,0.36) 0deg, rgba(234,141,14,0.12) 16deg, rgba(234,141,14,0.03) 40deg, transparent 64deg)",
-              maskImage: "radial-gradient(circle, transparent 24%, #000 40%, #000 97%, transparent 100%)",
-              WebkitMaskImage: "radial-gradient(circle, transparent 24%, #000 40%, #000 97%, transparent 100%)",
-            }}
-          />
-
-          {/* Rings · bezel ticks · spokes · node markers */}
-          <svg viewBox="0 0 288 288" className="absolute inset-0 w-full h-full overflow-visible">
-            <defs>
-              <linearGradient id="ringStroke" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="rgba(220,225,235,0.22)" />
-                <stop offset="55%" stopColor="rgba(220,225,235,0.08)" />
-                <stop offset="100%" stopColor="rgba(234,141,14,0.14)" />
-              </linearGradient>
-              <filter id="pipGlow" x="-400%" y="-400%" width="900%" height="900%">
-                <feGaussianBlur stdDeviation="2.4" result="b" />
-                <feMerge>
-                  <feMergeNode in="b" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
-
-            {/* concentric rings */}
-            <circle cx="144" cy="144" r="118" fill="none" stroke="rgba(220,225,235,0.06)" strokeWidth="1" />
-            <circle cx="144" cy="144" r="90"  fill="none" stroke="url(#ringStroke)" strokeWidth="1" />
-
-            {/* gauge bezel — slowly rotating, 60 fine ticks (every 5th longer) */}
-            <g
-              className="animate-spin motion-reduce:animate-none"
-              style={{ animationDuration: "90s", transformBox: "fill-box", transformOrigin: "center" }}
-            >
-              {Array.from({ length: 60 }, (_, i) => {
-                const a = (i / 60) * Math.PI * 2 - Math.PI / 2;
-                const major = i % 5 === 0;
-                const r1 = 118;
-                const r2 = 118 - (major ? 7 : 3.5);
-                return (
-                  <line
-                    key={i}
-                    x1={144 + Math.cos(a) * r1}
-                    y1={144 + Math.sin(a) * r1}
-                    x2={144 + Math.cos(a) * r2}
-                    y2={144 + Math.sin(a) * r2}
-                    stroke={major ? "rgba(220,225,235,0.22)" : "rgba(220,225,235,0.10)"}
-                    strokeWidth="1"
-                  />
-                );
-              })}
-            </g>
-
-            {/* dashed counter-rotating orbit around the logo */}
-            <circle
-              cx="144" cy="144" r="72" fill="none"
-              stroke="rgba(220,225,235,0.16)" strokeWidth="1" strokeDasharray="1.5 7"
-              className="animate-spin motion-reduce:animate-none"
-              style={{ animationDuration: "30s", animationDirection: "reverse", transformBox: "fill-box", transformOrigin: "center" }}
-            />
-
-            {/* faint spoke rails to each asset */}
-            {CLASSES.map((c) => (
-              <line
-                key={`rail-${c.label}`}
-                x1="144" y1="144" x2={c.x} y2={c.y}
-                stroke={c.accent} strokeOpacity="0.12" strokeWidth="1" strokeDasharray="2 5"
-              />
-            ))}
-
-            {/* radar emission — a light dot fires out to each asset as the sweep crosses it */}
-            {!reduceMotion && CLASSES.map((c) => (
-              <motion.circle
-                key={`beam-${c.label}`}
-                r="2.8" fill={c.accent} filter="url(#pipGlow)"
-                initial={{ cx: 144, cy: 144, opacity: 0 }}
-                animate={{
-                  cx: [144, 144, c.x, c.x, c.x],
-                  cy: [144, 144, c.y, c.y, c.y],
-                  opacity: [0, 0, 1, 0, 0],
-                }}
-                transition={{
-                  duration: RADAR_PERIOD,
-                  times: [0, 0.02, 0.13, 0.26, 1],
-                  repeat: Infinity,
-                  ease: "easeOut",
-                  delay: radarDelay(c.x, c.y),
-                }}
-              />
-            ))}
-
-            {/* node markers — light up only when the radar sweep reaches them */}
-            {CLASSES.map((c) => {
-              const delay = radarDelay(c.x, c.y);
-              return (
-                <g key={`m-${c.label}`}>
-                  {!reduceMotion && (
-                    <motion.circle
-                      cx={c.x} cy={c.y} fill="none" stroke={c.accent} strokeWidth="1.5"
-                      initial={{ r: 6, strokeOpacity: 0 }}
-                      animate={{ r: [6, 6, 15, 15], strokeOpacity: [0, 0.9, 0, 0] }}
-                      transition={{ duration: RADAR_PERIOD, times: [0, 0.13, 0.34, 1], repeat: Infinity, ease: "easeOut", delay }}
-                    />
-                  )}
-                  <motion.circle
-                    cx={c.x} cy={c.y} fill="none" stroke={c.accent} strokeWidth="1"
-                    initial={{ r: 6, strokeOpacity: 0.18 }}
-                    animate={reduceMotion ? { strokeOpacity: 0.3 } : { strokeOpacity: [0.18, 0.18, 0.85, 0.18, 0.18] }}
-                    transition={reduceMotion ? undefined : { duration: RADAR_PERIOD, times: [0, 0.05, 0.13, 0.3, 1], repeat: Infinity, ease: "easeOut", delay }}
-                  />
-                  <motion.circle
-                    cx={c.x} cy={c.y} r="2.6" fill={c.accent}
-                    initial={{ opacity: 0.35 }}
-                    animate={reduceMotion ? { opacity: 0.5 } : { opacity: [0.35, 0.35, 1, 0.35, 0.35] }}
-                    transition={reduceMotion ? undefined : { duration: RADAR_PERIOD, times: [0, 0.06, 0.13, 0.3, 1], repeat: Infinity, ease: "easeOut", delay }}
-                  />
-                </g>
-              );
-            })}
-          </svg>
-
-          {/* Center: OPAS logo mark with a breathing glow */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[116px] h-[116px]">
-            <motion.div
-              aria-hidden
-              className="absolute inset-[-16px] rounded-full motion-reduce:hidden"
+          >
+            <div
+              className="absolute inset-[18px] rounded-[42px] blur-3xl opacity-90"
               style={{
                 background:
-                  "radial-gradient(circle, rgba(234,141,14,0.42) 0%, rgba(234,141,14,0.08) 46%, transparent 70%)",
+                  "radial-gradient(circle at 50% 50%, rgba(242,140,40,0.22) 0%, rgba(217,107,157,0.10) 30%, rgba(61,15,28,0.16) 58%, transparent 80%)",
               }}
-              animate={reduceMotion ? { opacity: 0.55, scale: 1 } : { opacity: [0.5, 0.85, 0.5], scale: [0.94, 1.06, 0.94] }}
-              transition={reduceMotion ? undefined : { duration: 5, repeat: Infinity, ease: "easeInOut" }}
             />
-            <img
-              src="/opas-logo.png"
-              alt="Opas"
-              className="relative w-full h-full rounded-full object-cover"
+
+            <motion.div
+              className="absolute left-1/2 top-1/2 h-[236px] w-[236px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[32px]"
+              animate={reduceMotion ? undefined : { rotateZ: [-1, 1.2, -1] }}
+              transition={reduceMotion ? undefined : { duration: 16, repeat: Infinity, ease: "easeInOut" }}
               style={{
+                background:
+                  "linear-gradient(155deg, rgba(16,16,21,0.97) 0%, rgba(8,9,12,0.98) 48%, rgba(34,20,12,0.96) 100%)",
+                border: "1px solid rgba(255,236,205,0.16)",
                 boxShadow:
-                  "0 0 0 1px rgba(220,225,235,0.22), inset 0 0 18px rgba(0,0,0,0.5), 0 0 56px -6px rgba(234,141,14,0.6)",
-              }}
-            />
-            {/* rotating gloss sheen across the orb */}
-            <div
-              className="absolute inset-0 rounded-full overflow-hidden mix-blend-screen animate-spin motion-reduce:hidden"
-              style={{
-                animationDuration: "7s",
-                background:
-                  "conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.22) 16deg, rgba(255,236,200,0.05) 34deg, transparent 52deg)",
-              }}
-            />
-            {/* crisp metallic rim */}
-            <div
-              className="absolute inset-0 rounded-full pointer-events-none"
-              style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.14), inset 0 1px 2px rgba(255,255,255,0.18)" }}
-            />
-          </div>
-
-          {/* Asset-class node chips */}
-          {CLASSES.map((c) => (
-            <motion.div
-              key={c.label}
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: c.delay, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center px-2.5 py-1.5 rounded-lg"
-              style={{
-                left: `${(c.x / EMBLEM) * 100}%`,
-                top: `${(c.y / EMBLEM) * 100}%`,
-                background: "rgba(12,17,28,0.55)",
-                border: "1px solid rgba(220,225,235,0.10)",
-                backdropFilter: "blur(6px)",
-                WebkitBackdropFilter: "blur(6px)",
-                boxShadow: "0 8px 22px -12px rgba(0,0,0,0.7)",
+                  "0 44px 110px -40px rgba(0,0,0,0.95), 0 0 0 1px rgba(255,255,255,0.03), inset 0 1px 0 rgba(255,245,227,0.12), inset 0 -30px 60px rgba(242,140,40,0.08)",
               }}
             >
-              {/* radar highlight pulse — fires when the sweep crosses this asset */}
-              {!reduceMotion && (
-                <motion.span
-                  aria-hidden
-                  className="absolute inset-0 rounded-lg pointer-events-none"
-                  style={{ boxShadow: `0 0 0 1px ${c.accent}, 0 0 18px -2px ${c.accent}` }}
-                  initial={{ opacity: 0, scale: 1 }}
-                  animate={{ opacity: [0, 0, 0.9, 0, 0], scale: [1, 1, 1.05, 1.16, 1.16] }}
-                  transition={{ duration: RADAR_PERIOD, times: [0, 0.05, 0.13, 0.32, 1], repeat: Infinity, ease: "easeOut", delay: radarDelay(c.x, c.y) }}
-                />
-              )}
-              <motion.span
-                className="w-1.5 h-1.5 rounded-full mb-1"
-                style={{ background: c.accent }}
-                initial={{ boxShadow: `0 0 6px ${c.accent}` }}
-                animate={reduceMotion ? undefined : { boxShadow: [`0 0 6px ${c.accent}`, `0 0 6px ${c.accent}`, `0 0 16px 2px ${c.accent}`, `0 0 6px ${c.accent}`, `0 0 6px ${c.accent}`] }}
-                transition={reduceMotion ? undefined : { duration: RADAR_PERIOD, times: [0, 0.06, 0.13, 0.3, 1], repeat: Infinity, ease: "easeOut", delay: radarDelay(c.x, c.y) }}
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),transparent_18%,transparent_82%,rgba(242,140,40,0.05))]" />
+              <motion.div
+                aria-hidden
+                className="absolute inset-y-0 left-[-18%] w-[36%] skew-x-[-18deg] bg-[linear-gradient(90deg,transparent,rgba(255,244,221,0.16),transparent)] mix-blend-screen"
+                animate={reduceMotion ? undefined : { x: ["-20%", "350%"] }}
+                transition={reduceMotion ? undefined : { duration: 8.5, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.6 }}
               />
-              <span className="text-[11px] leading-none" style={{ ...SHARKON, color: c.accent }}>{c.yld}</span>
-              <span className="text-[6px] tracking-[0.26em] uppercase text-white/55 mt-1 whitespace-nowrap" style={NEVERA}>{c.label}</span>
+
+              <div className="relative z-10 flex h-full flex-col px-6 py-5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl"
+                      style={{
+                        background: "linear-gradient(145deg, rgba(245,217,142,0.22), rgba(242,140,40,0.16))",
+                        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.16), 0 10px 28px -16px rgba(242,140,40,0.85)",
+                      }}
+                    >
+                      <img src="/opas-logo.png" alt="Opas" className="h-8 w-8 object-contain" />
+                    </div>
+                    <div>
+                      <div className="text-[9px] tracking-[0.34em] uppercase text-white/36" style={NEVERA}>Private index</div>
+                      <div className="text-[14px] tracking-[0.18em] uppercase text-[#f6dfb2]" style={NEVERA}>Black Ledger</div>
+                    </div>
+                  </div>
+                  <div className="rounded-full border border-white/10 px-3 py-1 text-[8px] tracking-[0.28em] uppercase text-[#f3c97a]" style={NEVERA}>
+                    Invite only
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <div className="text-[8px] tracking-[0.34em] uppercase text-white/34" style={NEVERA}>Access to curated trophy inventory</div>
+                  <div className="mt-2 text-[31px] leading-[0.95] text-[#f7e7c3]" style={SHARKON}>
+                    Wealth wants
+                    <br />
+                    discretion.
+                  </div>
+                </div>
+
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  {[
+                    { label: "AUM", value: "$480M", tone: "text-[#f7e7c3]" },
+                    { label: "Net Yield", value: "6.1%", tone: "text-[#f3b562]" },
+                    { label: "Entry", value: "$100", tone: "text-[#f7e7c3]" },
+                    { label: "Windows", value: "04", tone: "text-[#d772a0]" },
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      className="rounded-2xl px-4 py-3"
+                      style={{
+                        background: "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))",
+                        border: "1px solid rgba(255,236,205,0.10)",
+                        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
+                      }}
+                    >
+                      <div className="text-[7px] tracking-[0.32em] uppercase text-white/34" style={NEVERA}>{item.label}</div>
+                      <div className={`mt-2 text-[18px] leading-none ${item.tone}`} style={SHARKON}>{item.value}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </motion.div>
-          ))}
-         </div>
+
+            {LEDGER_FRAGMENTS.map((fragment, index) => (
+              <motion.div
+                key={fragment.label}
+                initial={{ opacity: 0, y: 16, scale: 0.94 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.55 + index * 0.12, ease: [0.16, 1, 0.3, 1] }}
+                className={`absolute ${fragment.className}`}
+                style={{ transformStyle: "preserve-3d" }}
+              >
+                <motion.div
+                  className="overflow-hidden rounded-[24px]"
+                  animate={reduceMotion ? undefined : { y: [-4, 4, -4] }}
+                  transition={reduceMotion ? undefined : { duration: 9 + index, repeat: Infinity, ease: "easeInOut" }}
+                  style={{
+                    background: "linear-gradient(180deg, rgba(18,18,22,0.96), rgba(9,9,12,0.98))",
+                    border: "1px solid rgba(255,236,205,0.14)",
+                    boxShadow: `0 20px 40px -20px rgba(0,0,0,0.88), inset 0 1px 0 rgba(255,245,227,0.10), 0 0 24px -14px ${fragment.accent}`,
+                  }}
+                >
+                  <div className="relative h-[106px] overflow-hidden">
+                    <img src={fragment.image} alt="" className="h-full w-full object-cover object-center" />
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,rgba(7,7,10,0.08)_45%,rgba(7,7,10,0.72)_100%)]" />
+                  </div>
+                  <div className="px-4 py-3">
+                    <div className="text-[7px] tracking-[0.30em] uppercase text-white/34" style={NEVERA}>{fragment.meta}</div>
+                    <div className="mt-1 text-[13px] leading-tight text-white/88" style={SHARKON}>{fragment.label}</div>
+                    <div className="mt-2 text-[10px] tracking-[0.28em] uppercase" style={{ ...NEVERA, color: fragment.accent }}>{fragment.stat}</div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       )}
 
-      {/* ── Main content ── */}
       <motion.div
         style={{ y, opacity }}
         className="relative z-10 flex-1 w-full container mx-auto px-6 lg:px-12 pt-28 lg:pt-32 pb-4 flex items-center"
       >
         <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-10 xl:gap-16 items-center">
-
-          {/* ── Left: copy ── */}
           <div className="flex flex-col md:col-span-7">
-
-            {/* Status pill — silver/teal, refined */}
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -374,7 +263,6 @@ export default function Hero() {
               </span>
             </motion.div>
 
-            {/* Headline — Sharkon, sleek, metallic accents */}
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -387,7 +275,6 @@ export default function Hero() {
               <span className="metallic-warm-text">anywhere.</span>
             </motion.h1>
 
-            {/* Subhead — Cormorant italic, restrained */}
             <motion.p
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
@@ -395,11 +282,10 @@ export default function Hero() {
               className="text-[15px] md:text-base text-white/45 max-w-md mb-10 leading-relaxed"
               style={SERIF}
             >
-              The planet's rarest real estate, supercars, yachts &amp; jets — acquired in minutes,
-              owned on-chain, liquid on demand. AI valuation, blockchain title, sovereign-grade discretion.
+              The planet&apos;s rarest real estate, supercars, yachts and jets acquired in minutes,
+              held with discretion, and surfaced through a private ledger built for serious capital.
             </motion.p>
 
-            {/* CTAs — silver metallic outline + warm primary */}
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
@@ -429,7 +315,6 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          {/* ── Right: sleek metallic data panel (no building) ── */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -437,7 +322,6 @@ export default function Hero() {
             className="relative w-full md:col-span-5 flex justify-center md:justify-end"
           >
             <div className="relative w-full max-w-sm">
-              {/* Faint metallic disc behind panel */}
               <div
                 aria-hidden
                 className="absolute -inset-10 rounded-full opacity-60 blur-2xl pointer-events-none"
@@ -446,7 +330,6 @@ export default function Hero() {
                 }}
               />
 
-              {/* Index ticker card */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -460,7 +343,6 @@ export default function Hero() {
                     "0 30px 70px -15px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.12), 0 0 0 1px rgba(232,232,238,0.04)",
                 }}
               >
-                {/* Top row: token id + status */}
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-2">
                     <div
@@ -483,7 +365,6 @@ export default function Hero() {
                   </div>
                 </div>
 
-                {/* Live $OPAS price */}
                 <div
                   className="flex items-center justify-between mb-5 rounded-lg px-3 py-2.5"
                   style={{
@@ -511,7 +392,6 @@ export default function Hero() {
                   </div>
                 </div>
 
-                {/* Hero metric */}
                 <div className="mb-5">
                   <div className="text-[8.5px] tracking-[0.32em] uppercase text-white/35 mb-1.5" style={NEVERA}>
                     Aggregate net yield
@@ -527,9 +407,8 @@ export default function Hero() {
                   </div>
                 </div>
 
-                {/* Sparkline */}
                 <div className="h-12 flex items-end gap-[3px] mb-5 px-0.5">
-                  {[42,55,48,62,58,71,65,78,72,84,79,92,86,100].map((h,i) => (
+                  {[42,55,48,62,58,71,65,78,72,84,79,92,86,100].map((h, i) => (
                     <div
                       key={i}
                       className="flex-1 rounded-t-[2px]"
@@ -538,16 +417,14 @@ export default function Hero() {
                         background:
                           i === 13
                             ? "linear-gradient(180deg, #f5d98e, #ea8d0e)"
-                            : `linear-gradient(180deg, rgba(232,232,238,${0.18 + (i/13)*0.25}), rgba(154,160,168,${0.08 + (i/13)*0.12}))`,
+                            : `linear-gradient(180deg, rgba(232,232,238,${0.18 + (i / 13) * 0.25}), rgba(154,160,168,${0.08 + (i / 13) * 0.12}))`,
                       }}
                     />
                   ))}
                 </div>
 
-                {/* Metallic divider */}
                 <div className="metallic-divider mb-4" />
 
-                {/* Three-stat row — segmented premium panel with hairline dividers */}
                 <FitTextGroup>
                   <div
                     className="grid grid-cols-3 gap-px rounded-lg overflow-hidden"
@@ -558,10 +435,10 @@ export default function Hero() {
                     }}
                   >
                     {[
-                      { l: "AUM",       v: "$480M" },
-                      { l: "Assets",    v: "120"   },
-                      { l: "Investors", v: "18k"   },
-                    ].map(d => (
+                      { l: "AUM", v: "$480M" },
+                      { l: "Assets", v: "120" },
+                      { l: "Investors", v: "18k" },
+                    ].map((d) => (
                       <div
                         key={d.l}
                         className="px-2 py-2.5 flex flex-col justify-center"
@@ -574,37 +451,17 @@ export default function Hero() {
                   </div>
                 </FitTextGroup>
 
-                {/* Bottom token strip */}
                 <div className="mt-5 flex items-center justify-between text-[8px] tracking-[0.32em] uppercase text-white/30" style={NEVERA}>
                   <span>opa-idx-001</span>
                   <span className="text-primary/60">stake from $100</span>
                 </div>
               </motion.div>
 
-              {/* Tiny floating chip — Tokyo highlight */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 1.1 }}
-                className="absolute -bottom-4 -left-3 rounded-md px-3 py-2 backdrop-blur-xl border border-white/15"
-                style={{
-                  background: "rgba(20,28,48,0.95)",
-                  boxShadow: "0 8px 24px -8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
-                }}
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                  <span className="text-[8.5px] tracking-[0.3em] uppercase text-white/50" style={NEVERA}>Tokyo</span>
-                  <span className="text-[10px] metallic-warm-text" style={NEVERA}>+9.6%</span>
-                </div>
-              </motion.div>
             </div>
           </motion.div>
-
         </div>
       </motion.div>
 
-      {/* ── Refined ticker ── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
