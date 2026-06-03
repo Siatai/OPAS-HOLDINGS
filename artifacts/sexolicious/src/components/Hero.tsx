@@ -6,8 +6,10 @@ import FitText, { FitTextGroup } from "./FitText";
 import { useOpasPrice, fmtOpasRate } from "@/lib/opasPrice";
 import { useMinWidth } from "@/hooks/use-mobile";
 import worldSkyline from "@/assets/images/world_skyline.png";
-import propPenthouse from "@/assets/images/properties/lux_penthouse_skyline.jpg";
+import propBeachfront from "@/assets/images/properties/lux_beachfront.jpg";
 import yachtRiva from "@/assets/images/assets/yacht_riva.png";
+import jetCabin from "@/assets/images/assets/jet_cabin.png";
+import carLambo from "@/assets/images/assets/car_lambo.png";
 
 const TICKER_ITEMS = [
   "120 assets", "4 asset classes", "$480M aum", "18,000 investors",
@@ -18,25 +20,6 @@ const TICKER_ITEMS = [
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA = { fontFamily: "Nevera, Inter, sans-serif" };
 const SERIF = { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" as const };
-
-const LEDGER_FRAGMENTS = [
-  {
-    label: "Mayfair Penthouse",
-    meta: "Prime residential",
-    stat: "+17.2%",
-    image: propPenthouse,
-    accent: "#E8D7B6",
-    className: "left-[-20px] top-[40px] w-[154px] rotate-[-7deg]",
-  },
-  {
-    label: "Riva 110 Dolcevita",
-    meta: "Mediterranean charter",
-    stat: "+19.1%",
-    image: yachtRiva,
-    accent: "#3ED6C3",
-    className: "right-[-18px] bottom-[34px] w-[168px] rotate-[7deg]",
-  },
-] as const;
 
 export default function Hero() {
   const { scrollY } = useScroll();
@@ -116,131 +99,175 @@ export default function Hero() {
           initial={{ opacity: 0, scale: 0.92 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute z-[6] top-[45%] left-[calc(50%_+_24px)] -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] pointer-events-none"
+          className="absolute z-[6] top-[47%] left-[calc(50%_+_12px)] -translate-x-1/2 -translate-y-1/2 w-[368px] h-[520px] pointer-events-none"
           style={{ perspective: "1300px" }}
         >
           <div
             className="relative w-full h-full"
             style={{
               transformStyle: "preserve-3d",
-              transform: reduceMotion ? undefined : `rotateX(${tiltX * 0.55}deg) rotateY(${tiltY * 0.55}deg)`,
+              transform: reduceMotion ? undefined : `rotateX(${tiltX * 0.16}deg) rotateY(${tiltY * 0.16}deg)`,
               transition: "transform 0.35s ease-out",
             }}
           >
             <div
-              className="absolute inset-[18px] rounded-[42px] blur-3xl opacity-90"
+              className="absolute inset-[30px] rounded-[48px] blur-3xl opacity-80"
               style={{
                 background:
-                  "radial-gradient(circle at 50% 50%, rgba(242,140,40,0.22) 0%, rgba(217,107,157,0.10) 30%, rgba(61,15,28,0.16) 58%, transparent 80%)",
+                  "radial-gradient(circle at 50% 50%, rgba(242,140,40,0.16) 0%, rgba(217,107,157,0.08) 36%, rgba(61,15,28,0.12) 64%, transparent 84%)",
               }}
             />
 
             <motion.div
-              className="absolute left-1/2 top-1/2 h-[236px] w-[236px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[32px]"
-              animate={reduceMotion ? undefined : { rotateZ: [-1, 1.2, -1] }}
-              transition={reduceMotion ? undefined : { duration: 16, repeat: Infinity, ease: "easeInOut" }}
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.85, delay: 0.46, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute left-[40px] top-[58px] h-[318px] w-[150px]"
               style={{
-                background:
-                  "linear-gradient(155deg, rgba(16,16,21,0.97) 0%, rgba(8,9,12,0.98) 48%, rgba(34,20,12,0.96) 100%)",
-                border: "1px solid rgba(255,236,205,0.16)",
-                boxShadow:
-                  "0 44px 110px -40px rgba(0,0,0,0.95), 0 0 0 1px rgba(255,255,255,0.03), inset 0 1px 0 rgba(255,245,227,0.12), inset 0 -30px 60px rgba(242,140,40,0.08)",
+                transform: reduceMotion ? undefined : `translate3d(${tiltY * -0.18}px, ${tiltX * 0.12}px, -18px)`,
               }}
             >
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),transparent_18%,transparent_82%,rgba(242,140,40,0.05))]" />
-              <motion.div
-                aria-hidden
-                className="absolute inset-y-0 left-[-18%] w-[36%] skew-x-[-18deg] bg-[linear-gradient(90deg,transparent,rgba(255,244,221,0.16),transparent)] mix-blend-screen"
-                animate={reduceMotion ? undefined : { x: ["-20%", "350%"] }}
-                transition={reduceMotion ? undefined : { duration: 8.5, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.6 }}
-              />
-
-              <div className="relative z-10 flex h-full flex-col px-6 py-5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl"
-                      style={{
-                        background: "linear-gradient(145deg, rgba(245,217,142,0.22), rgba(242,140,40,0.16))",
-                        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.16), 0 10px 28px -16px rgba(242,140,40,0.85)",
-                      }}
-                    >
-                      <img src="/opas-logo.png" alt="Opas" className="h-8 w-8 object-contain" />
-                    </div>
-                    <div>
-                      <div className="text-[9px] tracking-[0.34em] uppercase text-white/36" style={NEVERA}>Private index</div>
-                      <div className="text-[14px] tracking-[0.18em] uppercase text-[#f6dfb2]" style={NEVERA}>Black Ledger</div>
-                    </div>
-                  </div>
-                  <div className="rounded-full border border-white/10 px-3 py-1 text-[8px] tracking-[0.28em] uppercase text-[#f3c97a]" style={NEVERA}>
-                    Invite only
-                  </div>
+              <div
+                className="relative h-full overflow-hidden rounded-[26px]"
+                style={{
+                  background: "linear-gradient(180deg, rgba(18,20,26,0.96), rgba(10,10,14,0.98))",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  boxShadow: "0 26px 56px -30px rgba(0,0,0,0.94), inset 0 1px 0 rgba(255,255,255,0.08)",
+                }}
+              >
+                <img src={jetCabin} alt="" className="h-full w-full object-cover object-center opacity-90" />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,8,14,0.10)_0%,rgba(6,8,14,0.24)_34%,rgba(7,7,10,0.78)_100%)]" />
+                <div className="absolute left-4 top-4 text-[8px] tracking-[0.34em] uppercase text-white/50" style={NEVERA}>
+                  Flight access
                 </div>
-
-                <div className="mt-6">
-                  <div className="text-[8px] tracking-[0.34em] uppercase text-white/34" style={NEVERA}>Access to curated trophy inventory</div>
-                  <div className="mt-2 text-[31px] leading-[0.95] text-[#f7e7c3]" style={SHARKON}>
-                    Wealth wants
-                    <br />
-                    discretion.
-                  </div>
-                </div>
-
-                <div className="mt-5 grid grid-cols-2 gap-3">
-                  {[
-                    { label: "AUM", value: "$480M", tone: "text-[#f7e7c3]" },
-                    { label: "Net Yield", value: "6.1%", tone: "text-[#f3b562]" },
-                    { label: "Entry", value: "$100", tone: "text-[#f7e7c3]" },
-                    { label: "Windows", value: "04", tone: "text-[#d772a0]" },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      className="rounded-2xl px-4 py-3"
-                      style={{
-                        background: "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))",
-                        border: "1px solid rgba(255,236,205,0.10)",
-                        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
-                      }}
-                    >
-                      <div className="text-[7px] tracking-[0.32em] uppercase text-white/34" style={NEVERA}>{item.label}</div>
-                      <div className={`mt-2 text-[18px] leading-none ${item.tone}`} style={SHARKON}>{item.value}</div>
-                    </div>
-                  ))}
+                <div className="absolute left-4 bottom-5 text-[9px] tracking-[0.26em] uppercase text-[#f3b562]" style={NEVERA}>
+                  Private jets
                 </div>
               </div>
             </motion.div>
 
-            {LEDGER_FRAGMENTS.map((fragment, index) => (
-              <motion.div
-                key={fragment.label}
-                initial={{ opacity: 0, y: 16, scale: 0.94 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.55 + index * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                className={`absolute ${fragment.className}`}
-                style={{ transformStyle: "preserve-3d" }}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.9, delay: 0.58, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute left-[172px] top-[286px] h-[158px] w-[174px]"
+              style={{
+                transform: reduceMotion ? undefined : `translate3d(${tiltY * 0.16}px, ${tiltX * -0.12}px, -10px)`,
+              }}
+            >
+              <div
+                className="relative h-full overflow-hidden rounded-[24px]"
+                style={{
+                  background: "linear-gradient(180deg, rgba(18,20,26,0.96), rgba(10,10,14,0.98))",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  boxShadow: "0 22px 46px -26px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.08)",
+                }}
               >
+                <img src={carLambo} alt="" className="h-full w-full object-cover object-center" />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,10,0.06)_0%,rgba(7,7,10,0.16)_34%,rgba(7,7,10,0.72)_100%)]" />
+                <div className="absolute left-4 bottom-4 text-[9px] tracking-[0.26em] uppercase text-[#d96b9d]" style={NEVERA}>
+                  Supercars
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 18, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 1, delay: 0.52, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute left-[88px] top-[24px] h-[404px] w-[228px]"
+              style={{
+                transformStyle: "preserve-3d",
+                transform: reduceMotion
+                  ? "translateZ(0)"
+                  : `translate3d(${tiltY * 0.24}px, ${tiltX * -0.18}px, 8px) rotateX(${tiltX * 0.04}deg) rotateY(${tiltY * 0.05}deg)`,
+              }}
+            >
+              <div
+                className="absolute inset-[18px] rounded-[34px] blur-2xl opacity-80"
+                style={{ background: "radial-gradient(circle at 50% 30%, rgba(234,141,14,0.22), transparent 72%)" }}
+              />
+              <div
+                className="relative h-full overflow-hidden rounded-[30px]"
+                style={{
+                  background: "linear-gradient(160deg, rgba(21,25,34,0.98) 0%, rgba(10,11,15,0.99) 70%, rgba(32,20,10,0.96) 100%)",
+                  border: "1px solid rgba(247,229,193,0.14)",
+                  boxShadow:
+                    "0 42px 90px -38px rgba(0,0,0,0.96), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -24px 60px rgba(234,141,14,0.05)",
+                }}
+              >
+                <div className="absolute inset-x-0 top-0 h-[56%] overflow-hidden">
+                  <img src={propBeachfront} alt="" className="h-full w-full object-cover object-center" />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,246,230,0.05)_0%,transparent_28%,rgba(9,10,14,0.12)_52%,rgba(9,10,14,0.62)_100%)]" />
+                </div>
+                <div className="absolute inset-x-0 top-[50%] h-[2px] bg-[linear-gradient(90deg,transparent,rgba(247,229,193,0.55),transparent)]" />
+                <div className="absolute inset-x-0 bottom-0 h-[50%] bg-[linear-gradient(180deg,rgba(12,14,18,0.08)_0%,rgba(11,12,16,0.94)_18%,rgba(10,10,14,0.98)_100%)]" />
+
+                <div className="absolute left-6 top-5 rounded-full px-3 py-1 text-[8px] tracking-[0.30em] uppercase text-[#f7e5c1]" style={{ ...NEVERA, background: "rgba(12,14,18,0.46)", border: "1px solid rgba(247,229,193,0.16)" }}>
+                  Tier I access
+                </div>
+                <div className="absolute right-6 top-6 text-[8px] tracking-[0.28em] uppercase text-white/52" style={NEVERA}>
+                  Curated issue
+                </div>
+
+                <div className="absolute left-6 right-6 bottom-28">
+                  <div className="text-[8px] tracking-[0.34em] uppercase text-white/40 mb-2" style={NEVERA}>
+                    Private market folio
+                  </div>
+                  <div className="text-[29px] leading-[0.95] text-[#f7e7c3]" style={SHARKON}>
+                    Trophy assets,
+                    <br />
+                    privately held.
+                  </div>
+                </div>
+
+                <div className="absolute left-6 right-6 bottom-7 grid grid-cols-2 gap-3">
+                  {[
+                    { label: "Estates", value: "Palm / Mayfair" },
+                    { label: "Water", value: "Riva / Gulf" },
+                    { label: "Air", value: "Cabin class" },
+                    { label: "Road", value: "Collector spec" },
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      className="rounded-2xl px-3 py-2"
+                      style={{
+                        background: "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))",
+                        border: "1px solid rgba(247,229,193,0.08)",
+                      }}
+                    >
+                      <div className="text-[7px] tracking-[0.28em] uppercase text-white/34" style={NEVERA}>{item.label}</div>
+                      <div className="mt-1 text-[10px] tracking-[0.12em] uppercase text-white/80" style={NEVERA}>{item.value}</div>
+                    </div>
+                  ))}
+                </div>
+
                 <motion.div
-                  className="overflow-hidden rounded-[24px]"
-                  animate={reduceMotion ? undefined : { y: [-4, 4, -4] }}
-                  transition={reduceMotion ? undefined : { duration: 9 + index, repeat: Infinity, ease: "easeInOut" }}
-                  style={{
-                    background: "linear-gradient(180deg, rgba(18,18,22,0.96), rgba(9,9,12,0.98))",
-                    border: "1px solid rgba(255,236,205,0.14)",
-                    boxShadow: `0 20px 40px -20px rgba(0,0,0,0.88), inset 0 1px 0 rgba(255,245,227,0.10), 0 0 24px -14px ${fragment.accent}`,
-                  }}
-                >
-                  <div className="relative h-[106px] overflow-hidden">
-                    <img src={fragment.image} alt="" className="h-full w-full object-cover object-center" />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,rgba(7,7,10,0.08)_45%,rgba(7,7,10,0.72)_100%)]" />
-                  </div>
-                  <div className="px-4 py-3">
-                    <div className="text-[7px] tracking-[0.30em] uppercase text-white/34" style={NEVERA}>{fragment.meta}</div>
-                    <div className="mt-1 text-[13px] leading-tight text-white/88" style={SHARKON}>{fragment.label}</div>
-                    <div className="mt-2 text-[10px] tracking-[0.28em] uppercase" style={{ ...NEVERA, color: fragment.accent }}>{fragment.stat}</div>
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
+                  aria-hidden
+                  className="absolute inset-y-0 left-[-24%] w-[26%] skew-x-[-18deg] bg-[linear-gradient(90deg,transparent,rgba(255,246,227,0.12),transparent)] mix-blend-screen"
+                  animate={reduceMotion ? undefined : { x: ["-24%", "420%"] }}
+                  transition={reduceMotion ? undefined : { duration: 10.2, repeat: Infinity, ease: "easeInOut", repeatDelay: 2.8 }}
+                />
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.85, delay: 0.68, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute left-[46px] top-[390px] flex items-center gap-3 rounded-full px-4 py-2"
+              style={{
+                background: "rgba(13,14,18,0.72)",
+                border: "1px solid rgba(247,229,193,0.10)",
+                boxShadow: "0 18px 36px -24px rgba(0,0,0,0.9)",
+              }}
+            >
+              <img src={yachtRiva} alt="" className="h-10 w-16 rounded-full object-cover object-center opacity-90" />
+              <div>
+                <div className="text-[7px] tracking-[0.28em] uppercase text-white/38" style={NEVERA}>Superyachts</div>
+                <div className="text-[10px] tracking-[0.18em] uppercase text-[#3ed6c3]" style={NEVERA}>Marina wealth</div>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
       )}
@@ -283,7 +310,7 @@ export default function Hero() {
               style={SERIF}
             >
               The planet&apos;s rarest real estate, supercars, yachts and jets acquired in minutes,
-              held with discretion, and surfaced through a private ledger built for serious capital.
+              owned on-chain, and packaged with the polish of a private-market glossy.
             </motion.p>
 
             <motion.div
@@ -456,7 +483,6 @@ export default function Hero() {
                   <span className="text-primary/60">stake from $100</span>
                 </div>
               </motion.div>
-
             </div>
           </motion.div>
         </div>
