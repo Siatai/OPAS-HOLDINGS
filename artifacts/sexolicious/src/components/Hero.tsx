@@ -6,7 +6,7 @@ import FitText, { FitTextGroup } from "./FitText";
 import { useOpasPrice, fmtOpasRate } from "@/lib/opasPrice";
 import { useMinWidth } from "@/hooks/use-mobile";
 import worldSkyline from "@/assets/images/world_skyline.png";
-import propBeachfront from "@/assets/images/properties/lux_beachfront.jpg";
+import propPenthouseSkyline from "@/assets/images/properties/lux_penthouse_skyline.jpg";
 import yachtRiva from "@/assets/images/assets/yacht_riva.png";
 import jetCabin from "@/assets/images/assets/jet_cabin.png";
 import carLambo from "@/assets/images/assets/car_lambo.png";
@@ -99,7 +99,7 @@ export default function Hero() {
           initial={{ opacity: 0, scale: 0.92 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute z-[6] top-[47%] left-[calc(50%_+_12px)] -translate-x-1/2 -translate-y-1/2 w-[368px] h-[520px] pointer-events-none"
+          className="absolute z-[6] top-[56%] left-[calc(50%_+_18px)] -translate-x-1/2 -translate-y-1/2 w-[380px] h-[500px] pointer-events-none"
           style={{ perspective: "1300px" }}
         >
           <div
@@ -122,9 +122,9 @@ export default function Hero() {
               initial={{ opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.85, delay: 0.46, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute left-[40px] top-[58px] h-[318px] w-[150px]"
+              className="absolute left-[34px] top-[76px] h-[286px] w-[132px]"
               style={{
-                transform: reduceMotion ? undefined : `translate3d(${tiltY * -0.18}px, ${tiltX * 0.12}px, -18px)`,
+                transform: reduceMotion ? undefined : `translate3d(${tiltY * -0.14}px, ${tiltX * 0.1}px, -22px)`,
               }}
             >
               <div
@@ -137,10 +137,10 @@ export default function Hero() {
               >
                 <img src={jetCabin} alt="" className="h-full w-full object-cover object-center opacity-90" />
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,8,14,0.10)_0%,rgba(6,8,14,0.24)_34%,rgba(7,7,10,0.78)_100%)]" />
-                <div className="absolute left-4 top-4 text-[8px] tracking-[0.34em] uppercase text-white/50" style={NEVERA}>
+                <div className="absolute left-4 top-4 text-[7px] tracking-[0.32em] uppercase text-white/44" style={NEVERA}>
                   Flight access
                 </div>
-                <div className="absolute left-4 bottom-5 text-[9px] tracking-[0.26em] uppercase text-[#f3b562]" style={NEVERA}>
+                <div className="absolute left-4 bottom-4 text-[8px] tracking-[0.22em] uppercase text-[#f3b562]" style={NEVERA}>
                   Private jets
                 </div>
               </div>
@@ -150,9 +150,9 @@ export default function Hero() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.9, delay: 0.58, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute left-[172px] top-[286px] h-[158px] w-[174px]"
+              className="absolute left-[216px] top-[282px] h-[132px] w-[138px]"
               style={{
-                transform: reduceMotion ? undefined : `translate3d(${tiltY * 0.16}px, ${tiltX * -0.12}px, -10px)`,
+                transform: reduceMotion ? undefined : `translate3d(${tiltY * 0.12}px, ${tiltX * -0.1}px, -16px)`,
               }}
             >
               <div
@@ -165,7 +165,7 @@ export default function Hero() {
               >
                 <img src={carLambo} alt="" className="h-full w-full object-cover object-center" />
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,10,0.06)_0%,rgba(7,7,10,0.16)_34%,rgba(7,7,10,0.72)_100%)]" />
-                <div className="absolute left-4 bottom-4 text-[9px] tracking-[0.26em] uppercase text-[#d96b9d]" style={NEVERA}>
+                <div className="absolute left-4 bottom-4 text-[8px] tracking-[0.22em] uppercase text-[#d96b9d]" style={NEVERA}>
                   Supercars
                 </div>
               </div>
@@ -175,12 +175,12 @@ export default function Hero() {
               initial={{ opacity: 0, y: 18, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 1, delay: 0.52, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute left-[88px] top-[24px] h-[404px] w-[228px]"
+              className="absolute left-[104px] top-[52px] h-[376px] w-[224px]"
               style={{
                 transformStyle: "preserve-3d",
                 transform: reduceMotion
                   ? "translateZ(0)"
-                  : `translate3d(${tiltY * 0.24}px, ${tiltX * -0.18}px, 8px) rotateX(${tiltX * 0.04}deg) rotateY(${tiltY * 0.05}deg)`,
+                  : `translate3d(${tiltY * 0.18}px, ${tiltX * -0.14}px, 8px) rotateX(${tiltX * 0.035}deg) rotateY(${tiltY * 0.045}deg)`,
               }}
             >
               <div
@@ -196,37 +196,34 @@ export default function Hero() {
                     "0 42px 90px -38px rgba(0,0,0,0.96), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -24px 60px rgba(234,141,14,0.05)",
                 }}
               >
-                <div className="absolute inset-x-0 top-0 h-[56%] overflow-hidden">
-                  <img src={propBeachfront} alt="" className="h-full w-full object-cover object-center" />
+                <div className="absolute inset-x-0 top-0 h-[58%] overflow-hidden">
+                  <img src={propPenthouseSkyline} alt="" className="h-full w-full object-cover object-center" />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,246,230,0.05)_0%,transparent_28%,rgba(9,10,14,0.12)_52%,rgba(9,10,14,0.62)_100%)]" />
                 </div>
-                <div className="absolute inset-x-0 top-[50%] h-[2px] bg-[linear-gradient(90deg,transparent,rgba(247,229,193,0.55),transparent)]" />
-                <div className="absolute inset-x-0 bottom-0 h-[50%] bg-[linear-gradient(180deg,rgba(12,14,18,0.08)_0%,rgba(11,12,16,0.94)_18%,rgba(10,10,14,0.98)_100%)]" />
+                <div className="absolute inset-x-0 top-[52%] h-[2px] bg-[linear-gradient(90deg,transparent,rgba(247,229,193,0.55),transparent)]" />
+                <div className="absolute inset-x-0 bottom-0 h-[48%] bg-[linear-gradient(180deg,rgba(12,14,18,0.08)_0%,rgba(11,12,16,0.94)_18%,rgba(10,10,14,0.98)_100%)]" />
 
-                <div className="absolute left-6 top-5 rounded-full px-3 py-1 text-[8px] tracking-[0.30em] uppercase text-[#f7e5c1]" style={{ ...NEVERA, background: "rgba(12,14,18,0.46)", border: "1px solid rgba(247,229,193,0.16)" }}>
-                  Tier I access
-                </div>
-                <div className="absolute right-6 top-6 text-[8px] tracking-[0.28em] uppercase text-white/52" style={NEVERA}>
-                  Curated issue
+                <div className="absolute left-6 top-5 rounded-full px-3 py-1 text-[8px] tracking-[0.24em] uppercase text-[#f7e5c1]" style={{ ...NEVERA, background: "rgba(12,14,18,0.46)", border: "1px solid rgba(247,229,193,0.16)" }}>
+                  Tier I
                 </div>
 
                 <div className="absolute left-6 right-6 bottom-28">
-                  <div className="text-[8px] tracking-[0.34em] uppercase text-white/40 mb-2" style={NEVERA}>
-                    Private market folio
+                  <div className="text-[8px] tracking-[0.24em] uppercase text-white/42 mb-2" style={NEVERA}>
+                    Private access
                   </div>
-                  <div className="text-[29px] leading-[0.95] text-[#f7e7c3]" style={SHARKON}>
-                    Trophy assets,
+                  <div className="text-[22px] leading-[0.96] text-[#f7e7c3]" style={SHARKON}>
+                    Asset access,
                     <br />
                     privately held.
                   </div>
                 </div>
 
-                <div className="absolute left-6 right-6 bottom-7 grid grid-cols-2 gap-3">
+                <div className="absolute left-6 right-6 bottom-6 grid grid-cols-2 gap-2">
                   {[
-                    { label: "Estates", value: "Palm / Mayfair" },
-                    { label: "Water", value: "Riva / Gulf" },
-                    { label: "Air", value: "Cabin class" },
-                    { label: "Road", value: "Collector spec" },
+                    { label: "Estates", value: "Mayfair" },
+                    { label: "Air", value: "G650" },
+                    { label: "Water", value: "Riva 110" },
+                    { label: "Road", value: "Collector" },
                   ].map((item) => (
                     <div
                       key={item.label}
@@ -237,7 +234,7 @@ export default function Hero() {
                       }}
                     >
                       <div className="text-[7px] tracking-[0.28em] uppercase text-white/34" style={NEVERA}>{item.label}</div>
-                      <div className="mt-1 text-[10px] tracking-[0.12em] uppercase text-white/80" style={NEVERA}>{item.value}</div>
+                      <div className="mt-1 text-[9px] tracking-[0.08em] uppercase text-white/80" style={NEVERA}>{item.value}</div>
                     </div>
                   ))}
                 </div>
@@ -248,24 +245,6 @@ export default function Hero() {
                   animate={reduceMotion ? undefined : { x: ["-24%", "420%"] }}
                   transition={reduceMotion ? undefined : { duration: 10.2, repeat: Infinity, ease: "easeInOut", repeatDelay: 2.8 }}
                 />
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.85, delay: 0.68, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute left-[46px] top-[390px] flex items-center gap-3 rounded-full px-4 py-2"
-              style={{
-                background: "rgba(13,14,18,0.72)",
-                border: "1px solid rgba(247,229,193,0.10)",
-                boxShadow: "0 18px 36px -24px rgba(0,0,0,0.9)",
-              }}
-            >
-              <img src={yachtRiva} alt="" className="h-10 w-16 rounded-full object-cover object-center opacity-90" />
-              <div>
-                <div className="text-[7px] tracking-[0.28em] uppercase text-white/38" style={NEVERA}>Superyachts</div>
-                <div className="text-[10px] tracking-[0.18em] uppercase text-[#3ed6c3]" style={NEVERA}>Marina wealth</div>
               </div>
             </motion.div>
           </div>
