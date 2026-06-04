@@ -8,7 +8,7 @@ export function SlideHeader({
   label: string;
 }) {
   return (
-    <div className="absolute top-[4.5vh] left-[8vw] right-[8vw] flex items-center justify-between z-20">
+    <div className="absolute top-[4.5vh] left-[8vw] right-[8vw] z-20 flex items-center justify-between">
       <div className="flex items-center gap-[1vw]">
         <div
           className="relative flex h-[6.8vh] w-[6.8vh] items-center justify-center rounded-full"
@@ -24,24 +24,25 @@ export function SlideHeader({
             className="h-[5.9vh] w-[5.9vh] object-contain"
           />
         </div>
-        <span className="font-body uppercase tracking-[0.4em] text-[1vw] text-fg/70">
+        <span className="font-body text-[1vw] uppercase tracking-[0.4em] text-fg/70">
           Opas Holdings
         </span>
       </div>
       <div className="flex items-center gap-[0.9vw]">
-        <span className="font-display text-gold text-[1.3vw] leading-none">
+        <span className="font-display text-[1.3vw] leading-none text-gold">
           {section}
         </span>
-        <span className="font-body uppercase tracking-[0.4em] text-[1vw] text-muted">
+        <span className="font-body text-[1vw] uppercase tracking-[0.4em] text-muted">
           {label}
         </span>
-        <a
-          href="/pitch"
+        <button
+          type="button"
+          onClick={() => window.location.assign("/pitch")}
           className="inline-flex h-[3vw] w-[3vw] min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-white/14 bg-[rgba(8,12,24,0.84)] text-fg/72 transition-colors hover:border-[rgba(234,141,14,0.45)] hover:text-gold"
           aria-label="Close presentation and return to pitch room"
         >
-          <span className="font-display text-[1.05vw] leading-none">×</span>
-        </a>
+          <span className="font-display text-[0.95vw] leading-none">X</span>
+        </button>
       </div>
     </div>
   );
@@ -57,14 +58,14 @@ export function SlideFooter({
   note?: string;
 }) {
   return (
-    <div className="absolute bottom-[4.5vh] left-[8vw] right-[8vw] flex items-center justify-between z-20">
+    <div className="absolute bottom-[4.5vh] left-[8vw] right-[8vw] z-20 flex items-center justify-between">
       <div className="flex items-center gap-[0.8vw]">
-        <div className="h-[1vh] w-[1vh] bg-gold rotate-45" />
-        <span className="font-body uppercase tracking-[0.35em] text-[0.85vw] text-muted">
+        <div className="h-[1vh] w-[1vh] rotate-45 bg-gold" />
+        <span className="font-body text-[0.85vw] uppercase tracking-[0.35em] text-muted">
           {note}
         </span>
       </div>
-      <span className="font-body uppercase tracking-[0.35em] text-[0.85vw] text-muted">
+      <span className="font-body text-[0.85vw] uppercase tracking-[0.35em] text-muted">
         {page} / {total}
       </span>
     </div>
