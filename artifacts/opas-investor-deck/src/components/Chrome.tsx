@@ -29,20 +29,19 @@ export function SlideHeader({
         </span>
       </div>
       <div className="flex items-center gap-[0.9vw]">
-        <a
-          href="/pitch"
-          className="inline-flex items-center gap-[0.45vw] rounded-full border border-white/12 bg-[rgba(8,12,24,0.82)] px-[0.9vw] py-[0.55vw] font-body uppercase tracking-[0.28em] text-[0.62vw] text-fg/68 transition-colors hover:border-[rgba(234,141,14,0.45)] hover:text-gold"
-          aria-label="Return to pitch room"
-        >
-          <span className="text-[0.92vw] leading-none">×</span>
-          <span>Back to pitch</span>
-        </a>
         <span className="font-display text-gold text-[1.3vw] leading-none">
           {section}
         </span>
         <span className="font-body uppercase tracking-[0.4em] text-[1vw] text-muted">
           {label}
         </span>
+        <a
+          href="/pitch"
+          className="inline-flex h-[3vw] w-[3vw] min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-white/14 bg-[rgba(8,12,24,0.84)] text-fg/72 transition-colors hover:border-[rgba(234,141,14,0.45)] hover:text-gold"
+          aria-label="Close presentation and return to pitch room"
+        >
+          <span className="font-display text-[1.05vw] leading-none">×</span>
+        </a>
       </div>
     </div>
   );
