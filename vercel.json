@@ -15,7 +15,7 @@
       "destination": "/opas-overview-deck/index.html"
     },
     {
-      "source": "/((?!assets/|.*\\.[^/]+$).*)",
+      "source": "/((?!(assets/|opas-investor-deck(?:/|$)|opas-customer-deck(?:/|$)|opas-overview-deck(?:/|$)|.*\\.[^/]+$)).*)",
       "destination": "/index.html"
     }
   ]

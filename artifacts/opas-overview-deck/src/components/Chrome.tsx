@@ -31,10 +31,11 @@ export function SlideHeader({
       <div className="flex items-center gap-[0.9vw]">
         <a
           href="/pitch"
-          className="inline-flex items-center justify-center h-[2.5vw] min-h-[30px] w-[2.5vw] min-w-[30px] rounded-full border border-white/12 bg-[rgba(8,12,24,0.78)] text-[0.9vw] text-fg/70 transition-colors hover:border-[rgba(234,141,14,0.45)] hover:text-gold"
-          aria-label="Close deck and return to pitch"
+          className="inline-flex items-center gap-[0.45vw] rounded-full border border-white/12 bg-[rgba(8,12,24,0.82)] px-[0.9vw] py-[0.55vw] font-body uppercase tracking-[0.28em] text-[0.62vw] text-fg/68 transition-colors hover:border-[rgba(234,141,14,0.45)] hover:text-gold"
+          aria-label="Return to pitch room"
         >
-          ×
+          <span className="text-[0.92vw] leading-none">×</span>
+          <span>Back to pitch</span>
         </a>
         <span className="font-display text-gold text-[1.3vw] leading-none">
           {section}
