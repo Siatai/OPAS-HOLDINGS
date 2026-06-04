@@ -1,22 +1,25 @@
 {
   "buildCommand": "node scripts/build-vercel.mjs",
   "outputDirectory": "dist/vercel",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/opas-investor-deck/((?!assets/|.*\\.[^/]+$).*)",
-      "destination": "/opas-investor-deck/index.html"
+      "handle": "filesystem"
     },
     {
-      "source": "/opas-customer-deck/((?!assets/|.*\\.[^/]+$).*)",
-      "destination": "/opas-customer-deck/index.html"
+      "src": "^/opas-investor-deck(?:/.*)?$",
+      "dest": "/opas-investor-deck/index.html"
     },
     {
-      "source": "/opas-overview-deck/((?!assets/|.*\\.[^/]+$).*)",
-      "destination": "/opas-overview-deck/index.html"
+      "src": "^/opas-customer-deck(?:/.*)?$",
+      "dest": "/opas-customer-deck/index.html"
     },
     {
-      "source": "/((?!(assets/|opas-investor-deck(?:/|$)|opas-customer-deck(?:/|$)|opas-overview-deck(?:/|$)|.*\\.[^/]+$)).*)",
-      "destination": "/index.html"
+      "src": "^/opas-overview-deck(?:/.*)?$",
+      "dest": "/opas-overview-deck/index.html"
+    },
+    {
+      "src": "^/(?!opas-investor-deck(?:/|$)|opas-customer-deck(?:/|$)|opas-overview-deck(?:/|$)).*$",
+      "dest": "/index.html"
     }
   ]
 }
