@@ -90,7 +90,7 @@ export default function AssetDetail() {
   const actionBase = `/marketplace?asset=${encodeURIComponent(prop.id)}`;
 
   return (
-    <div className="relative min-h-screen bg-background overflow-hidden">
+    <div className="relative min-h-screen max-w-full bg-background overflow-x-clip">
       <div className="absolute inset-0 opacity-[0.06] pointer-events-none
         bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)]
         bg-[size:5rem_5rem]" />
@@ -165,7 +165,7 @@ export default function AssetDetail() {
             </div>
 
             <div
-              className="rounded-2xl p-5 sm:p-6 backdrop-blur-xl"
+              className="rounded-2xl p-4 sm:p-6 backdrop-blur-xl min-w-0 max-w-full"
               style={{
                 background: "linear-gradient(180deg, rgba(10,16,32,0.86) 0%, rgba(8,12,24,0.92) 100%)",
                 border: "1px solid rgba(220,225,235,0.14)",
@@ -184,7 +184,7 @@ export default function AssetDetail() {
               </div>
 
               <FitTextGroup>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5 min-w-0">
                   <MetricTile label="Best ask" value={bestAsk ? fmtUsd(bestAsk.askPerShare) : "No ask"} />
                   <MetricTile label="Fair value" value={fmtUsd(fair)} />
                   <MetricTile label="Shares live" value={String(totalListed)} />
@@ -206,10 +206,10 @@ export default function AssetDetail() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 min-w-0">
                 <Link
                   href={`${actionBase}&intent=buy`}
-                  className="btn-metal inline-flex min-w-0 items-center justify-center gap-2 px-4 py-3 rounded-md text-[9.5px] sm:text-[10.5px] tracking-[0.18em] sm:tracking-[0.22em] uppercase text-[#050810] font-bold text-center"
+                  className="btn-metal inline-flex min-w-0 max-w-full items-center justify-center gap-2 px-4 py-3 rounded-md text-[9px] sm:text-[10.5px] tracking-[0.12em] sm:tracking-[0.22em] uppercase text-[#050810] font-bold text-center leading-tight whitespace-normal break-words"
                   style={{ fontFamily: "BankGothic, sans-serif" }}
                 >
                   <Wallet className="w-3.5 h-3.5" />
@@ -217,7 +217,7 @@ export default function AssetDetail() {
                 </Link>
                 <Link
                   href={`${actionBase}&intent=bid`}
-                  className="inline-flex min-w-0 items-center justify-center gap-2 px-4 py-3 rounded-md text-[9.5px] sm:text-[10.5px] tracking-[0.18em] sm:tracking-[0.22em] uppercase border border-primary/35 text-primary hover:bg-primary/10 text-center"
+                  className="inline-flex min-w-0 max-w-full items-center justify-center gap-2 px-4 py-3 rounded-md text-[9px] sm:text-[10.5px] tracking-[0.12em] sm:tracking-[0.22em] uppercase border border-primary/35 text-primary hover:bg-primary/10 text-center leading-tight whitespace-normal break-words"
                   style={NEVERA}
                 >
                   <Gavel className="w-3.5 h-3.5" />
@@ -247,7 +247,7 @@ export default function AssetDetail() {
       </section>
 
       <section className="relative py-14 md:py-18">
-        <div className="container mx-auto px-4 sm:px-6 md:px-12 grid xl:grid-cols-[minmax(0,1fr)_360px] gap-8">
+        <div className="container mx-auto px-4 sm:px-6 md:px-12 grid xl:grid-cols-[minmax(0,1fr)_360px] gap-8 min-w-0">
           <div className="space-y-6">
             <Panel title="Asset brief" eyebrow="Investment note">
               <p className="text-[15px] text-white/70 leading-7" style={NEVERA}>
@@ -339,22 +339,22 @@ export default function AssetDetail() {
                 <li>2. Move to marketplace in buy mode or bid mode, already scoped to this asset.</li>
                 <li>3. Settle the order in OPAS; yield distributions continue in USDT.</li>
               </ol>
-              <div className="mt-4 flex flex-col gap-2">
+              <div className="mt-4 flex flex-col gap-2 min-w-0">
                 <Link
                   href={`${actionBase}&intent=buy`}
-                  className="inline-flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-primary/30 bg-primary/8 text-primary hover:bg-primary/12"
+                  className="inline-flex min-w-0 max-w-full items-center justify-between gap-3 px-4 py-3 rounded-xl border border-primary/30 bg-primary/8 text-primary hover:bg-primary/12"
                   style={NEVERA}
                 >
-                  <span className="min-w-0">Open marketplace in buy mode</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span className="min-w-0 break-words">Open marketplace in buy mode</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
                 </Link>
                 <Link
                   href={`${actionBase}&intent=bid`}
-                  className="inline-flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-white/10 bg-[rgba(255,255,255,0.03)] text-white/72 hover:text-white"
+                  className="inline-flex min-w-0 max-w-full items-center justify-between gap-3 px-4 py-3 rounded-xl border border-white/10 bg-[rgba(255,255,255,0.03)] text-white/72 hover:text-white"
                   style={NEVERA}
                 >
-                  <span className="min-w-0">Open marketplace in bid mode</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span className="min-w-0 break-words">Open marketplace in bid mode</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
                 </Link>
               </div>
             </Panel>
@@ -400,7 +400,7 @@ function SignalCard({ label, value, accent }: { label: string; value: string; ac
 
 function MetricTile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl px-4 py-3 border border-white/8 bg-[rgba(255,255,255,0.03)] min-w-0">
+    <div className="rounded-xl px-4 py-3 border border-white/8 bg-[rgba(255,255,255,0.03)] min-w-0 max-w-full overflow-hidden">
       <div className="text-[8.5px] tracking-[0.24em] uppercase text-white/35 mb-1" style={NEVERA}>{label}</div>
       <FitText share className="text-base sm:text-lg text-white min-w-0" style={SHARKON}>{value}</FitText>
     </div>
@@ -409,9 +409,9 @@ function MetricTile({ label, value }: { label: string; value: string }) {
 
 function InfoRow({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 rounded-xl px-4 py-3 border border-white/8 bg-[rgba(255,255,255,0.03)] min-w-0">
-      <span className="text-[10px] tracking-[0.24em] uppercase text-white/38" style={NEVERA}>{label}</span>
-      <span className="text-[13px] sm:text-[14px] sm:text-right break-words" style={{ ...SHARKON, color: accent ?? "#F5F7FB" }}>{value}</span>
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 rounded-xl px-4 py-3 border border-white/8 bg-[rgba(255,255,255,0.03)] min-w-0 max-w-full overflow-hidden">
+      <span className="text-[10px] tracking-[0.2em] sm:tracking-[0.24em] uppercase text-white/38 break-words" style={NEVERA}>{label}</span>
+      <span className="min-w-0 text-[13px] sm:text-[14px] sm:text-right break-words leading-tight" style={{ ...SHARKON, color: accent ?? "#F5F7FB" }}>{value}</span>
     </div>
   );
 }
