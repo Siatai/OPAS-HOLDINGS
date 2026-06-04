@@ -742,6 +742,7 @@ function HeroGallery({
         className="relative aspect-[16/10] overflow-hidden"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        style={{ touchAction: "pan-y" }}
       >
         <img
           key={activeImage}

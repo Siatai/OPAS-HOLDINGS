@@ -20,10 +20,10 @@ export default function Navbar() {
   });
 
   const navLinks = [
-    { label: "Collection",  href: "#properties" },
+    { label: "Collection",  href: "/#properties" },
     { label: "Marketplace", href: "/marketplace", internal: true },
-    { label: "Protocol",    href: "#how-it-works" },
-    { label: "FAQ",         href: "#faq" },
+    { label: "Protocol",    href: "/#how-it-works" },
+    { label: "FAQ",         href: "/#faq" },
   ];
 
   return (

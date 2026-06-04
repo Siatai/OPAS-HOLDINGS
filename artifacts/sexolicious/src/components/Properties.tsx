@@ -517,6 +517,15 @@ function AssetCard({
   return (
     <div
       className="group relative w-[240px] sm:w-[290px] md:w-[320px] rounded-xl overflow-hidden transition-transform duration-300 hover:-translate-y-1"
+      onClick={interactive ? onOpen : undefined}
+      role={interactive ? "button" : undefined}
+      tabIndex={interactive ? 0 : -1}
+      onKeyDown={interactive ? (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onOpen();
+        }
+      } : undefined}
       style={{
         background: "linear-gradient(160deg, rgba(20,28,48,0.96) 0%, rgba(14,20,36,0.96) 60%, rgba(28,20,12,0.96) 100%)",
         border: "1px solid rgba(220,225,235,0.16)",
@@ -531,7 +540,10 @@ function AssetCard({
 
       <button
         type="button"
-        onClick={onOpen}
+        onClick={(event) => {
+          event.stopPropagation();
+          onOpen();
+        }}
         tabIndex={interactive ? undefined : -1}
         className="block w-full text-left"
       >
@@ -614,7 +626,10 @@ function AssetCard({
 
         <button
           type="button"
-          onClick={onAcquire}
+          onClick={(event) => {
+            event.stopPropagation();
+            onAcquire();
+          }}
           tabIndex={interactive ? undefined : -1}
           className="btn-metal w-full py-2.5 rounded-sm text-[10px] font-bold tracking-[0.28em] uppercase"
           style={NEVERA}
