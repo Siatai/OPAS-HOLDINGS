@@ -157,7 +157,7 @@ export default function AssetDetail() {
                 {prop.spec ? `${prop.subtitle} · ${prop.spec}` : prop.subtitle}
               </p>
 
-              <div className="mt-8 grid sm:grid-cols-3 gap-3 max-w-3xl">
+              <div className="mt-8 grid gap-3 sm:grid-cols-3 max-w-3xl">
                 <SignalCard label="Net yield" value={prop.rentalYield} accent="#0BB5BE" />
                 <SignalCard label="Capital growth" value={prop.capitalGrowth} accent="#EA8D0E" />
                 <SignalCard label="Indicative ROI" value={prop.totalRoi} accent="#D6E3F4" />
@@ -172,19 +172,19 @@ export default function AssetDetail() {
                 boxShadow: "0 28px 80px -48px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.06)",
               }}
             >
-              <div className="flex items-center justify-between gap-3 mb-5">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                <div className="min-w-0">
                   <div className="text-[9px] tracking-[0.3em] uppercase text-white/40 mb-1" style={NEVERA}>Market access</div>
-                  <div className="text-xl text-white" style={SHARKON}>Live detail</div>
+                  <div className="text-lg sm:text-xl text-white leading-none" style={SHARKON}>Live detail</div>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/30 text-secondary text-[10px] tracking-[0.2em] uppercase font-mono">
+                <div className="inline-flex w-fit items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/30 text-secondary text-[10px] tracking-[0.2em] uppercase font-mono">
                   <Layers3 className="w-3.5 h-3.5" />
                   {liveAsks} asks
                 </div>
               </div>
 
               <FitTextGroup>
-                <div className="grid grid-cols-2 gap-3 mb-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
                   <MetricTile label="Best ask" value={bestAsk ? fmtUsd(bestAsk.askPerShare) : "No ask"} />
                   <MetricTile label="Fair value" value={fmtUsd(fair)} />
                   <MetricTile label="Shares live" value={String(totalListed)} />
@@ -193,23 +193,23 @@ export default function AssetDetail() {
               </FitTextGroup>
 
               <div className="rounded-xl px-4 py-3 mb-5 border border-white/8 bg-[rgba(255,255,255,0.03)]">
-                <div className="flex items-center justify-between gap-3 text-[10px] tracking-[0.24em] uppercase mb-1" style={NEVERA}>
+                <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3 text-[10px] tracking-[0.24em] uppercase mb-1" style={NEVERA}>
                   <span className="text-white/42">Current market tone</span>
                   <span className={priceDelta > 0 ? "text-rose-300" : "text-emerald-300"}>
                     {bestAsk ? `${priceDelta > 0 ? "+" : ""}${priceDelta.toFixed(1)}% vs fair` : "Bid-driven"}
                   </span>
                 </div>
-                <p className="text-[12px] text-white/62 leading-relaxed" style={NEVERA}>
+                <p className="text-[12px] text-white/62 leading-relaxed break-words" style={NEVERA}>
                   {bestAsk
                     ? `Best live paper is ${fmtUsd(bestAsk.askPerShare)} per share across ${bestAsk.shares} shares. Live rate ${fmtOpasRate(opasPrice)}/OPAS.`
                     : `No live seller right now. This asset is still bid-capable and can be entered through the marketplace order flow.`}
                 </p>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <Link
                   href={`${actionBase}&intent=buy`}
-                  className="btn-metal inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md text-[10.5px] tracking-[0.22em] uppercase text-[#050810] font-bold"
+                  className="btn-metal inline-flex min-w-0 items-center justify-center gap-2 px-4 py-3 rounded-md text-[9.5px] sm:text-[10.5px] tracking-[0.18em] sm:tracking-[0.22em] uppercase text-[#050810] font-bold text-center"
                   style={{ fontFamily: "BankGothic, sans-serif" }}
                 >
                   <Wallet className="w-3.5 h-3.5" />
@@ -217,7 +217,7 @@ export default function AssetDetail() {
                 </Link>
                 <Link
                   href={`${actionBase}&intent=bid`}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md text-[10.5px] tracking-[0.22em] uppercase border border-primary/35 text-primary hover:bg-primary/10"
+                  className="inline-flex min-w-0 items-center justify-center gap-2 px-4 py-3 rounded-md text-[9.5px] sm:text-[10.5px] tracking-[0.18em] sm:tracking-[0.22em] uppercase border border-primary/35 text-primary hover:bg-primary/10 text-center"
                   style={NEVERA}
                 >
                   <Gavel className="w-3.5 h-3.5" />
@@ -226,7 +226,7 @@ export default function AssetDetail() {
               </div>
 
               {isConnected && userHolding && (
-                <div className="mt-4 pt-4 border-t border-white/8 text-[11px] text-white/55" style={NEVERA}>
+                <div className="mt-4 pt-4 border-t border-white/8 text-[11px] text-white/55 leading-6 break-words" style={NEVERA}>
                   You hold <span className="text-white">{userHolding.shares} shares</span> in this asset with
                   a basis of <span className="text-white">{fmtUsd(userHolding.costBasisUsd)}</span>.
                 </div>
@@ -295,7 +295,7 @@ export default function AssetDetail() {
                           </span>
                         </div>
                         <div className="text-white text-[15px]" style={SHARKON}>{fmtUsd(listing.askPerShare)} / share</div>
-                        <div className="text-[11px] text-white/45 font-mono">
+                        <div className="text-[11px] text-white/45 font-mono break-words">
                           {listing.shares} shares available · order notional {fmtUsd(listing.askPerShare * listing.shares)}
                         </div>
                       </div>
@@ -342,18 +342,18 @@ export default function AssetDetail() {
               <div className="mt-4 flex flex-col gap-2">
                 <Link
                   href={`${actionBase}&intent=buy`}
-                  className="inline-flex items-center justify-between px-4 py-3 rounded-xl border border-primary/30 bg-primary/8 text-primary hover:bg-primary/12"
+                  className="inline-flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-primary/30 bg-primary/8 text-primary hover:bg-primary/12"
                   style={NEVERA}
                 >
-                  <span>Open marketplace in buy mode</span>
+                  <span className="min-w-0">Open marketplace in buy mode</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
                   href={`${actionBase}&intent=bid`}
-                  className="inline-flex items-center justify-between px-4 py-3 rounded-xl border border-white/10 bg-[rgba(255,255,255,0.03)] text-white/72 hover:text-white"
+                  className="inline-flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-white/10 bg-[rgba(255,255,255,0.03)] text-white/72 hover:text-white"
                   style={NEVERA}
                 >
-                  <span>Open marketplace in bid mode</span>
+                  <span className="min-w-0">Open marketplace in bid mode</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -402,16 +402,16 @@ function MetricTile({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl px-4 py-3 border border-white/8 bg-[rgba(255,255,255,0.03)] min-w-0">
       <div className="text-[8.5px] tracking-[0.24em] uppercase text-white/35 mb-1" style={NEVERA}>{label}</div>
-      <FitText share className="text-lg text-white min-w-0" style={SHARKON}>{value}</FitText>
+      <FitText share className="text-base sm:text-lg text-white min-w-0" style={SHARKON}>{value}</FitText>
     </div>
   );
 }
 
 function InfoRow({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl px-4 py-3 border border-white/8 bg-[rgba(255,255,255,0.03)]">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 rounded-xl px-4 py-3 border border-white/8 bg-[rgba(255,255,255,0.03)] min-w-0">
       <span className="text-[10px] tracking-[0.24em] uppercase text-white/38" style={NEVERA}>{label}</span>
-      <span className="text-[14px] text-right" style={{ ...SHARKON, color: accent ?? "#F5F7FB" }}>{value}</span>
+      <span className="text-[13px] sm:text-[14px] sm:text-right break-words" style={{ ...SHARKON, color: accent ?? "#F5F7FB" }}>{value}</span>
     </div>
   );
 }
