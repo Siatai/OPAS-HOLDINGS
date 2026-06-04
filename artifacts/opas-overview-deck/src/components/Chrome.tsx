@@ -29,6 +29,13 @@ export function SlideHeader({
         </span>
       </div>
       <div className="flex items-center gap-[0.9vw]">
+        <a
+          href="/pitch"
+          className="inline-flex items-center justify-center h-[2.5vw] min-h-[30px] w-[2.5vw] min-w-[30px] rounded-full border border-white/12 bg-[rgba(8,12,24,0.78)] text-[0.9vw] text-fg/70 transition-colors hover:border-[rgba(234,141,14,0.45)] hover:text-gold"
+          aria-label="Close deck and return to pitch"
+        >
+          ×
+        </a>
         <span className="font-display text-gold text-[1.3vw] leading-none">
           {section}
         </span>

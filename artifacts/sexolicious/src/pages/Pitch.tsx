@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Lock } from "lucide-react";
 import logo from "/opas-logo.png";
 import worldSkyline from "@/assets/images/world_skyline.png";
@@ -51,11 +51,37 @@ const reveal = {
 };
 
 export default function Pitch() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex flex-col">
       <img src={worldSkyline} alt="" className="absolute inset-0 w-full h-full object-cover opacity-[0.12]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,hsl(35_92%_50%/0.14),transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_110%,hsl(185_88%_40%/0.10),transparent_45%)]" />
+      <motion.div
+        aria-hidden
+        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,hsl(35_92%_50%/0.14),transparent_55%)]"
+        animate={reduceMotion ? undefined : { scale: [1, 1.06, 1], opacity: [0.8, 1, 0.82] }}
+        transition={reduceMotion ? undefined : { duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="absolute inset-0 bg-[radial-gradient(circle_at_85%_110%,hsl(185_88%_40%/0.10),transparent_45%)]"
+        animate={reduceMotion ? undefined : { x: [0, -18, 0], y: [0, -10, 0], opacity: [0.7, 1, 0.72] }}
+        transition={reduceMotion ? undefined : { duration: 10, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="absolute -left-24 top-[24vh] h-56 w-56 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(234,141,14,0.18) 0%, transparent 68%)" }}
+        animate={reduceMotion ? undefined : { x: [0, 26, 0], y: [0, -18, 0] }}
+        transition={reduceMotion ? undefined : { duration: 9, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="absolute right-[-5rem] bottom-[14vh] h-64 w-64 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(72,186,193,0.16) 0%, transparent 72%)" }}
+        animate={reduceMotion ? undefined : { x: [0, -28, 0], y: [0, 16, 0] }}
+        transition={reduceMotion ? undefined : { duration: 11, repeat: Infinity, ease: "easeInOut" }}
+      />
       <div className="absolute top-0 left-0 right-0 h-[3px] bg-primary" />
 
       {/* Top bar */}
@@ -101,9 +127,23 @@ export default function Pitch() {
             <motion.a
               key={d.n}
               href={d.href}
-              {...reveal}
-              transition={{ ...reveal.transition, delay: 0.24 + i * 0.1 }}
-              whileHover={{ y: -8 }}
+              initial={{ opacity: 0, y: 28 }}
+              animate={
+                reduceMotion
+                  ? { opacity: 1, y: 0 }
+                  : { opacity: 1, y: [0, i % 2 === 0 ? -8 : -5, 0] }
+              }
+              whileHover={{ y: -10, scale: 1.01 }}
+              transition={
+                reduceMotion
+                  ? { ...reveal.transition, delay: 0.24 + i * 0.1 }
+                  : {
+                      opacity: { duration: 0.7, delay: 0.24 + i * 0.1, ease: [0.22, 1, 0.36, 1] },
+                      y: { duration: 5.6 + i * 0.7, repeat: Infinity, ease: "easeInOut", delay: 0.24 + i * 0.1 },
+                      scale: { duration: 0.7, delay: 0.24 + i * 0.1, ease: [0.22, 1, 0.36, 1] },
+                      delay: 0.24 + i * 0.1,
+                    }
+              }
               className="group relative flex flex-col overflow-hidden rounded-xl bg-card border border-border hover:border-primary/50 transition-colors shadow-[0_20px_60px_-30px_rgba(0,0,0,0.9)]"
             >
               <div className="relative h-44 md:h-48 overflow-hidden">
