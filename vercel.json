@@ -1,6 +1,19 @@
 {
-  "outputDirectory": "artifacts/sexolicious/dist/public",
+  "buildCommand": "node scripts/build-vercel.mjs",
+  "outputDirectory": "dist/vercel",
   "rewrites": [
+    {
+      "source": "/opas-investor-deck/((?!assets/|.*\\.[^/]+$).*)",
+      "destination": "/opas-investor-deck/index.html"
+    },
+    {
+      "source": "/opas-customer-deck/((?!assets/|.*\\.[^/]+$).*)",
+      "destination": "/opas-customer-deck/index.html"
+    },
+    {
+      "source": "/opas-overview-deck/((?!assets/|.*\\.[^/]+$).*)",
+      "destination": "/opas-overview-deck/index.html"
+    },
     {
       "source": "/((?!assets/|.*\\.[^/]+$).*)",
       "destination": "/index.html"
