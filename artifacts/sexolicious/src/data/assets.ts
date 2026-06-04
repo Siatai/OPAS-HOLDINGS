@@ -84,6 +84,76 @@ export const getCategory = (id: AssetCategory): CategoryMeta =>
 
 const cycle = <T,>(pool: T[], i: number) => pool[i % pool.length];
 
+function carProfile(title: string, idx: number) {
+  const vaults = [
+    "OPAS Geneva Freeport vault, Switzerland",
+    "OPAS Monaco collector storage, Monaco",
+    "OPAS Mayfair collector suite, London",
+    "OPAS DIFC collector vault, Dubai",
+  ];
+  const years = ["2022", "2023", "2024", "2025"];
+  const colors = ["Nero Noctis over Cuoio", "Blu Tour de France over Sabbia", "Arancio Atlas over Nero", "Gunmetal over Mandarin"];
+  return {
+    address: vaults[idx % vaults.length],
+    location: vaults[idx % vaults.length],
+    area: "Climate-controlled collector storage",
+    sourceNote: "Manufacturer specifications and market positioning from official marque releases",
+    highlights: ["Managed concierge storage", "Collector-grade documentation", "Event and charter allocation ready"],
+    facts: [
+      { label: "Model year", value: years[idx % years.length] },
+      { label: "Storage", value: vaults[idx % vaults.length] },
+      { label: "Spec finish", value: colors[idx % colors.length] },
+      { label: "Use case", value: "Collector reserve / curated access" },
+    ],
+  };
+}
+
+function yachtProfile(title: string, idx: number) {
+  const berths = [
+    "Port Hercule, Monaco",
+    "Porto Cervo Marina, Sardinia",
+    "Dubai Harbour Marina, Dubai",
+    "Port de Saint-Tropez, France",
+  ];
+  const seasons = ["Med summer circuit", "Monaco Grand Prix week", "Cannes / Antibes charter season", "Winter Gulf program"];
+  return {
+    address: berths[idx % berths.length],
+    location: berths[idx % berths.length],
+    area: "Full-service berth and crew management",
+    sourceNote: "Builder specifications and charter profile aligned to official yard data",
+    highlights: ["Managed charter calendar", "Crewed operations", "Premium marina positioning"],
+    facts: [
+      { label: "Home berth", value: berths[idx % berths.length] },
+      { label: "Program", value: seasons[idx % seasons.length] },
+      { label: "Crew", value: `${5 + idx} professional crew` },
+      { label: "Use case", value: "Charter income / owner weeks" },
+    ],
+  };
+}
+
+function jetProfile(title: string, idx: number) {
+  const bases = [
+    "Farnborough Airport, UK",
+    "DWC Al Maktoum, Dubai",
+    "Le Bourget Airport, Paris",
+    "Teterboro Airport, New Jersey",
+  ];
+  const cabins = ["4 living zones", "4-zone flagship cabin", "3-zone executive cabin", "Forward galley + aft stateroom"];
+  return {
+    address: bases[idx % bases.length],
+    location: bases[idx % bases.length],
+    area: "Managed hangar and dispatch operations",
+    sourceNote: "Range and cabin figures aligned to official OEM program data",
+    highlights: ["Managed charter dispatch", "Signature FBO handling", "Long-range executive routing"],
+    facts: [
+      { label: "Home base", value: bases[idx % bases.length] },
+      { label: "Cabin plan", value: cabins[idx % cabins.length] },
+      { label: "Program", value: "Managed charter / owner block hours" },
+      { label: "Use case", value: "Intercontinental executive lift" },
+    ],
+  };
+}
+
 // ── Real estate (flattened from cities.ts) ──────────────────────────────
 const realEstate: Asset[] = CITIES.flatMap((c) =>
   c.properties.map((p) => ({
@@ -107,7 +177,7 @@ const cars: Asset[] = (
     { id: "car-5", title: "Rolls-Royce Spectre",      token: "OPA-CAR-05", price: 85,  available: 18, rentalYield: "8.6%",  capitalGrowth: "+6.4%",  totalRoi: "~15.0%", tier: "Grand",     subtitle: "Goodwood · Coachbuilt", spec: "577 hp · Electric" },
     { id: "car-6", title: "Koenigsegg Jesko",         token: "OPA-CAR-06", price: 135, available: 3,  rentalYield: "10.1%", capitalGrowth: "+19.6%", totalRoi: "~29.7%", tier: "Hyper",     subtitle: "Ängelholm · 1 of 125", spec: "1600 hp · V8" },
   ] as RawAsset[]
-).map((r, i) => ({ ...r, category: "supercars" as const, image: cycle(CAR_POOL, i) }));
+).map((r, i) => ({ ...r, ...carProfile(r.title, i), category: "supercars" as const, image: cycle(CAR_POOL, i) }));
 
 // ── Yachts ──────────────────────────────────────────────────────────────
 const YACHT_POOL = [yachtSuper, yachtRiva, yachtMarina, yachtMega];
@@ -119,7 +189,7 @@ const yachts: Asset[] = (
     { id: "yacht-4", title: "Feadship Symphony",    token: "OPA-YHT-04", price: 360, available: 3,  rentalYield: "8.2%",  capitalGrowth: "+4.4%", totalRoi: "~12.6%", tier: "Mega",       subtitle: "Aalsmeer · Custom", spec: "101m · 16 guests" },
     { id: "yacht-5", title: "Azimut Grande 35M",    token: "OPA-YHT-05", price: 210, available: 7,  rentalYield: "9.0%",  capitalGrowth: "+3.2%", totalRoi: "~12.2%", tier: "Superyacht", subtitle: "Viareggio · Tri-deck", spec: "35m · 12 guests" },
   ] as RawAsset[]
-).map((r, i) => ({ ...r, category: "yachts" as const, image: cycle(YACHT_POOL, i) }));
+).map((r, i) => ({ ...r, ...yachtProfile(r.title, i), category: "yachts" as const, image: cycle(YACHT_POOL, i) }));
 
 // ── Private jets ──────────────────────────────────────────────────────────
 const JET_POOL = [jetGulfstream, jetSky, jetHangar, jetCabin];
@@ -131,7 +201,7 @@ const jets: Asset[] = (
     { id: "jet-4", title: "Embraer Praetor 600",        token: "OPA-JET-04", price: 160, available: 24, rentalYield: "10.4%", capitalGrowth: "+1.6%", totalRoi: "~12.0%", tier: "Super-mid",  subtitle: "São José · Super-mid", spec: "4018 nm · 12 pax" },
     { id: "jet-5", title: "Cessna Citation Longitude",  token: "OPA-JET-05", price: 140, available: 19, rentalYield: "10.8%", capitalGrowth: "+1.4%", totalRoi: "~12.2%", tier: "Super-mid",  subtitle: "Wichita · Super-mid", spec: "3500 nm · 12 pax" },
   ] as RawAsset[]
-).map((r, i) => ({ ...r, category: "jets" as const, image: cycle(JET_POOL, i) }));
+).map((r, i) => ({ ...r, ...jetProfile(r.title, i), category: "jets" as const, image: cycle(JET_POOL, i) }));
 
 // ── Unified catalog ───────────────────────────────────────────────────────
 export const ASSETS: Asset[] = [...realEstate, ...cars, ...yachts, ...jets];

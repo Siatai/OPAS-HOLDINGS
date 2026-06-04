@@ -154,7 +154,7 @@ export default function AssetDetail() {
               </h1>
 
               <p className="text-lg sm:text-xl md:text-2xl text-white/78 max-w-2xl" style={SERIF}>
-                {prop.spec ? `${prop.subtitle} · ${prop.spec}` : prop.subtitle}
+                {prop.spec ? `${prop.location ?? prop.subtitle} · ${prop.spec}` : (prop.location ?? prop.subtitle)}
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-3 max-w-3xl">
@@ -258,10 +258,25 @@ export default function AssetDetail() {
               <div className="grid sm:grid-cols-2 gap-3 mt-4">
                 <InfoRow label="Asset class" value={catMeta.label} />
                 <InfoRow label="Signature" value={prop.spec ?? prop.subtitle} />
+                <InfoRow label="Location" value={prop.location ?? prop.subtitle} />
+                <InfoRow label="Address / base" value={prop.address ?? "Private inventory"} />
+                {prop.area ? <InfoRow label="Area / profile" value={prop.area} /> : null}
                 <InfoRow label="Primary launch" value={fmtUsd(prop.price)} />
                 <InfoRow label="Catalog availability" value={`${prop.available} shares`} />
               </div>
             </Panel>
+
+            {prop.highlights?.length ? (
+              <Panel title="Key highlights" eyebrow="Asset memo">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {prop.highlights.map((item) => (
+                    <div key={item} className="rounded-xl px-4 py-3 border border-white/8 bg-[rgba(255,255,255,0.03)] text-[13px] text-white/68 leading-6" style={NEVERA}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </Panel>
+            ) : null}
 
             <Panel title="Live marketplace depth" eyebrow="Secondary market">
               {listings.length === 0 ? (
@@ -332,6 +347,21 @@ export default function AssetDetail() {
                 <InfoRow label="Best live notional" value={fmtUsdCompact(maxOrderUsd)} />
               </div>
             </Panel>
+
+            {prop.facts?.length ? (
+              <Panel title="Dossier facts" eyebrow="Profile data">
+                <div className="space-y-3">
+                  {prop.facts.map((fact) => (
+                    <InfoRow key={`${fact.label}-${fact.value}`} label={fact.label} value={fact.value} />
+                  ))}
+                </div>
+                {prop.sourceNote ? (
+                  <div className="mt-4 pt-4 border-t border-white/8 text-[11px] text-white/45 leading-6" style={NEVERA}>
+                    Source note: {prop.sourceNote}
+                  </div>
+                ) : null}
+              </Panel>
+            ) : null}
 
             <Panel title="Execution path" eyebrow="Trade flow">
               <ol className="space-y-3 text-[13px] text-white/68 leading-6" style={NEVERA}>

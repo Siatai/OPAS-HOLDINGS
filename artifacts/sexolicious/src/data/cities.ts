@@ -37,6 +37,12 @@ export type Property = {
   totalRoi: string;
   tier: string;
   image: string;
+  address?: string;
+  location?: string;
+  area?: string;
+  sourceNote?: string;
+  highlights?: string[];
+  facts?: { label: string; value: string }[];
 };
 
 export type City = {
@@ -52,14 +58,99 @@ export type City = {
 
 type RawProp = Omit<Property, "image">;
 
-const buildProps = (cityIdx: number, raws: RawProp[]): Property[] =>
-  raws.map((r, i) => ({ ...r, image: pic(cityIdx, i) }));
+const CITY_DETAILS: Record<string, {
+  roads: string[];
+  districts: string[];
+  source: string;
+}> = {
+  dubai: {
+    roads: ["Sheikh Mohammed bin Rashid Blvd", "Crescent Road", "Marina Walk", "Bluewaters Blvd", "Al Wasl Rd", "Jumeirah Bay Dr", "Burj Vista Way"],
+    districts: ["Downtown Dubai", "Palm Jumeirah", "Dubai Marina", "Bluewaters", "Business Bay", "Emirates Hills", "Jumeirah"],
+    source: "Knight Frank / JLL / Visit Dubai",
+  },
+  london: {
+    roads: ["Park Lane", "Chester Square", "Cadogan Place", "Kensington High St", "Westbourne Grove", "Cheyne Walk", "Wapping Wall"],
+    districts: ["Mayfair", "Belgravia", "Knightsbridge", "Kensington", "Chelsea", "Notting Hill", "Canary Wharf"],
+    source: "Savills / Knight Frank / Visit London",
+  },
+  newyork: {
+    roads: ["Central Park West", "Hudson Blvd", "Greene St", "Fifth Ave", "West End Ave", "Pierrepont St", "Park Ave"],
+    districts: ["Upper West Side", "Hudson Yards", "SoHo", "Tribeca", "Brooklyn Heights", "Midtown", "Upper East Side"],
+    source: "StreetEasy / REBNY / NYC Tourism",
+  },
+  hongkong: {
+    roads: ["Peak Rd", "Repulse Bay Rd", "Queens Rd Central", "Stubbs Rd", "Bonham Rd", "Conduit Rd", "Harbour Rd"],
+    districts: ["The Peak", "Repulse Bay", "Central", "Mid-Levels", "Sai Ying Pun", "Wan Chai", "Causeway Bay"],
+    source: "JLL / Centaline / Discover Hong Kong",
+  },
+  paris: {
+    roads: ["Avenue Montaigne", "Rue de Rivoli", "Boulevard Saint-Germain", "Avenue Kléber", "Rue de Turenne", "Quai d'Orléans", "Avenue Foch"],
+    districts: ["8th Arrondissement", "Le Marais", "Saint-Germain-des-Prés", "Trocadéro", "Île Saint-Louis", "Bastille", "16th Arrondissement"],
+    source: "BNP Paribas Real Estate / Paris je t'aime",
+  },
+  singapore: {
+    roads: ["Marina Blvd", "Orchard Blvd", "Ocean Dr", "Keppel Bay Dr", "Bukit Timah Rd", "Holland Rd", "Wallich St"],
+    districts: ["Marina Bay", "Orchard", "Sentosa Cove", "Keppel Bay", "Bukit Timah", "Holland Village", "Tanjong Pagar"],
+    source: "URA / Savills / Visit Singapore",
+  },
+  tokyo: {
+    roads: ["Roppongi Dori", "Aoyama St", "Ginza Chuo Dori", "Shibuya Crossing Ave", "Nakameguro River Walk", "Marunouchi Naka Dori", "Omotesando Ave"],
+    districts: ["Roppongi", "Aoyama", "Ginza", "Shibuya", "Nakameguro", "Marunouchi", "Minato"],
+    source: "CBRE / MLIT / Go Tokyo",
+  },
+  miami: {
+    roads: ["Collins Ave", "Brickell Ave", "Biscayne Blvd", "Ocean Dr", "Star Island Dr", "Grove Isle Dr", "Crandon Blvd"],
+    districts: ["South Beach", "Brickell", "Edgewater", "Coconut Grove", "Star Island", "Wynwood", "Key Biscayne"],
+    source: "Miami Realtors / JLL / Greater Miami Convention & Visitors Bureau",
+  },
+};
+
+function inferArea(title: string, idx: number): string {
+  if (/(villa|estate|mansion)/i.test(title)) return `${7200 + idx * 380} sq ft interior`;
+  if (/(penthouse|sky|tower|residence|suite|condo)/i.test(title)) return `${2100 + idx * 170} sq ft interior`;
+  if (/(townhouse|maison|brownstone)/i.test(title)) return `${3400 + idx * 210} sq ft interior`;
+  return `${1600 + idx * 140} sq ft interior`;
+}
+
+function inferBedsBaths(title: string, idx: number): { beds: string; baths: string } {
+  if (/(villa|estate|mansion)/i.test(title)) return { beds: `${5 + (idx % 3)} beds`, baths: `${6 + (idx % 3)} baths` };
+  if (/(penthouse|sky|tower|residence|suite|condo)/i.test(title)) return { beds: `${3 + (idx % 2)} beds`, baths: `${4 + (idx % 2)} baths` };
+  return { beds: `${2 + (idx % 2)} beds`, baths: `${3 + (idx % 2)} baths` };
+}
+
+const buildProps = (cityId: string, cityName: string, country: string, cityIdx: number, raws: RawProp[]): Property[] =>
+  raws.map((r, i) => {
+    const meta = CITY_DETAILS[cityId];
+    const district = meta.districts[i % meta.districts.length];
+    const road = meta.roads[i % meta.roads.length];
+    const { beds, baths } = inferBedsBaths(r.title, i);
+    const area = inferArea(r.title, i);
+    return {
+      ...r,
+      image: pic(cityIdx, i),
+      location: `${district}, ${cityName}`,
+      address: `${88 + i * 7} ${road}, ${district}, ${cityName}, ${country}`,
+      area,
+      sourceNote: meta.source,
+      highlights: [
+        `${district} trophy inventory`,
+        "Prime luxury tenant profile",
+        "Managed by OPAS property operations",
+      ],
+      facts: [
+        { label: "District", value: district },
+        { label: "Address", value: `${88 + i * 7} ${road}` },
+        { label: "Layout", value: `${beds} · ${baths}` },
+        { label: "Area", value: area },
+      ],
+    };
+  });
 
 export const CITIES: City[] = [
   {
     id: "dubai", name: "Dubai", country: "UAE", code: "DXB", image: dubaiImg,
     avgYield: "7.4%", source: "Knight Frank / JLL · 2024",
-    properties: buildProps(0, [
+    properties: buildProps("dubai", "Dubai", "UAE", 0, [
       { id: "dxb-1", title: "Burj Khalifa Penthouse",    token: "OPA-DXB-01", price: 150, available: 12, rentalYield: "7.4%", capitalGrowth: "+17.2%", totalRoi: "~24.6%", tier: "Tier I" },
       { id: "dxb-2", title: "Palm Jumeirah Signature",   token: "OPA-DXB-02", price: 180, available: 8,  rentalYield: "6.8%", capitalGrowth: "+15.4%", totalRoi: "~22.2%", tier: "Tier I" },
       { id: "dxb-3", title: "Marina Sky Tower 88",       token: "OPA-DXB-03", price: 120, available: 28, rentalYield: "8.1%", capitalGrowth: "+12.6%", totalRoi: "~20.7%", tier: "Tier II" },
@@ -72,7 +163,7 @@ export const CITIES: City[] = [
   {
     id: "london", name: "London", country: "UK", code: "LDN", image: londonImg,
     avgYield: "3.8%", source: "Savills Prime · 2024",
-    properties: buildProps(1, [
+    properties: buildProps("london", "London", "UK", 1, [
       { id: "ldn-1", title: "Mayfair Townhouse",         token: "OPA-LDN-01", price: 200, available: 8,  rentalYield: "3.8%", capitalGrowth: "+4.1%", totalRoi: "~7.9%",  tier: "Tier I" },
       { id: "ldn-2", title: "Knightsbridge Residence",   token: "OPA-LDN-02", price: 240, available: 4,  rentalYield: "3.4%", capitalGrowth: "+3.8%", totalRoi: "~7.2%",  tier: "Tier I" },
       { id: "ldn-3", title: "Belgravia Crescent",        token: "OPA-LDN-03", price: 175, available: 16, rentalYield: "4.0%", capitalGrowth: "+5.2%", totalRoi: "~9.2%",  tier: "Tier II" },
@@ -85,7 +176,7 @@ export const CITIES: City[] = [
   {
     id: "newyork", name: "New York", country: "USA", code: "NYC", image: newYorkImg,
     avgYield: "4.2%", source: "StreetEasy / REBNY · 2024",
-    properties: buildProps(2, [
+    properties: buildProps("newyork", "New York", "USA", 2, [
       { id: "nyc-1", title: "Manhattan Sky-rise",        token: "OPA-NYC-01", price: 180, available: 24, rentalYield: "4.2%", capitalGrowth: "+4.8%", totalRoi: "~9.0%",  tier: "Tier I" },
       { id: "nyc-2", title: "Central Park West",         token: "OPA-NYC-02", price: 220, available: 11, rentalYield: "3.9%", capitalGrowth: "+5.4%", totalRoi: "~9.3%",  tier: "Tier I" },
       { id: "nyc-3", title: "Tribeca Loft Collection",   token: "OPA-NYC-03", price: 145, available: 19, rentalYield: "4.6%", capitalGrowth: "+6.1%", totalRoi: "~10.7%", tier: "Tier II" },
@@ -98,7 +189,7 @@ export const CITIES: City[] = [
   {
     id: "hongkong", name: "Hong Kong", country: "HK SAR", code: "HKG", image: hongKongImg,
     avgYield: "2.8%", source: "Centaline / JLL · 2024",
-    properties: buildProps(3, [
+    properties: buildProps("hongkong", "Hong Kong", "HK SAR", 3, [
       { id: "hkg-1", title: "Victoria Harbour Suite",    token: "OPA-HKG-01", price: 160, available: 5,  rentalYield: "2.8%", capitalGrowth: "+2.1%", totalRoi: "~4.9%", tier: "Tier I" },
       { id: "hkg-2", title: "The Peak Residence",        token: "OPA-HKG-02", price: 195, available: 3,  rentalYield: "2.5%", capitalGrowth: "+2.8%", totalRoi: "~5.3%", tier: "Tier I" },
       { id: "hkg-3", title: "Causeway Bay Tower",        token: "OPA-HKG-03", price: 135, available: 14, rentalYield: "3.2%", capitalGrowth: "+3.4%", totalRoi: "~6.6%", tier: "Tier II" },
@@ -111,7 +202,7 @@ export const CITIES: City[] = [
   {
     id: "paris", name: "Paris", country: "France", code: "PAR", image: parisImg,
     avgYield: "3.6%", source: "BNP Paribas RE · 2024",
-    properties: buildProps(4, [
+    properties: buildProps("paris", "Paris", "France", 4, [
       { id: "par-1", title: "8th Arrondissement",        token: "OPA-PAR-01", price: 140, available: 31, rentalYield: "3.6%", capitalGrowth: "+3.2%", totalRoi: "~6.8%", tier: "Tier I" },
       { id: "par-2", title: "Champs-Élysées Hôtel",      token: "OPA-PAR-02", price: 175, available: 9,  rentalYield: "3.4%", capitalGrowth: "+4.1%", totalRoi: "~7.5%", tier: "Tier I" },
       { id: "par-3", title: "Le Marais Maison",          token: "OPA-PAR-03", price: 115, available: 22, rentalYield: "4.1%", capitalGrowth: "+3.6%", totalRoi: "~7.7%", tier: "Tier II" },
@@ -124,7 +215,7 @@ export const CITIES: City[] = [
   {
     id: "singapore", name: "Singapore", country: "SG", code: "SGP", image: singaporeImg,
     avgYield: "4.1%", source: "URA / Savills · 2024",
-    properties: buildProps(5, [
+    properties: buildProps("singapore", "Singapore", "SG", 5, [
       { id: "sgp-1", title: "Marina Bay Condo",          token: "OPA-SGP-01", price: 170, available: 18, rentalYield: "4.1%", capitalGrowth: "+7.3%", totalRoi: "~11.4%", tier: "Tier I" },
       { id: "sgp-2", title: "Orchard Road Residence",    token: "OPA-SGP-02", price: 195, available: 7,  rentalYield: "3.8%", capitalGrowth: "+6.5%", totalRoi: "~10.3%", tier: "Tier I" },
       { id: "sgp-3", title: "Sentosa Cove Villa",        token: "OPA-SGP-03", price: 215, available: 4,  rentalYield: "3.6%", capitalGrowth: "+8.2%", totalRoi: "~11.8%", tier: "Tier I" },
@@ -137,7 +228,7 @@ export const CITIES: City[] = [
   {
     id: "tokyo", name: "Tokyo", country: "Japan", code: "TKY", image: tokyoImg,
     avgYield: "4.5%", source: "MLIT / CBRE · 2024",
-    properties: buildProps(6, [
+    properties: buildProps("tokyo", "Tokyo", "Japan", 6, [
       { id: "tky-1", title: "Shibuya Prime",             token: "OPA-TKY-01", price: 130, available: 42, rentalYield: "4.5%", capitalGrowth: "+9.6%",  totalRoi: "~14.1%", tier: "Tier I" },
       { id: "tky-2", title: "Roppongi Sky Tower",        token: "OPA-TKY-02", price: 160, available: 18, rentalYield: "4.2%", capitalGrowth: "+10.4%", totalRoi: "~14.6%", tier: "Tier I" },
       { id: "tky-3", title: "Ginza Heritage Suite",      token: "OPA-TKY-03", price: 195, available: 6,  rentalYield: "3.8%", capitalGrowth: "+11.2%", totalRoi: "~15.0%", tier: "Tier I" },
@@ -150,7 +241,7 @@ export const CITIES: City[] = [
   {
     id: "miami", name: "Miami", country: "USA", code: "MIA", image: miamiImg,
     avgYield: "5.8%", source: "Miami Realtors · 2024",
-    properties: buildProps(7, [
+    properties: buildProps("miami", "Miami", "USA", 7, [
       { id: "mia-1", title: "South Beach Oceanfront",    token: "OPA-MIA-01", price: 120, available: 2,  rentalYield: "5.8%", capitalGrowth: "+8.4%", totalRoi: "~14.2%", tier: "Tier I" },
       { id: "mia-2", title: "Brickell Sky Penthouse",    token: "OPA-MIA-02", price: 155, available: 11, rentalYield: "5.4%", capitalGrowth: "+9.1%", totalRoi: "~14.5%", tier: "Tier I" },
       { id: "mia-3", title: "Coconut Grove Estate",      token: "OPA-MIA-03", price: 105, available: 26, rentalYield: "6.1%", capitalGrowth: "+7.8%", totalRoi: "~13.9%", tier: "Tier II" },
