@@ -5,7 +5,7 @@ import { Link } from "wouter";
 import {
   Store, TrendingUp, TrendingDown, Tag, ShoppingCart, X as XIcon,
   Wallet, Search, ArrowUpDown, ChevronRight, Gavel, Minus, Plus, Loader2,
-  Heart, Bell, ArrowLeftRight, Check,
+  Heart, Bell, ArrowLeftRight, Check, ChevronDown, ChevronUp, Eye,
 } from "lucide-react";
 import {
   getListings, buyListing, cancelListing, lookupProperty, fairValuePerShare,
@@ -21,6 +21,7 @@ import FitText, { FitTextGroup } from "@/components/FitText";
 import OpasPriceTag from "@/components/OpasPriceTag";
 import { useOpasPrice, usdToOpas, fmtOpas, fmtOpasRate } from "@/lib/opasPrice";
 import { CATEGORIES, getCategory, categoryOf, type AssetCategory } from "@/data/assets";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
@@ -55,6 +56,8 @@ export default function Marketplace() {
   const [interest, setInterest] = useState<InterestMessage[]>([]);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [toast, setToast] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
+  const [interestOpen, setInterestOpen] = useState(true);
+  const routeIntentHandled = useRef(false);
 
   useEffect(() => { setListings(getListings()); }, []);
   useEffect(() => { setBids(address ? getBids(address) : []); }, [address]);
@@ -77,6 +80,10 @@ export default function Marketplace() {
     const t = setTimeout(() => setToast(null), 3000);
     return () => clearTimeout(t);
   }, [toast]);
+
+  useEffect(() => {
+    if (notifications.length > 0) setInterestOpen(true);
+  }, [notifications.length]);
 
   const filtered = useMemo(() => {
     let l = [...listings];
@@ -213,6 +220,50 @@ export default function Marketplace() {
     () => bids.filter((b) => b.status === "pending" || b.status === "filled").slice(0, 6),
     [bids],
   );
+
+  useEffect(() => {
+    if (routeIntentHandled.current || typeof window === "undefined" || listings.length === 0) return;
+    const params = new URLSearchParams(window.location.search);
+    const assetId = params.get("asset");
+    const intent = params.get("intent");
+    if (!assetId) {
+      routeIntentHandled.current = true;
+      return;
+    }
+
+    const scoped = lookupProperty(assetId);
+    if (!scoped) {
+      routeIntentHandled.current = true;
+      return;
+    }
+
+    setTab("all");
+    setCatFilter(scoped.prop.category);
+    setSearch(scoped.prop.token);
+
+    if ((intent === "buy" || intent === "bid") && !isConnected) {
+      return;
+    }
+
+    if (intent === "bid" && isConnected) {
+      setBidState({ propertyId: assetId, qty: 1, perShare: Math.round(fairValuePerShare(assetId)) });
+      routeIntentHandled.current = true;
+      return;
+    }
+
+    if (intent === "buy" && isConnected) {
+      const bestListing = [...listings]
+        .filter((l) => l.propertyId === assetId && l.seller !== address?.toLowerCase())
+        .sort((a, b) => a.askPerShare - b.askPerShare || b.shares - a.shares)[0];
+      if (bestListing) {
+        setBuyState({ listing: bestListing, qty: 1 });
+        routeIntentHandled.current = true;
+        return;
+      }
+    }
+
+    routeIntentHandled.current = true;
+  }, [listings, isConnected, address]);
 
   // ── Interest received on the user's own listings ──
   const myListingIds = useMemo(
@@ -424,12 +475,18 @@ export default function Marketplace() {
                   >
                     <div className="min-w-0">
                       <div className="text-[12px] text-white truncate" style={SHARKON}>{m?.prop.token ?? b.propertyId}</div>
-                      <div className="text-[9.5px] text-white/45 font-mono truncate">
-                        {b.shares} × {fmtUsd(b.bidPerShare)}/sh
-                      </div>
+                      <div className="text-[9.5px] text-white/45 font-mono truncate">{b.shares} x {fmtUsd(b.bidPerShare)}/sh</div>
                     </div>
                     {pending ? (
                       <div className="flex items-center gap-2 shrink-0">
+                        <Link
+                          href={`/asset/${b.propertyId}`}
+                          className="inline-flex items-center gap-1 text-[8.5px] tracking-[0.18em] uppercase text-white/45 hover:text-white transition-colors"
+                          style={NEVERA}
+                        >
+                          <Eye className="w-3 h-3" />
+                          Details
+                        </Link>
                         <span className="flex items-center gap-1 text-[9px] tracking-[0.18em] uppercase text-primary font-mono">
                           <Loader2 className="w-3 h-3 animate-spin" /> Live
                         </span>
@@ -443,7 +500,17 @@ export default function Marketplace() {
                         </button>
                       </div>
                     ) : (
-                      <span className="shrink-0 text-[9px] tracking-[0.18em] uppercase text-emerald-300 font-mono">Filled</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Link
+                          href={`/asset/${b.propertyId}`}
+                          className="inline-flex items-center gap-1 text-[8.5px] tracking-[0.18em] uppercase text-white/45 hover:text-white transition-colors"
+                          style={NEVERA}
+                        >
+                          <Eye className="w-3 h-3" />
+                          Details
+                        </Link>
+                        <span className="shrink-0 text-[9px] tracking-[0.18em] uppercase text-emerald-300 font-mono">Filled</span>
+                      </div>
                     )}
                   </div>
                 );
@@ -454,36 +521,56 @@ export default function Marketplace() {
 
         {/* Interest inbox — interest on your listings + incoming swap offers */}
         {(tab === "mine" || notifications.length > 0) && (
-          <div className="rounded-lg p-4 space-y-3"
+          <Collapsible
+            open={interestOpen}
+            onOpenChange={setInterestOpen}
+            className="rounded-lg p-4 space-y-3"
             style={{ background: "rgba(20,28,48,0.4)", border: "1px solid rgba(11,181,190,0.22)" }}
             data-testid="interest-inbox"
           >
             <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="relative inline-flex">
-                  <Bell className="w-3.5 h-3.5 text-secondary" />
-                  {unreadInterest > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] px-1 rounded-full bg-secondary text-[8px] leading-[14px] text-[#050810] font-bold text-center">
-                      {unreadInterest}
+              <div className="flex items-center gap-2 min-w-0">
+                <CollapsibleTrigger asChild>
+                  <button
+                    className="inline-flex items-center gap-2 text-left min-w-0"
+                    data-testid="interest-toggle"
+                    aria-label={interestOpen ? "Collapse interest and swap offers" : "Expand interest and swap offers"}
+                  >
+                    <span className="relative inline-flex">
+                      <Bell className="w-3.5 h-3.5 text-secondary" />
+                      {unreadInterest > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] px-1 rounded-full bg-secondary text-[8px] leading-[14px] text-[#050810] font-bold text-center">
+                          {unreadInterest}
+                        </span>
+                      )}
                     </span>
-                  )}
-                </span>
-                <span className="text-[9.5px] tracking-[0.3em] uppercase text-white/55" style={NEVERA}>
-                  Interest &amp; swap offers
-                </span>
+                    <span className="text-[9.5px] tracking-[0.3em] uppercase text-white/55" style={NEVERA}>
+                      Interest &amp; swap offers
+                    </span>
+                    <span className="text-white/35">
+                      {interestOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                    </span>
+                  </button>
+                </CollapsibleTrigger>
               </div>
-              {unreadInterest > 0 && (
-                <button
-                  onClick={onMarkAllRead}
-                  data-testid="mark-all-read"
-                  className="flex items-center gap-1 text-[8.5px] tracking-[0.22em] uppercase text-white/45 hover:text-secondary transition-colors"
-                  style={NEVERA}
-                >
-                  <Check className="w-3 h-3" /> Mark all read
-                </button>
-              )}
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[8.5px] tracking-[0.2em] uppercase text-white/28" style={NEVERA}>
+                  {notifications.length} item{notifications.length === 1 ? "" : "s"}
+                </span>
+                {unreadInterest > 0 && (
+                  <button
+                    onClick={onMarkAllRead}
+                    data-testid="mark-all-read"
+                    className="flex items-center gap-1 text-[8.5px] tracking-[0.22em] uppercase text-white/45 hover:text-secondary transition-colors"
+                    style={NEVERA}
+                  >
+                    <Check className="w-3 h-3" /> Mark all read
+                  </button>
+                )}
+              </div>
             </div>
 
+            <CollapsibleContent className="space-y-3">
             {notifications.length === 0 ? (
               <div className="text-[11px] text-white/45 py-3" style={NEVERA}>
                 {hasOwnListings
@@ -511,7 +598,18 @@ export default function Marketplace() {
                           <span className={`text-[7.5px] tracking-[0.22em] uppercase ${tone} font-mono`}>{m.kind}</span>
                         </div>
                         <div className="text-[10.5px] text-white/60 leading-snug" style={NEVERA}>{m.note}</div>
-                        <div className="text-[8.5px] text-white/30 font-mono mt-0.5">{timeAgo(m.createdAt)}</div>
+                        <div className="mt-2 flex items-center justify-between gap-3">
+                          <div className="text-[8.5px] text-white/30 font-mono">{timeAgo(m.createdAt)}</div>
+                          <Link
+                            href={`/asset/${m.propertyId}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 text-[8.5px] tracking-[0.18em] uppercase text-white/45 hover:text-white transition-colors"
+                            style={NEVERA}
+                          >
+                            <Eye className="w-3 h-3" />
+                            View asset
+                          </Link>
+                        </div>
                       </div>
                       <button
                         onClick={(e) => { e.stopPropagation(); onDismissInterest(m); }}
@@ -526,7 +624,8 @@ export default function Marketplace() {
                 })}
               </div>
             )}
-          </div>
+            </CollapsibleContent>
+          </Collapsible>
         )}
 
         {/* Listings grid */}
@@ -551,8 +650,6 @@ export default function Marketplace() {
               if (!meta) return null;
               const { prop, city } = meta;
               const catMeta = getCategory(prop.category);
-              const TitleTag: any = city ? Link : "span";
-              const titleProps = city ? { href: `/city/${city}` } : {};
               const mine = address && listing.seller === address.toLowerCase();
               const isPremium = discount < 0;
               return (
@@ -593,9 +690,9 @@ export default function Marketplace() {
                       )}
                     </div>
                     <div className="absolute bottom-3 left-3 right-3">
-                      <TitleTag {...titleProps} className={`text-[15px] text-white font-medium transition-colors block leading-tight ${city ? "hover:text-primary" : ""}`} style={SHARKON}>
+                      <Link href={`/asset/${listing.propertyId}`} className="text-[15px] text-white font-medium transition-colors block leading-tight hover:text-primary" style={SHARKON}>
                         <MarqueeText desktopStatic title={prop.title}>{prop.title}</MarqueeText>
-                      </TitleTag>
+                      </Link>
                       <div className="text-[9.5px] text-white/55 line-clamp-2 font-mono">{prop.spec ?? prop.subtitle}</div>
                     </div>
                   </div>
@@ -641,18 +738,27 @@ export default function Marketplace() {
                       </span>
                     </div>
 
-                    <div className="mt-auto pt-3 border-t border-white/5 flex gap-2">
+                    <div className="mt-auto pt-3 border-t border-white/5 space-y-2">
                       {mine ? (
-                        <button
-                          onClick={() => handleCancel(listing)}
-                          data-testid={`cancel-${listing.id}`}
-                          className="flex-1 px-4 py-2.5 text-[10.5px] tracking-[0.22em] uppercase border border-rose-400/40 text-rose-300 hover:bg-rose-400/10 rounded-sm transition-colors"
-                          style={NEVERA}
-                        >
-                          Cancel listing
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleCancel(listing)}
+                            data-testid={`cancel-${listing.id}`}
+                            className="flex-1 px-4 py-2.5 text-[10.5px] tracking-[0.22em] uppercase border border-rose-400/40 text-rose-300 hover:bg-rose-400/10 rounded-sm transition-colors"
+                            style={NEVERA}
+                          >
+                            Cancel listing
+                          </button>
+                          <Link
+                            href={`/asset/${listing.propertyId}`}
+                            className="px-3 py-2.5 text-[10.5px] tracking-[0.22em] uppercase text-white/70 hover:text-white border border-white/10 hover:border-white/20 rounded-sm transition-colors flex items-center justify-center"
+                            style={NEVERA}
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </Link>
+                        </div>
                       ) : (
-                        <>
+                        <div className="flex gap-2">
                           <button
                             onClick={() => isConnected ? setBuyState({ listing, qty: Math.min(1, listing.shares) }) : openWallet()}
                             data-testid={`buy-${listing.id}`}
@@ -680,17 +786,28 @@ export default function Marketplace() {
                           >
                             <Heart className="w-3.5 h-3.5" />
                           </button>
-                        </>
+                        </div>
                       )}
-                      {city && (
+                      <div className="flex gap-2">
                         <Link
-                          href={`/city/${city}`}
-                          className="px-3 py-2.5 text-[10.5px] tracking-[0.22em] uppercase text-white/55 hover:text-white border border-white/10 hover:border-white/25 rounded-sm transition-colors flex items-center"
+                          href={`/asset/${listing.propertyId}`}
+                          className="flex-1 px-4 py-2.5 text-[10px] tracking-[0.22em] uppercase text-white/65 hover:text-white border border-white/10 hover:border-white/20 rounded-sm transition-colors flex items-center justify-center gap-2"
                           style={NEVERA}
                         >
-                          <ChevronRight className="w-3 h-3" />
+                          <Eye className="w-3.5 h-3.5" />
+                          Asset details
                         </Link>
-                      )}
+                        {city && (
+                          <Link
+                            href={`/city/${city}`}
+                            className="px-3 py-2.5 text-[10px] tracking-[0.22em] uppercase text-white/55 hover:text-white border border-white/10 hover:border-white/25 rounded-sm transition-colors flex items-center gap-1.5"
+                            style={NEVERA}
+                          >
+                            City
+                            <ChevronRight className="w-3 h-3" />
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -736,6 +853,26 @@ export default function Marketplace() {
                       {meta.prop.token} · Buy order
                     </div>
                     <h3 className="text-2xl text-white" style={SHARKON}>{meta.prop.title}</h3>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <Link
+                        href={`/asset/${buyState.listing.propertyId}`}
+                        className="inline-flex items-center gap-1 text-[8.5px] tracking-[0.2em] uppercase text-white/45 hover:text-white transition-colors"
+                        style={NEVERA}
+                      >
+                        <Eye className="w-3 h-3" />
+                        View asset details
+                      </Link>
+                      {meta.city && (
+                        <Link
+                          href={`/city/${meta.city}`}
+                          className="inline-flex items-center gap-1 text-[8.5px] tracking-[0.2em] uppercase text-white/35 hover:text-white/70 transition-colors"
+                          style={NEVERA}
+                        >
+                          City collection
+                          <ChevronRight className="w-3 h-3" />
+                        </Link>
+                      )}
+                    </div>
                   </div>
 
                   <div className="space-y-3">
@@ -757,12 +894,12 @@ export default function Marketplace() {
                       style={{ background: "rgba(20,28,48,0.6)", border: "1px solid rgba(220,225,235,0.08)" }}
                     >
                       <Row label="Ask / share" value={fmtUsd(buyState.listing.askPerShare)} />
-                      <Row label="Quantity"    value={`${buyState.qty} × shares`} />
+                      <Row label="Quantity"    value={`${buyState.qty} x shares`} />
                       <Row label="Subtotal"    value={fmtUsd(subtotal)} />
                       <Row label="Platform fee · 7%" value={fmtUsd(buyFee)} />
                       <div className="h-px bg-white/10 my-1" />
                       <Row label="Total"       value={fmtUsd(total)} accent />
-                      <Row label="≈ OPAS required" value={fmtOpas(usdToOpas(total, opasPrice))} accent />
+                      <Row label="Approx. OPAS required" value={fmtOpas(usdToOpas(total, opasPrice))} accent />
                     </div>
                     <p className="text-[10px] text-white/40 leading-relaxed" style={NEVERA}>
                       Paid in <span className="text-primary">$OPAS</span> at the live rate
@@ -831,6 +968,26 @@ export default function Marketplace() {
                   {meta.prop.token} · Place bid
                 </div>
                 <h3 className="text-2xl text-white" style={SHARKON}>{meta.prop.title}</h3>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <Link
+                    href={`/asset/${bidState.propertyId}`}
+                    className="inline-flex items-center gap-1 text-[8.5px] tracking-[0.2em] uppercase text-white/45 hover:text-white transition-colors"
+                    style={NEVERA}
+                  >
+                    <Eye className="w-3 h-3" />
+                    View asset details
+                  </Link>
+                  {meta.city && (
+                    <Link
+                      href={`/city/${meta.city}`}
+                      className="inline-flex items-center gap-1 text-[8.5px] tracking-[0.2em] uppercase text-white/35 hover:text-white/70 transition-colors"
+                      style={NEVERA}
+                    >
+                      City collection
+                      <ChevronRight className="w-3 h-3" />
+                    </Link>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-3">
@@ -896,12 +1053,12 @@ export default function Marketplace() {
                   style={{ background: "rgba(20,28,48,0.6)", border: "1px solid rgba(220,225,235,0.08)" }}
                 >
                   <Row label="Bid / share" value={fmtUsd(bidState.perShare)} />
-                  <Row label="Quantity"    value={`${bidState.qty} × shares`} />
+                  <Row label="Quantity"    value={`${bidState.qty} x shares`} />
                   <Row label="Subtotal"    value={fmtUsd(subtotal)} />
                   <Row label="Platform fee · 7%" value={fmtUsd(bidFee)} />
                   <div className="h-px bg-white/10 my-1" />
                   <Row label="Max total"   value={fmtUsd(total)} accent />
-                  <Row label="≈ OPAS (max)" value={fmtOpas(usdToOpas(total, opasPrice))} accent />
+                  <Row label="Approx. OPAS (max)" value={fmtOpas(usdToOpas(total, opasPrice))} accent />
                 </div>
                 <p className="text-[10px] text-white/40 leading-relaxed" style={NEVERA}>
                   Bids are capped to <span className="text-primary">±{(BID_VARIANCE * 100).toFixed(0)}%</span> of fair

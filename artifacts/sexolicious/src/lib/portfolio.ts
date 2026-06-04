@@ -1142,6 +1142,7 @@ export type AppNotification = {
   note: string;
   createdAt: number;
   read: boolean;
+  propertyId: string;
   href: string;                  // route to act on it
 };
 
@@ -1183,6 +1184,7 @@ export function getNotifications(address: string): AppNotification[] {
     note: m.note,
     createdAt: m.createdAt,
     read: m.read,
+    propertyId: m.propertyId,
     href: "/marketplace",
   }));
   const readSet = readSwapReadSet(address);
@@ -1196,6 +1198,7 @@ export function getNotifications(address: string): AppNotification[] {
       note: swapOfferNote(o),
       createdAt: o.createdAt,
       read: readSet.has(o.id),
+      propertyId: o.giveId,
       href: "/portfolio",
     }));
   return [...interest, ...swaps].sort((a, b) => b.createdAt - a.createdAt);
