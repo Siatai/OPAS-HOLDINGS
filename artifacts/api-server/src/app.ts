@@ -35,15 +35,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", router);
 app.use(express.static(frontendDir, { index: false }));
 
-app.get(/^\/opas-investor-deck(?:\/.*)?$/, (_req, res) => {
+app.get(/^\/opas-investor-deck(?:\/(?!.*\.[^/]+$).*)?$/, (_req, res) => {
   res.sendFile(path.join(frontendDir, "opas-investor-deck", "index.html"));
 });
 
-app.get(/^\/opas-customer-deck(?:\/.*)?$/, (_req, res) => {
+app.get(/^\/opas-customer-deck(?:\/(?!.*\.[^/]+$).*)?$/, (_req, res) => {
   res.sendFile(path.join(frontendDir, "opas-customer-deck", "index.html"));
 });
 
-app.get(/^\/opas-overview-deck(?:\/.*)?$/, (_req, res) => {
+app.get(/^\/opas-overview-deck(?:\/(?!.*\.[^/]+$).*)?$/, (_req, res) => {
   res.sendFile(path.join(frontendDir, "opas-overview-deck", "index.html"));
 });
 
