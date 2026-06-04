@@ -12,13 +12,24 @@
  * check" if this file has been hand-edited and needs repair.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 
 import { slides } from "@/slideLoader";
 
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+function toDeckPath(path: string): string {
+  if (!basePath) return path;
+  return path.startsWith(basePath) ? path.slice(basePath.length) || "/" : path;
+}
+
+function deckHref(path: string): string {
+  return `${basePath}${path}`;
+}
+
 function getSlideIndex(pathname: string): number {
-  const match = pathname.match(/^\/slide(\d+)$/);
+  const match = toDeckPath(pathname).match(/^\/slide(\d+)$/);
   if (!match) return -1;
   const position = parseInt(match[1], 10);
   return slides.findIndex((s) => s.position === position);
@@ -34,9 +45,15 @@ function SlideEditor() {
   // navigation only in the workspace — the parent owns it there.
   const navigationDisabledRef = useRef(window.parent !== window.parent.parent);
   const touchHandledRefStable = useRef(false);
+  const wheelLockRef = useRef(false);
 
   useEffect(() => {
     if (currentIndex === -1) return;
+
+    const goToIndex = (nextIndex: number) => {
+      if (nextIndex < 0 || nextIndex >= slides.length || nextIndex === currentIndex) return;
+      navigate(deckHref(`/slide${slides[nextIndex].position}`));
+    };
 
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (navigationDisabledRef.current) return;
@@ -44,13 +61,13 @@ function SlideEditor() {
         event.preventDefault();
       }
       if ((event.key === "ArrowLeft" || event.key === "ArrowUp") && currentIndex > 0) {
-        navigate(`/slide${slides[currentIndex - 1].position}`);
+        goToIndex(currentIndex - 1);
       }
       if (
         (event.key === "ArrowRight" || event.key === "ArrowDown" || event.key === " ") &&
         currentIndex < slides.length - 1
       ) {
-        navigate(`/slide${slides[currentIndex + 1].position}`);
+        goToIndex(currentIndex + 1);
       }
     };
 
@@ -77,7 +94,26 @@ function SlideEditor() {
       }
 
       if (currentIndex < slides.length - 1) {
-        navigate(`/slide${slides[currentIndex + 1].position}`);
+        goToIndex(currentIndex + 1);
+      }
+    };
+
+    const onWheel = (event: WheelEvent) => {
+      if (isInteractive(event.target)) return;
+      const dominant = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+      if (Math.abs(dominant) < 24) return;
+      event.preventDefault();
+
+      if (wheelLockRef.current) return;
+      wheelLockRef.current = true;
+      window.setTimeout(() => {
+        wheelLockRef.current = false;
+      }, 420);
+
+      if (dominant > 0 && currentIndex < slides.length - 1) {
+        goToIndex(currentIndex + 1);
+      } else if (dominant < 0 && currentIndex > 0) {
+        goToIndex(currentIndex - 1);
       }
     };
 
@@ -95,30 +131,51 @@ function SlideEditor() {
     const onTouchEnd = (event: TouchEvent) => {
       const dx = event.changedTouches[0].clientX - touchStartX;
       const dy = event.changedTouches[0].clientY - touchStartY;
-      if (Math.abs(dx) >= 10 || Math.abs(dy) >= 10) return;
       if (isInteractive(touchTarget)) return;
-      touchHandledRef.current = true;
+
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+      const isSwipe = Math.max(absX, absY) >= 36;
 
       if (navigationDisabledRef.current) {
-        window.parent.postMessage({ type: "advanceSlide" }, "*");
+        if (isSwipe) {
+          window.parent.postMessage({ type: absY > absX ? (dy > 0 ? "retreatSlide" : "advanceSlide") : (dx > 0 ? "retreatSlide" : "advanceSlide") }, "*");
+        } else {
+          touchHandledRef.current = true;
+          window.parent.postMessage({ type: "advanceSlide" }, "*");
+        }
         return;
       }
 
+      if (isSwipe) {
+        if (absY > absX) {
+          if (dy < 0 && currentIndex < slides.length - 1) goToIndex(currentIndex + 1);
+          if (dy > 0 && currentIndex > 0) goToIndex(currentIndex - 1);
+        } else {
+          if (dx < 0 && currentIndex < slides.length - 1) goToIndex(currentIndex + 1);
+          if (dx > 0 && currentIndex > 0) goToIndex(currentIndex - 1);
+        }
+        return;
+      }
+
+      touchHandledRef.current = true;
       const fraction = touchStartX / window.innerWidth;
       if (fraction < 0.4 && currentIndex > 0) {
-        navigate(`/slide${slides[currentIndex - 1].position}`);
+        goToIndex(currentIndex - 1);
       } else if (fraction >= 0.4 && currentIndex < slides.length - 1) {
-        navigate(`/slide${slides[currentIndex + 1].position}`);
+        goToIndex(currentIndex + 1);
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("click", onClick);
+    window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("touchstart", onTouchStart);
     window.addEventListener("touchend", onTouchEnd);
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("click", onClick);
+      window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchend", onTouchEnd);
     };
@@ -163,21 +220,6 @@ function AllSlides() {
 // This component is used for the deployed view at `/`
 function SlideViewer() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [dims, setDims] = useState(() => ({
-    width: Math.min(window.innerWidth, window.innerHeight * (16 / 9)),
-    height: Math.min(window.innerHeight, window.innerWidth * (9 / 16)),
-  }));
-
-  useEffect(() => {
-    const update = () => {
-      setDims({
-        width: Math.min(window.innerWidth, window.innerHeight * (16 / 9)),
-        height: Math.min(window.innerHeight, window.innerWidth * (9 / 16)),
-      });
-    };
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
@@ -191,6 +233,28 @@ function SlideViewer() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  useEffect(() => {
+    let wheelLocked = false;
+    const post = (type: "advanceSlide" | "retreatSlide") => {
+      iframeRef.current?.contentWindow?.postMessage({ type }, "*");
+    };
+
+    const onWheel = (event: WheelEvent) => {
+      const dominant = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+      if (Math.abs(dominant) < 24) return;
+      event.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      window.setTimeout(() => {
+        wheelLocked = false;
+      }, 420);
+      post(dominant > 0 ? "advanceSlide" : "retreatSlide");
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, []);
+
   const base = import.meta.env.BASE_URL.replace(/\/$/, "");
   const firstPosition = slides.length > 0 ? slides[0].position : 1;
 
@@ -202,7 +266,7 @@ function SlideViewer() {
       <iframe
         ref={iframeRef}
         src={`${base}/slide${firstPosition}`}
-        style={{ width: dims.width, height: dims.height, border: "none" }}
+        style={{ width: "100vw", height: "100vh", border: "none" }}
         onLoad={() => iframeRef.current?.focus()}
         title="Slide viewer"
       />
@@ -217,12 +281,12 @@ export default function App() {
   // The "/" and "/allslides" routes are handled separately below.
   useEffect(() => {
     if (
-      location !== "/" &&
-      location !== "/allslides" &&
+      toDeckPath(location) !== "/" &&
+      toDeckPath(location) !== "/allslides" &&
       getSlideIndex(location) === -1
     ) {
       if (slides.length > 0) {
-        navigate(`/slide${slides[0].position}`, { replace: true });
+        navigate(deckHref(`/slide${slides[0].position}`), { replace: true });
       }
     }
   }, [location, navigate]);
@@ -232,12 +296,26 @@ export default function App() {
   // src (which causes a white flash).
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
+      if (event.data?.type === "advanceSlide") {
+        const idx = getSlideIndex(window.location.pathname);
+        if (idx >= 0 && idx < slides.length - 1) {
+          navigate(deckHref(`/slide${slides[idx + 1].position}`));
+        }
+        return;
+      }
+      if (event.data?.type === "retreatSlide") {
+        const idx = getSlideIndex(window.location.pathname);
+        if (idx > 0) {
+          navigate(deckHref(`/slide${slides[idx - 1].position}`));
+        }
+        return;
+      }
       if (
         event.data?.type === "navigateToSlide" &&
         typeof event.data.position === "number" &&
         slides.some((s) => s.position === event.data.position)
       ) {
-        navigate(`/slide${event.data.position}`);
+        navigate(deckHref(`/slide${event.data.position}`));
       }
     };
 
@@ -245,7 +323,7 @@ export default function App() {
     return () => window.removeEventListener("message", onMessage);
   }, [navigate]);
 
-  if (location === "/") return <SlideViewer />;
-  if (location === "/allslides") return <AllSlides />;
+  if (toDeckPath(location) === "/") return <SlideViewer />;
+  if (toDeckPath(location) === "/allslides") return <AllSlides />;
   return <SlideEditor />;
 }

@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useAccount } from "wagmi";
 import { useLocation } from "wouter";
 import {
   ChevronLeft, ChevronRight, TrendingUp, ArrowUpRight,
@@ -10,7 +11,7 @@ import MarqueeText from "./MarqueeText";
 import FitText, { FitTextGroup } from "./FitText";
 import { CITIES } from "@/data/cities";
 import {
-  CATEGORIES, assetsByCategory, getCategory,
+  CATEGORIES, assetCountByCity, assetsByCategory, getCategory,
   type Asset, type AssetCategory, type CategoryMeta,
 } from "@/data/assets";
 
@@ -31,6 +32,7 @@ const COMING_SOON = [
 
 export default function Properties() {
   const { openWallet } = useWallet();
+  const { isConnected } = useAccount();
   const [, navigate] = useLocation();
   const cityRail = useLoopRail(2800);
 
@@ -166,7 +168,7 @@ export default function Properties() {
                     {city.code}
                   </span>
                   <span className="text-[8px] tracking-[0.25em] uppercase text-white/55" style={NEVERA}>
-                    {city.properties.length} · listings
+                    {assetCountByCity(city.id)} · assets
                   </span>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3">
@@ -202,7 +204,14 @@ export default function Properties() {
               index={i}
               meta={row.meta}
               assets={row.assets}
-              onAcquire={openWallet}
+              onAcquire={(asset) => {
+                if (!isConnected) {
+                  openWallet();
+                  return;
+                }
+                navigate(`/asset/${asset.id}?intent=buy`);
+              }}
+              onOpen={(asset) => navigate(`/asset/${asset.id}`)}
               onViewAll={() => navigate("/marketplace")}
             />
           ))}
@@ -393,12 +402,13 @@ function useLoopRail(autoMs: number) {
 
 /* ─────────────────────── Showcase row ─────────────────────── */
 function AssetRow({
-  index, meta, assets, onAcquire, onViewAll,
+  index, meta, assets, onAcquire, onOpen, onViewAll,
 }: {
   index: number;
   meta: CategoryMeta;
   assets: Asset[];
-  onAcquire: () => void;
+  onAcquire: (asset: Asset) => void;
+  onOpen: (asset: Asset) => void;
   onViewAll: () => void;
 }) {
   const { railRef, scrollByDir, pauseHandlers } = useLoopRail(3200 + index * 500);
@@ -481,7 +491,8 @@ function AssetRow({
                 card={a}
                 accent={accent}
                 rentalNoun={meta.rentalNoun}
-                onAcquire={onAcquire}
+                onAcquire={() => onAcquire(a)}
+                onOpen={() => onOpen(a)}
                 interactive={copy === 1}
               />
             </div>
@@ -494,12 +505,13 @@ function AssetRow({
 
 /* ─────────────────────── Asset card ─────────────────────── */
 function AssetCard({
-  card, accent, rentalNoun, onAcquire, interactive = true,
+  card, accent, rentalNoun, onAcquire, onOpen, interactive = true,
 }: {
   card: Asset;
   accent: string;
   rentalNoun: string;
   onAcquire: () => void;
+  onOpen: () => void;
   interactive?: boolean;
 }) {
   return (
@@ -517,6 +529,12 @@ function AssetCard({
         style={{ boxShadow: `inset 0 0 0 1px ${accent}59, 0 0 60px -10px ${accent}4d` }}
       />
 
+      <button
+        type="button"
+        onClick={onOpen}
+        tabIndex={interactive ? undefined : -1}
+        className="block w-full text-left"
+      >
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
           src={card.image}
@@ -555,6 +573,7 @@ function AssetCard({
           )}
         </div>
       </div>
+      </button>
 
       <div className="relative p-4 space-y-3">
         <div>
@@ -594,6 +613,7 @@ function AssetCard({
         </FitTextGroup>
 
         <button
+          type="button"
           onClick={onAcquire}
           tabIndex={interactive ? undefined : -1}
           className="btn-metal w-full py-2.5 rounded-sm text-[10px] font-bold tracking-[0.28em] uppercase"

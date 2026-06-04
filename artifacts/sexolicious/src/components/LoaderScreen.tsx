@@ -8,8 +8,8 @@ export default function LoaderScreen({ onComplete }: { onComplete: () => void })
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase("hold"), 200);
-    const t2 = setTimeout(() => setPhase("out"),  3100);
-    const t3 = setTimeout(onComplete,              3750);
+    const t2 = setTimeout(() => setPhase("out"),  3900);
+    const t3 = setTimeout(onComplete,              4700);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [onComplete]);
 
@@ -44,9 +44,18 @@ export default function LoaderScreen({ onComplete }: { onComplete: () => void })
           <motion.img
             src="/opas-logo.png"
             alt="Opas"
+            loading="eager"
+            decoding="sync"
             className="w-full h-full object-contain drop-shadow-[0_0_30px_rgba(234,141,14,0.7)]"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+            animate={{
+              scale: [1, 1.045, 1],
+              filter: [
+                "drop-shadow(0 0 22px rgba(234,141,14,0.52))",
+                "drop-shadow(0 0 34px rgba(234,141,14,0.82))",
+                "drop-shadow(0 0 22px rgba(234,141,14,0.52))",
+              ],
+            }}
+            transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
           />
         </motion.div>
 
@@ -93,10 +102,23 @@ export default function LoaderScreen({ onComplete }: { onComplete: () => void })
             <motion.span
               key={i}
               initial={{ y: -50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1.75 + i * 0.03, ease: [0.16, 1, 0.3, 1] }}
-              className="text-xl md:text-2xl leading-none text-white/50 tracking-[0.45em] uppercase"
-              style={{ fontFamily: "BankGothic, sans-serif", fontWeight: 300 }}
+              animate={{
+                y: 0,
+                opacity: 1,
+                backgroundPosition: ["140% 50%", "-40% 50%", "-40% 50%"],
+              }}
+              transition={{
+                y: { duration: 0.5, delay: 1.75 + i * 0.03, ease: [0.16, 1, 0.3, 1] },
+                opacity: { duration: 0.5, delay: 1.75 + i * 0.03, ease: [0.16, 1, 0.3, 1] },
+                backgroundPosition: { duration: 1.15, delay: 2.1, ease: "easeInOut", repeat: Infinity, repeatDelay: 1.9 },
+              }}
+              className="text-xl md:text-2xl leading-none tracking-[0.45em] uppercase text-transparent bg-clip-text [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
+              style={{
+                fontFamily: "BankGothic, sans-serif",
+                fontWeight: 300,
+                backgroundImage: "linear-gradient(100deg, rgba(255,255,255,0.36) 18%, rgba(255,255,255,0.42) 34%, rgba(255,246,222,0.98) 50%, rgba(255,255,255,0.42) 66%, rgba(255,255,255,0.36) 82%)",
+                backgroundSize: "220% 100%",
+              }}
             >
               {letter}
             </motion.span>
@@ -107,7 +129,7 @@ export default function LoaderScreen({ onComplete }: { onComplete: () => void })
         <motion.div
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
-          transition={{ duration: 0.4, delay: 2.25, ease: "easeInOut" }}
+          transition={{ duration: 0.4, delay: 2.55, ease: "easeInOut" }}
           className="relative z-10 w-40 h-px bg-primary/25 origin-center mt-5"
         />
 
@@ -116,7 +138,7 @@ export default function LoaderScreen({ onComplete }: { onComplete: () => void })
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ duration: 0.7, delay: 2.3, ease: "linear" }}
+            transition={{ duration: 1, delay: 2.6, ease: "linear" }}
             className="w-full h-full bg-primary origin-left"
           />
         </div>
@@ -125,7 +147,7 @@ export default function LoaderScreen({ onComplete }: { onComplete: () => void })
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 2.5 }}
+          transition={{ duration: 0.5, delay: 2.85 }}
           className="relative z-10 mt-3 text-[9px] text-white/20 tracking-[0.35em] uppercase"
           style={{ fontFamily: "Xirod, monospace" }}
         >

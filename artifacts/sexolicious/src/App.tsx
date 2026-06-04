@@ -42,7 +42,7 @@ function Shell() {
     <>
       <ScrollToTop />
       {!immersive && <Navbar />}
-      <main className="flex-1">
+      <main className="flex-1 w-full min-w-0 max-w-full overflow-x-hidden">
         <Router />
       </main>
       {!immersive && <Footer />}
@@ -79,7 +79,7 @@ function App() {
       <TooltipProvider>
         <WalletProvider>
           <>
-            <div style={{ visibility: loaded ? 'visible' : 'hidden', opacity: loaded ? 1 : 0, transition: 'opacity 0.3s' }} className="dark min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/30 selection:text-primary-foreground">
+            <div style={{ visibility: loaded ? 'visible' : 'hidden', opacity: loaded ? 1 : 0, transition: 'opacity 0.3s' }} className="dark min-h-screen w-full max-w-full overflow-x-hidden bg-background text-foreground flex flex-col selection:bg-primary/30 selection:text-primary-foreground">
               <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
                 <Shell />
               </WouterRouter>

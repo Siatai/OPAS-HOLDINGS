@@ -92,6 +92,7 @@ export default function FitText({
 
   useEffect(() => {
     let raf = 0;
+    let mounted = true;
 
     const measure = () => {
       const c = containerRef.current;
@@ -122,10 +123,24 @@ export default function FitText({
 
     const timers = [120, 400, 1000].map((d) => window.setTimeout(measure, d));
 
+    const fontsApi = typeof document !== "undefined" ? document.fonts : undefined;
+    const onFontsDone = () => {
+      if (mounted) schedule();
+    };
+
+    if (fontsApi) {
+      fontsApi.ready.then(() => {
+        if (mounted) schedule();
+      });
+      fontsApi.addEventListener?.("loadingdone", onFontsDone);
+    }
+
     return () => {
+      mounted = false;
       cancelAnimationFrame(raf);
       ro.disconnect();
       timers.forEach((t) => window.clearTimeout(t));
+      fontsApi?.removeEventListener?.("loadingdone", onFontsDone);
       if (grouped) groupRef.current!.release(id);
     };
   }, [min, grouped, id]);
@@ -135,7 +150,7 @@ export default function FitText({
   return (
     <span
       ref={containerRef}
-      className={`flex items-center overflow-hidden ${align === "center" ? "justify-center" : "justify-start"} ${className ?? ""}`}
+      className={`flex w-full max-w-full min-w-0 items-center overflow-hidden ${align === "center" ? "justify-center" : "justify-start"} ${className ?? ""}`}
       style={style}
       title={title}
     >

@@ -19,12 +19,12 @@ import propLoftWarm from "@/assets/images/properties/lux_loft_warm.jpg";
 import propMansion from "@/assets/images/properties/lux_mansion_night.jpg";
 import propRooftop from "@/assets/images/properties/lux_rooftop_pool.jpg";
 
-const POOL = [
+export const PROPERTY_IMAGE_POOL = [
   propPenthouse, propVillaPool, propSkyscraper, propBeachfront, propTownhouse,
   propLivingGold, propSuiteMarble, propLoftWarm, propMansion, propRooftop,
 ];
 const pic = (cityIdx: number, propIdx: number): string =>
-  POOL[(cityIdx * 7 + propIdx) % POOL.length];
+  PROPERTY_IMAGE_POOL[(cityIdx * 7 + propIdx) % PROPERTY_IMAGE_POOL.length];
 
 export type Property = {
   id: string;
@@ -37,6 +37,7 @@ export type Property = {
   totalRoi: string;
   tier: string;
   image: string;
+  gallery?: string[];
   address?: string;
   location?: string;
   area?: string;
@@ -128,6 +129,7 @@ const buildProps = (cityId: string, cityName: string, country: string, cityIdx: 
     return {
       ...r,
       image: pic(cityIdx, i),
+      gallery: Array.from({ length: 4 }, (_, offset) => pic(cityIdx, i + offset)),
       location: `${district}, ${cityName}`,
       address: `${88 + i * 7} ${road}, ${district}, ${cityName}, ${country}`,
       area,

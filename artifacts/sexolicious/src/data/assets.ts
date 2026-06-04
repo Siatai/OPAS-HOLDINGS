@@ -20,7 +20,8 @@ export type AssetCategory = "real-estate" | "supercars" | "yachts" | "jets";
 // consumer (lookupProperty, portfolioStats, cards) keeps working unchanged.
 export type Asset = Property & {
   category: AssetCategory;
-  cityId?: string; // only set for real-estate (drives /city/:id route)
+  cityId?: string; // canonical city for real-estate inventory
+  marketCityId?: string; // city collection this asset appears under
   subtitle: string; // location / marque / builder line under the title
   spec?: string; // short headline spec (engine, length, range)
 };
@@ -83,6 +84,8 @@ export const getCategory = (id: AssetCategory): CategoryMeta =>
   CATEGORIES.find((c) => c.id === id)!;
 
 const cycle = <T,>(pool: T[], i: number) => pool[i % pool.length];
+const galleryFromPool = <T,>(pool: T[], start: number, count = 4): T[] =>
+  Array.from({ length: count }, (_, offset) => cycle(pool, start + offset));
 
 function carProfile(title: string, idx: number) {
   const vaults = [
@@ -160,6 +163,7 @@ const realEstate: Asset[] = CITIES.flatMap((c) =>
     ...p,
     category: "real-estate" as const,
     cityId: c.id,
+    marketCityId: c.id,
     subtitle: `${c.name}, ${c.country}`,
   })),
 );
@@ -168,6 +172,7 @@ const realEstate: Asset[] = CITIES.flatMap((c) =>
 const CAR_POOL = [carHyper, carFerrari, carLambo, carRolls];
 type RawAsset = Omit<Asset, "image" | "category" | "subtitle"> & { subtitle: string };
 
+const CAR_CITY_ROTATION = ["dubai", "london", "miami", "singapore", "tokyo", "paris"] as const;
 const cars: Asset[] = (
   [
     { id: "car-1", title: "Bugatti Chiron Profilée", token: "OPA-CAR-01", price: 95,  available: 14, rentalYield: "11.2%", capitalGrowth: "+18.5%", totalRoi: "~29.7%", tier: "Hyper",     subtitle: "Molsheim · 1 of 1", spec: "1500 hp · W16" },
@@ -177,10 +182,18 @@ const cars: Asset[] = (
     { id: "car-5", title: "Rolls-Royce Spectre",      token: "OPA-CAR-05", price: 85,  available: 18, rentalYield: "8.6%",  capitalGrowth: "+6.4%",  totalRoi: "~15.0%", tier: "Grand",     subtitle: "Goodwood · Coachbuilt", spec: "577 hp · Electric" },
     { id: "car-6", title: "Koenigsegg Jesko",         token: "OPA-CAR-06", price: 135, available: 3,  rentalYield: "10.1%", capitalGrowth: "+19.6%", totalRoi: "~29.7%", tier: "Hyper",     subtitle: "Ängelholm · 1 of 125", spec: "1600 hp · V8" },
   ] as RawAsset[]
-).map((r, i) => ({ ...r, ...carProfile(r.title, i), category: "supercars" as const, image: cycle(CAR_POOL, i) }));
+).map((r, i) => ({
+  ...r,
+  ...carProfile(r.title, i),
+  category: "supercars" as const,
+  marketCityId: CAR_CITY_ROTATION[i % CAR_CITY_ROTATION.length],
+  image: cycle(CAR_POOL, i),
+  gallery: galleryFromPool(CAR_POOL, i),
+}));
 
 // ── Yachts ──────────────────────────────────────────────────────────────
 const YACHT_POOL = [yachtSuper, yachtRiva, yachtMarina, yachtMega];
+const YACHT_CITY_ROTATION = ["miami", "dubai", "singapore", "london", "hongkong"] as const;
 const yachts: Asset[] = (
   [
     { id: "yacht-1", title: "Benetti Oasis 40M",    token: "OPA-YHT-01", price: 240, available: 9,  rentalYield: "9.4%",  capitalGrowth: "+3.8%", totalRoi: "~13.2%", tier: "Superyacht", subtitle: "Livorno · Tri-deck", spec: "40m · 10 guests" },
@@ -189,10 +202,18 @@ const yachts: Asset[] = (
     { id: "yacht-4", title: "Feadship Symphony",    token: "OPA-YHT-04", price: 360, available: 3,  rentalYield: "8.2%",  capitalGrowth: "+4.4%", totalRoi: "~12.6%", tier: "Mega",       subtitle: "Aalsmeer · Custom", spec: "101m · 16 guests" },
     { id: "yacht-5", title: "Azimut Grande 35M",    token: "OPA-YHT-05", price: 210, available: 7,  rentalYield: "9.0%",  capitalGrowth: "+3.2%", totalRoi: "~12.2%", tier: "Superyacht", subtitle: "Viareggio · Tri-deck", spec: "35m · 12 guests" },
   ] as RawAsset[]
-).map((r, i) => ({ ...r, ...yachtProfile(r.title, i), category: "yachts" as const, image: cycle(YACHT_POOL, i) }));
+).map((r, i) => ({
+  ...r,
+  ...yachtProfile(r.title, i),
+  category: "yachts" as const,
+  marketCityId: YACHT_CITY_ROTATION[i % YACHT_CITY_ROTATION.length],
+  image: cycle(YACHT_POOL, i),
+  gallery: galleryFromPool(YACHT_POOL, i),
+}));
 
 // ── Private jets ──────────────────────────────────────────────────────────
 const JET_POOL = [jetGulfstream, jetSky, jetHangar, jetCabin];
+const JET_CITY_ROTATION = ["london", "dubai", "paris", "newyork", "tokyo"] as const;
 const jets: Asset[] = (
   [
     { id: "jet-1", title: "Gulfstream G700",            token: "OPA-JET-01", price: 320, available: 8,  rentalYield: "8.8%",  capitalGrowth: "+2.4%", totalRoi: "~11.2%", tier: "Ultra-long", subtitle: "Savannah · Flagship", spec: "7500 nm · 19 pax" },
@@ -201,16 +222,29 @@ const jets: Asset[] = (
     { id: "jet-4", title: "Embraer Praetor 600",        token: "OPA-JET-04", price: 160, available: 24, rentalYield: "10.4%", capitalGrowth: "+1.6%", totalRoi: "~12.0%", tier: "Super-mid",  subtitle: "São José · Super-mid", spec: "4018 nm · 12 pax" },
     { id: "jet-5", title: "Cessna Citation Longitude",  token: "OPA-JET-05", price: 140, available: 19, rentalYield: "10.8%", capitalGrowth: "+1.4%", totalRoi: "~12.2%", tier: "Super-mid",  subtitle: "Wichita · Super-mid", spec: "3500 nm · 12 pax" },
   ] as RawAsset[]
-).map((r, i) => ({ ...r, ...jetProfile(r.title, i), category: "jets" as const, image: cycle(JET_POOL, i) }));
+).map((r, i) => ({
+  ...r,
+  ...jetProfile(r.title, i),
+  category: "jets" as const,
+  marketCityId: JET_CITY_ROTATION[i % JET_CITY_ROTATION.length],
+  image: cycle(JET_POOL, i),
+  gallery: galleryFromPool(JET_POOL, i),
+}));
 
 // ── Unified catalog ───────────────────────────────────────────────────────
 export const ASSETS: Asset[] = [...realEstate, ...cars, ...yachts, ...jets];
 
 export const ASSET_INDEX = new Map<string, { city: string; prop: Asset }>();
-ASSETS.forEach((a) => ASSET_INDEX.set(a.id, { city: a.cityId ?? "", prop: a }));
+ASSETS.forEach((a) => ASSET_INDEX.set(a.id, { city: a.marketCityId ?? a.cityId ?? "", prop: a }));
 
 export const assetsByCategory = (cat: AssetCategory): Asset[] =>
   ASSETS.filter((a) => a.category === cat);
 
 export const categoryOf = (id: string): AssetCategory | undefined =>
   ASSET_INDEX.get(id)?.prop.category;
+
+export const assetsByCity = (cityId: string): Asset[] =>
+  ASSETS.filter((a) => (a.marketCityId ?? a.cityId) === cityId);
+
+export const assetCountByCity = (cityId: string): number =>
+  assetsByCity(cityId).length;

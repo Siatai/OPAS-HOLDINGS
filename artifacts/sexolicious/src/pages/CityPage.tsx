@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
+import { useAccount } from "wagmi";
 import { useRoute, useLocation, Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowLeft, TrendingUp, MapPin, Coins } from "lucide-react";
-import { getCityById, type Property } from "@/data/cities";
+import { ArrowLeft, Building2, Car, Coins, MapPin, Plane, Ship, TrendingUp } from "lucide-react";
+import { getCityById } from "@/data/cities";
+import { assetsByCity, getCategory, type Asset, type AssetCategory } from "@/data/assets";
 import { useWallet } from "@/components/WalletContext";
 import MarqueeText from "@/components/MarqueeText";
 import FitText, { FitTextGroup } from "@/components/FitText";
@@ -10,12 +12,24 @@ import FitText, { FitTextGroup } from "@/components/FitText";
 const SHARKON = { fontFamily: "Sharkon, Nevera, sans-serif" };
 const NEVERA  = { fontFamily: "Nevera, Inter, sans-serif" };
 const SERIF   = { fontFamily: "Cormorant Garamond, serif", fontStyle: "italic" as const };
+const ICONS: Record<AssetCategory, React.ComponentType<{ className?: string }>> = {
+  "real-estate": Building2,
+  supercars: Car,
+  yachts: Ship,
+  jets: Plane,
+};
 
 export default function CityPage() {
   const [, params] = useRoute<{ cityId: string }>("/city/:cityId");
   const [, navigate] = useLocation();
   const { openWallet } = useWallet();
+  const { isConnected } = useAccount();
   const city = params?.cityId ? getCityById(params.cityId) : undefined;
+  const cityAssets = city ? assetsByCity(city.id) : [];
+  const cityStats = cityAssets.reduce<Record<AssetCategory, number>>((acc, asset) => {
+    acc[asset.category] += 1;
+    return acc;
+  }, { "real-estate": 0, supercars: 0, yachts: 0, jets: 0 });
 
   useEffect(() => { window.scrollTo(0, 0); }, [params?.cityId]);
 
@@ -113,7 +127,7 @@ export default function CityPage() {
               className="text-white/70 text-lg sm:text-xl md:text-2xl max-w-2xl"
               style={SERIF}
             >
-              {city.properties.length} curated assets · avg yield {city.avgYield} · sourced from {city.source}
+              {cityAssets.length} curated assets · avg yield {city.avgYield} · sourced from {city.source}
             </motion.p>
 
             {/* Stat strip */}
@@ -136,7 +150,7 @@ export default function CityPage() {
               >
                 <MapPin className="w-3.5 h-3.5 text-primary" />
                 <span className="text-xs tracking-[0.28em] uppercase text-white/85" style={NEVERA}>
-                  {city.properties.length} listings
+                  {cityAssets.length} assets
                 </span>
               </div>
             </motion.div>
@@ -160,11 +174,46 @@ export default function CityPage() {
                 <span className="metallic-warm-text">portfolio</span>
               </h2>
             </div>
+            <div className="flex flex-wrap gap-2">
+              {(["real-estate", "supercars", "yachts", "jets"] as AssetCategory[]).map((category) => {
+                const meta = getCategory(category);
+                const Icon = ICONS[category];
+                const count = cityStats[category];
+                if (!count) return null;
+                return (
+                  <div
+                    key={category}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-md"
+                    style={{ background: "rgba(10,16,32,0.45)", border: `1px solid ${meta.accent}3d` }}
+                  >
+                    <span style={{ color: meta.accent }}>
+                      <Icon className="w-3.5 h-3.5" />
+                    </span>
+                    <span className="text-[10px] tracking-[0.24em] uppercase text-white/80" style={NEVERA}>
+                      {meta.label} · {count}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-7">
-            {city.properties.map((p, i) => (
-              <PropertyCard key={p.id} property={p} propImage={p.image} cityName={city.name} index={i} onAcquire={openWallet} />
+            {cityAssets.map((asset, i) => (
+              <PropertyCard
+                key={asset.id}
+                asset={asset}
+                cityName={city.name}
+                index={i}
+                onOpen={() => navigate(`/asset/${asset.id}`)}
+                onAcquire={() => {
+                  if (!isConnected) {
+                    openWallet();
+                    return;
+                  }
+                  navigate(`/asset/${asset.id}?intent=buy`);
+                }}
+              />
             ))}
           </div>
 
@@ -190,18 +239,20 @@ export default function CityPage() {
 }
 
 function PropertyCard({
-  property: p,
-  propImage,
+  asset: p,
   cityName,
   index,
+  onOpen,
   onAcquire,
 }: {
-  property: Property;
-  propImage: string;
+  asset: Asset;
   cityName: string;
   index: number;
+  onOpen: () => void;
   onAcquire: () => void;
 }) {
+  const meta = getCategory(p.category);
+  const Icon = ICONS[p.category];
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -216,10 +267,11 @@ function PropertyCard({
         boxShadow: "0 18px 50px -25px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05)",
       }}
     >
+      <button type="button" onClick={onOpen} className="block w-full text-left">
       {/* Image area */}
       <div className="relative aspect-[16/10] overflow-hidden">
         <img
-          src={propImage}
+          src={p.image}
           alt={p.title}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-110"
           style={{ filter: "saturate(1) brightness(0.85)" }}
@@ -232,12 +284,15 @@ function PropertyCard({
             className="text-[10px] tracking-[0.28em] uppercase px-2 py-1 rounded backdrop-blur-sm"
             style={{
               ...NEVERA,
-              background: "rgba(234,141,14,0.18)",
-              color: "#f5d98e",
-              border: "1px solid rgba(234,141,14,0.35)",
+              background: `${meta.accent}22`,
+              color: meta.accent,
+              border: `1px solid ${meta.accent}59`,
             }}
           >
-            {p.tier}
+            <span className="inline-flex items-center gap-1.5">
+              <Icon className="w-3 h-3" />
+              {meta.singular}
+            </span>
           </span>
         </div>
 
@@ -254,7 +309,7 @@ function PropertyCard({
         {/* Title overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="text-[10px] tracking-[0.32em] uppercase text-primary/80 mb-1" style={NEVERA}>
-            {cityName}
+            {cityName} · {p.tier}
           </div>
           <h3 className="text-lg sm:text-xl md:text-2xl leading-tight tracking-wide" style={SHARKON}>
             <MarqueeText title={p.title}>
@@ -263,6 +318,7 @@ function PropertyCard({
           </h3>
         </div>
       </div>
+      </button>
 
       {/* Stats body */}
       <div className="p-4 sm:p-5">
@@ -276,17 +332,26 @@ function PropertyCard({
 
         <div className="flex items-center justify-between text-[11px] tracking-[0.22em] uppercase text-white/55 mb-4" style={NEVERA}>
           <span>From <span className="text-white/85">${p.price}</span></span>
-          <span>{p.available} units left</span>
+          <span>{p.available} shares live</span>
         </div>
 
-        <button
-          onClick={onAcquire}
-          className="btn-metal w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-md text-xs sm:text-sm font-bold tracking-[0.3em] uppercase text-[#100b03]"
-          style={NEVERA}
-        >
-          <Coins className="w-3.5 h-3.5" />
-          Acquire equity
-        </button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button
+            onClick={onOpen}
+            className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-md text-xs sm:text-sm tracking-[0.24em] uppercase text-white/78 border border-white/10 hover:border-white/25"
+            style={NEVERA}
+          >
+            View catalogue
+          </button>
+          <button
+            onClick={onAcquire}
+            className="btn-metal w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-md text-xs sm:text-sm font-bold tracking-[0.3em] uppercase text-[#100b03]"
+            style={NEVERA}
+          >
+            <Coins className="w-3.5 h-3.5" />
+            Acquire interest
+          </button>
+        </div>
       </div>
     </motion.div>
   );

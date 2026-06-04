@@ -229,7 +229,15 @@ html {
   -moz-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
-html, body { overflow-x: hidden; max-width: 100vw; }
+html, body, #root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+}
 
 /* ── Utility helpers ────────────────────────────────── */
 .font-hero    { font-family: var(--app-font-hero)    !important; }
