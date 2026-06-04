@@ -1,3 +1,9 @@
 {
-  "outputDirectory": "artifacts/sexolicious/dist/public"
+  "outputDirectory": "artifacts/sexolicious/dist/public",
+  "rewrites": [
+    {
+      "source": "/((?!assets/|.*\\.[^/]+$).*)",
+      "destination": "/index.html"
+    }
+  ]
 }
