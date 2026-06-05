@@ -22,7 +22,7 @@ import {
 import { Link } from "wouter";
 import { useAccount, useChainId, useConnect, useDisconnect } from "wagmi";
 import { simulateIncomingSwap, getHoldings } from "@/lib/portfolio";
-import connectWalletVisual from "@/assets/images/connect-wallet-visual-v1.png";
+import connectWalletVisual from "@/assets/images/hero/opas-asset-orbit-v1.png";
 
 interface WalletContextType {
   isOpen: boolean;
@@ -131,8 +131,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                   <img
                     src={connectWalletVisual}
                     alt=""
-                    className="absolute inset-0 h-full w-full object-cover object-center"
-                    style={{ filter: "saturate(1.02) contrast(1.04)" }}
+                    className="absolute inset-0 h-full w-full object-cover object-[48%_50%]"
+                    style={{ filter: "saturate(0.98) contrast(1.04) brightness(0.88)" }}
                   />
                   <div
                     className="absolute inset-0"

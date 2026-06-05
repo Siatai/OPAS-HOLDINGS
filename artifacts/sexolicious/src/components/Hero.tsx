@@ -5,7 +5,7 @@ import { useWallet } from "./WalletContext";
 import FitText, { FitTextGroup } from "./FitText";
 import { useOpasPrice, fmtOpasRate } from "@/lib/opasPrice";
 import { useMinWidth } from "@/hooks/use-mobile";
-import heroTokenizationBg from "@/assets/images/hero/opas-world-map-premium-v2.png";
+import heroTokenizationBg from "@/assets/images/hero/opas-asset-orbit-v1.png";
 import propPenthouseSkyline from "@/assets/images/properties/lux_penthouse_skyline.jpg";
 import jetCabin from "@/assets/images/assets/jet_cabin.png";
 import carLambo from "@/assets/images/assets/car_lambo.png";
@@ -51,8 +51,8 @@ export default function Hero() {
           src={heroTokenizationBg}
           alt=""
           draggable={false}
-          className="h-full w-full scale-[1.1] object-cover object-[58%_46%]"
-          style={{ filter: "brightness(0.88) saturate(0.98) contrast(1.08)" }}
+          className="h-full w-full scale-[1.05] object-cover object-[50%_50%] md:scale-[1.08] md:object-[50%_52%]"
+          style={{ filter: "brightness(0.76) saturate(0.96) contrast(1.08)" }}
         />
         <div
           aria-hidden
