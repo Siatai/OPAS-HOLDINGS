@@ -62,10 +62,11 @@ export default function FAQ() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          className="premium-shell p-4 sm:p-5 md:p-6"
         >
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`} className="border-white/10 mb-4 bg-[#0a0a0a] px-4 sm:px-6 rounded-lg data-[state=open]:border-primary/30 transition-colors">
+              <AccordionItem key={index} value={`item-${index}`} className="premium-flex-card border-white/10 mb-4 px-4 sm:px-6 rounded-[1.1rem] data-[state=open]:border-primary/30 transition-colors">
                 <AccordionTrigger className="text-white hover:text-primary hover:no-underline font-serif text-base sm:text-lg py-5 sm:py-6 text-left">
                   {faq.question}
                 </AccordionTrigger>

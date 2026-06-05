@@ -52,7 +52,8 @@ export default function Stats() {
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent shadow-[0_0_10px_rgba(232,137,12,0.5)]" />
       
       <div className="container mx-auto px-4 sm:px-6 md:px-12 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 md:gap-8 md:divide-x md:divide-white/5">
+        <div className="premium-shell p-6 sm:p-8 md:p-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -62,9 +63,9 @@ export default function Stats() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="flex flex-col items-center text-center px-2 sm:px-4"
+                className="premium-flex-card items-center text-center px-4 py-6 sm:px-6 sm:py-8"
               >
-                <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-full bg-white/5 border border-white/10">
+                <div className="premium-icon-chip mb-2 sm:mb-3">
                   <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
                 </div>
                 <div
@@ -82,6 +83,7 @@ export default function Stats() {
               </motion.div>
             )
           })}
+        </div>
         </div>
       </div>
     </section>

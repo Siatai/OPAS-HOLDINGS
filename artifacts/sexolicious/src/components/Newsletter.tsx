@@ -21,7 +21,7 @@ export default function Newsletter() {
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="max-w-4xl mx-auto bg-card border border-white/10 rounded-lg p-6 sm:p-10 md:p-16 text-center relative overflow-hidden"
+          className="premium-shell max-w-4xl mx-auto p-6 sm:p-10 md:p-16 text-center relative overflow-hidden"
         >
           {/* Tech decoration */}
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-secondary via-primary to-secondary" />
@@ -55,7 +55,7 @@ export default function Newsletter() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter email address..."
                 required
-                className="flex-1 bg-black border border-white/20 rounded px-6 py-4 text-white placeholder:text-white/30 font-mono text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                className="flex-1 rounded-xl border border-white/20 bg-[rgba(6,8,14,0.88)] px-6 py-4 text-white placeholder:text-white/30 font-mono text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
               />
               <button
                 type="submit"

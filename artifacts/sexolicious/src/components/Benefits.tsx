@@ -68,7 +68,8 @@ export default function Benefits() {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="premium-grid-frame p-5 sm:p-7 md:p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
           {benefits.map((benefit, index) => {
             const Icon = benefit.icon;
             return (
@@ -78,13 +79,13 @@ export default function Benefits() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 * index }}
-                className="bg-card border border-white/5 p-5 sm:p-8 rounded-lg relative overflow-hidden group hover:bg-white/[0.02] transition-colors"
+                className="premium-flex-card p-5 sm:p-7 relative overflow-hidden group hover:bg-white/[0.02] transition-colors"
               >
                 {/* Glowing left border */}
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity shadow-[0_0_15px_rgba(232,137,12,0.8)]" />
                 
                 <div className="flex items-start gap-4 sm:gap-6">
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                  <div className="premium-icon-chip shrink-0">
                     <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                   </div>
                   <div className="min-w-0">
@@ -95,6 +96,7 @@ export default function Benefits() {
               </motion.div>
             );
           })}
+        </div>
         </div>
       </div>
     </section>

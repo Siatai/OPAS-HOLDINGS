@@ -5,9 +5,8 @@ import { useWallet } from "./WalletContext";
 import FitText, { FitTextGroup } from "./FitText";
 import { useOpasPrice, fmtOpasRate } from "@/lib/opasPrice";
 import { useMinWidth } from "@/hooks/use-mobile";
-import worldSkyline from "@/assets/images/world_skyline.png";
+import heroTokenizationBg from "@/assets/images/hero/opas-world-map-premium-v2.png";
 import propPenthouseSkyline from "@/assets/images/properties/lux_penthouse_skyline.jpg";
-import yachtRiva from "@/assets/images/assets/yacht_riva.png";
 import jetCabin from "@/assets/images/assets/jet_cabin.png";
 import carLambo from "@/assets/images/assets/car_lambo.png";
 
@@ -47,6 +46,49 @@ export default function Hero() {
 
   return (
     <section ref={sectionRef} className="relative min-h-screen w-full overflow-hidden bg-background flex flex-col">
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <img
+          src={heroTokenizationBg}
+          alt=""
+          draggable={false}
+          className="h-full w-full scale-[1.1] object-cover object-[58%_46%]"
+          style={{ filter: "brightness(0.88) saturate(0.98) contrast(1.08)" }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-x-[-10%] top-[12%] h-[78%] opacity-35 mix-blend-screen"
+          style={{
+            background:
+              "linear-gradient(105deg, transparent 8%, rgba(255,236,192,0.05) 20%, rgba(255,214,132,0.22) 36%, rgba(255,241,213,0.08) 50%, transparent 62%)",
+            maskImage: "radial-gradient(ellipse 74% 68% at 62% 48%, black 18%, transparent 82%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 origin-top-right"
+          style={{
+            background:
+              "radial-gradient(ellipse 34% 24% at 72% 24%, rgba(255,224,156,0.16), transparent 72%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(5,10,22,0.95) 0%, rgba(6,12,24,0.84) 24%, rgba(6,12,24,0.48) 44%, rgba(6,12,24,0.24) 72%, rgba(6,12,24,0.34) 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(4,8,18,0.92) 0%, rgba(5,10,20,0.32) 16%, rgba(5,9,18,0.06) 44%, rgba(4,8,16,0.54) 84%, rgba(4,8,16,0.86) 100%)",
+          }}
+        />
+        <div className="absolute inset-y-0 left-0 w-32 md:w-56 bg-gradient-to-r from-background via-background/55 to-transparent" />
+        <div className="absolute inset-y-0 right-0 w-20 md:w-32 bg-gradient-to-l from-background/45 to-transparent" />
+      </div>
+
       <div
         className="absolute inset-0 pointer-events-none z-0"
         style={{
@@ -57,24 +99,12 @@ export default function Hero() {
       <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_45%_60%_at_75%_45%,rgba(200,210,225,0.045)_0%,transparent_70%)]" />
       <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_45%_55%_at_22%_55%,rgba(234,141,14,0.04)_0%,transparent_70%)]" />
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[44%] z-0 overflow-hidden">
-        <div className="skyline-scroll flex h-full w-max items-end will-change-transform">
-          {Array.from({ length: 8 }, (_, i) => i).map((i) => (
-            <img
-              key={i}
-              src={worldSkyline}
-              alt=""
-              draggable={false}
-              className={`h-full w-auto object-cover object-bottom select-none ${i % 2 === 1 ? "-scale-x-100" : ""}`}
-              style={{ filter: "brightness(0.7) saturate(0.8) contrast(1.03)" }}
-            />
-          ))}
-        </div>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[38%] z-0 overflow-hidden">
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, hsl(222,47%,5%) 0%, rgba(8,12,24,0.55) 30%, rgba(8,12,24,0.12) 62%, transparent 100%)",
+              "linear-gradient(180deg, rgba(8,12,24,0.54) 0%, rgba(8,12,24,0.28) 28%, rgba(8,12,24,0.08) 62%, transparent 100%)",
           }}
         />
         <div className="absolute inset-y-0 left-0 w-24 md:w-44 bg-gradient-to-r from-background to-transparent" />

@@ -57,7 +57,8 @@ export default function Testimonials() {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="premium-grid-frame p-5 sm:p-7 md:p-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={index}
@@ -65,7 +66,7 @@ export default function Testimonials() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.2 }}
-              className="glass-panel p-6 sm:p-10 border border-white/5 hover:border-primary/30 transition-colors duration-500 relative group"
+              className="premium-flex-card p-6 sm:p-8 border-white/5 hover:border-primary/30 transition-colors duration-500 relative group"
             >
               <div className="absolute top-0 left-10 w-10 h-px bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
               
@@ -83,6 +84,7 @@ export default function Testimonials() {
               </div>
             </motion.div>
           ))}
+        </div>
         </div>
       </div>
     </section>

@@ -65,7 +65,8 @@ export default function HowItWorks() {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 relative">
+        <div className="premium-grid-frame p-6 sm:p-8 md:p-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6 relative">
           {/* Connecting line for desktop */}
           <div className="hidden lg:block absolute top-12 left-[10%] right-[10%] h-px bg-white/10 z-0 overflow-hidden">
             <motion.div 
@@ -84,9 +85,9 @@ export default function HowItWorks() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.8, delay: index * 0.2 }}
-                className="relative z-10 flex flex-col items-center text-center"
+                className="premium-flex-card relative z-10 items-center text-center p-6 sm:p-7"
               >
-                <div className="w-24 h-24 rounded-full bg-card border border-white/10 flex items-center justify-center mb-8 relative group hover:border-primary/50 transition-colors">
+                <div className="w-24 h-24 rounded-full bg-card border border-white/10 flex items-center justify-center mb-6 relative group hover:border-primary/50 transition-colors">
                   <div className="absolute inset-0 rounded-full bg-primary/5 scale-[1.15] opacity-0 group-hover:opacity-100 transition-all duration-500" />
                   <Icon className="w-8 h-8 text-primary relative z-10" />
                   <div
@@ -97,13 +98,14 @@ export default function HowItWorks() {
                 </div>
                 </div>
                 
-                <h3 className="text-xl font-sans font-bold text-white mb-4 mt-2">{step.title}</h3>
+                <h3 className="text-xl font-sans font-bold text-white mb-2 mt-1">{step.title}</h3>
                 <p className="text-white/50 text-sm leading-relaxed max-w-[250px]">
                   {step.description}
                 </p>
               </motion.div>
             );
           })}
+        </div>
         </div>
       </div>
     </section>
