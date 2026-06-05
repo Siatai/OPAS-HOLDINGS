@@ -22,7 +22,7 @@ import {
 import { Link } from "wouter";
 import { useAccount, useChainId, useConnect, useDisconnect } from "wagmi";
 import { simulateIncomingSwap, getHoldings } from "@/lib/portfolio";
-import worldSkyline from "@/assets/images/world_skyline.png";
+import connectWalletVisual from "@/assets/images/connect-wallet-visual-v1.png";
 
 interface WalletContextType {
   isOpen: boolean;
@@ -129,16 +129,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
               <div className="grid grid-cols-1 md:grid-cols-[1.05fr_1fr]">
                 <div className="relative h-[180px] overflow-hidden md:h-auto md:min-h-[480px]">
                   <img
-                    src={worldSkyline}
+                    src={connectWalletVisual}
                     alt=""
-                    className="absolute inset-0 h-full w-full object-cover object-bottom"
-                    style={{ filter: "saturate(1.05) contrast(1.05)" }}
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                    style={{ filter: "saturate(1.02) contrast(1.04)" }}
                   />
                   <div
                     className="absolute inset-0"
                     style={{
                       background:
-                        "linear-gradient(180deg, rgba(8,12,24,0.6) 0%, rgba(8,12,24,0.15) 35%, rgba(8,12,24,0.5) 80%, rgba(8,12,24,0.9) 100%)",
+                        "linear-gradient(180deg, rgba(8,12,24,0.42) 0%, rgba(8,12,24,0.08) 35%, rgba(8,12,24,0.38) 80%, rgba(8,12,24,0.84) 100%)",
                     }}
                   />
                   <div
@@ -148,65 +148,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                         "linear-gradient(90deg, transparent 0%, rgba(8,12,24,0.85) 100%)",
                     }}
                   />
-                  <div
-                    className="pointer-events-none absolute inset-x-0 bottom-[18%] h-32 opacity-60"
-                    style={{
-                      background:
-                        "radial-gradient(ellipse 60% 100% at 50% 100%, rgba(234,141,14,0.35), transparent 70%)",
-                    }}
-                  />
-
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[60%]"
-                  >
-                    <div className="relative">
-                      <motion.div
-                        className="absolute inset-0 rounded-full"
-                        style={{ border: "1px solid rgba(234,141,14,0.45)" }}
-                        animate={{ scale: [1, 1.55], opacity: [0.6, 0] }}
-                        transition={{ repeat: Infinity, duration: 2.6, ease: "easeOut" }}
-                      />
-                      <motion.div
-                        className="absolute inset-0 rounded-full"
-                        style={{ border: "1px solid rgba(11,181,190,0.4)" }}
-                        animate={{ scale: [1, 1.8], opacity: [0.5, 0] }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 3.2,
-                          ease: "easeOut",
-                          delay: 0.4,
-                        }}
-                      />
-                      <div
-                        className="relative flex h-[110px] w-[110px] items-center justify-center rounded-full"
-                        style={{
-                          background:
-                            "radial-gradient(circle at 30% 30%, rgba(234,141,14,0.55), rgba(234,141,14,0.08) 70%)",
-                          border: "1px solid rgba(234,141,14,0.55)",
-                          boxShadow:
-                            "inset 0 1px 0 rgba(255,255,255,0.2), 0 0 50px -5px rgba(234,141,14,0.55)",
-                        }}
-                      >
-                        <div className="text-center">
-                          <div
-                            className="text-[22px] tracking-[0.18em] text-white"
-                            style={{ fontFamily: "Sharkon, Nevera, sans-serif" }}
-                          >
-                            OPAS
-                          </div>
-                          <div
-                            className="mt-0.5 text-[7px] uppercase tracking-[0.4em] text-primary"
-                            style={NEVERA}
-                          >
-                            Vault · 001
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
 
                   <div className="absolute left-4 top-4 z-10 flex items-center gap-1.5">
                     <span
