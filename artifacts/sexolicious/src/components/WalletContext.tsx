@@ -22,7 +22,7 @@ import {
 import { Link } from "wouter";
 import { useAccount, useChainId, useConnect, useDisconnect } from "wagmi";
 import { simulateIncomingSwap, getHoldings } from "@/lib/portfolio";
-import connectWalletVisual from "@/assets/images/hero/opas-asset-orbit-v1.png";
+import connectWalletVisual from "@/assets/images/hero/opas-asset-orbit-v2.png";
 
 interface WalletContextType {
   isOpen: boolean;

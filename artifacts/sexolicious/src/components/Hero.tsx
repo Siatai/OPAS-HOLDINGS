@@ -5,7 +5,7 @@ import { useWallet } from "./WalletContext";
 import FitText, { FitTextGroup } from "./FitText";
 import { useOpasPrice, fmtOpasRate } from "@/lib/opasPrice";
 import { useMinWidth } from "@/hooks/use-mobile";
-import heroTokenizationBg from "@/assets/images/hero/opas-asset-orbit-v1.png";
+import heroTokenizationBg from "@/assets/images/hero/opas-asset-orbit-v2.png";
 import propPenthouseSkyline from "@/assets/images/properties/lux_penthouse_skyline.jpg";
 import jetCabin from "@/assets/images/assets/jet_cabin.png";
 import carLambo from "@/assets/images/assets/car_lambo.png";
