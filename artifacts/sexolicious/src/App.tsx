@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "@/password-gate.css";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
@@ -42,21 +43,33 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
   }
 
   return (
-    <main className="dark relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-5 text-foreground">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,hsl(var(--primary)/0.14),transparent_42%)]" />
-      <div className="relative w-full max-w-md rounded-xl border border-white/10 bg-card/90 p-7 shadow-2xl backdrop-blur-xl sm:p-10">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-5 flex size-12 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary">
-            <LockKeyhole className="size-5" aria-hidden="true" />
+    <main className="password-gate dark">
+      <div className="password-gate__glow" aria-hidden="true" />
+      <div className="password-gate__grid" aria-hidden="true" />
+
+      <section className="password-gate__panel" aria-labelledby="password-gate-title">
+        <span className="password-gate__corner password-gate__corner--tl" aria-hidden="true" />
+        <span className="password-gate__corner password-gate__corner--tr" aria-hidden="true" />
+        <span className="password-gate__corner password-gate__corner--bl" aria-hidden="true" />
+        <span className="password-gate__corner password-gate__corner--br" aria-hidden="true" />
+
+        <div className="mb-9 text-center sm:mb-10">
+          <div className="password-gate__lock">
+            <span className="password-gate__lock-inner">
+              <LockKeyhole className="size-6" aria-hidden="true" />
+            </span>
           </div>
-          <p className="mb-3 text-xs uppercase tracking-[0.35em] text-primary">Private access</p>
-          <h1 className="font-display text-3xl tracking-wide">OPAS Holdings</h1>
-          <p className="mt-3 text-sm text-muted-foreground">Enter the password to continue.</p>
+          <p className="password-gate__eyebrow">Private access</p>
+          <h1 id="password-gate-title" className="password-gate__wordmark">
+            <span>OPAS</span>
+            <span>Holdings</span>
+          </h1>
+          <p className="password-gate__subtitle">Enter the password to continue.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="site-password" className="mb-2 block text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <label htmlFor="site-password" className="password-gate__label">
               Password
             </label>
             <Input
@@ -72,19 +85,25 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
               required
               aria-invalid={error}
               aria-describedby={error ? "password-error" : undefined}
-              className="h-12 border-white/10 bg-black/20 px-4"
+              className="password-gate__input"
             />
             {error && (
-              <p id="password-error" role="alert" className="mt-2 text-sm text-destructive">
+              <p id="password-error" role="alert" className="password-gate__error">
                 Incorrect password. Please try again.
               </p>
             )}
           </div>
-          <Button type="submit" className="h-12 w-full uppercase tracking-[0.16em]">
-            Enter
+          <Button type="submit" className="password-gate__button">
+            <span>Enter</span>
           </Button>
         </form>
-      </div>
+
+        <div className="password-gate__footer" aria-hidden="true">
+          <span />
+          Secure access portal
+          <span />
+        </div>
+      </section>
     </main>
   );
 }
