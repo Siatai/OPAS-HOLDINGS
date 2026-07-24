@@ -67,7 +67,10 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
             <span>OPAS</span>
             <span>Holdings</span>
           </h1>
-          <p className="password-gate__subtitle">Enter the password to continue.</p>
+          <p className="password-gate__subtitle">
+            <span>Enter the password</span>
+            <span>to continue.</span>
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
