@@ -75,7 +75,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="password-gate__form">
           <div>
             <label htmlFor="site-password" className="password-gate__label">
               Password
