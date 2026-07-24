@@ -54,13 +54,15 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
         <span className="password-gate__corner password-gate__corner--br" aria-hidden="true" />
 
         <div className="password-gate__header">
-          <div className="password-gate__lock">
-            <span className="password-gate__lock-inner">
-              <LockKeyhole className="size-6" aria-hidden="true" />
-            </span>
-          </div>
-          <div className="password-gate__emblem" aria-hidden="true">
-            <img src="/opas-logo.png" alt="" />
+          <div className="password-gate__brand-mark" aria-hidden="true">
+            <div className="password-gate__lock">
+              <span className="password-gate__lock-inner">
+                <LockKeyhole className="size-6" />
+              </span>
+            </div>
+            <div className="password-gate__emblem">
+              <img src="/opas-logo.png" alt="" />
+            </div>
           </div>
           <p className="password-gate__eyebrow">Private access</p>
           <h1 id="password-gate-title" className="password-gate__wordmark">
