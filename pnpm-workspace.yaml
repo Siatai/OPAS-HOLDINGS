@@ -70,9 +70,13 @@ autoInstallPeers: false
 
 allowBuilds:
   '@swc/core': true
+  '@reown/appkit': false
+  bufferutil: false
   esbuild: true
+  keccak: false
   msw: true
   unrs-resolver: true
+  utf-8-validate: false
 
 overrides:
   # replit uses linux-x64 only, we can exclude all other platforms
